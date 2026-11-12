@@ -99,6 +99,34 @@ function ns.AddLogo(frame, title, size)
     return logo
 end
 
+-- A window in the style of BugSack's: Blizzard's portrait frame, with the logo in the round portrait at the top
+-- left. Where that template doesn't exist, the plain dialog frame with the logo beside the title instead.
+-- Its X just hides it: the templates' close goes through HideUIPanel, which is blocked in combat.
+function ns.CreateWindow(name, width, height, title)
+    local f
+    if PortraitFrameMixin then
+        f = CreateFrame("Frame", name, UIParent, "PortraitFrameTemplate")
+        if f.SetBorder then f:SetBorder("HeldBagLayout") end
+        if f.SetPortraitTextureSizeAndOffset then f:SetPortraitTextureSizeAndOffset(38, -5, 0) end
+        if f.SetPortraitTextureRaw then f:SetPortraitTextureRaw(ns.ICON) end
+        if f.SetTitle then f:SetTitle(title) end
+        f.portrait = true
+    else
+        f = CreateFrame("Frame", name, UIParent, "BasicFrameTemplateWithInset")
+        f.title = f:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+        f.title:SetPoint("TOP", 0, -5)
+        f.title:SetText(title)
+        f.logo = ns.AddLogo(f, f.title, 20)
+    end
+    f:SetSize(width, height)
+    local close = rawget(f, "CloseButton") or (name and _G[name .. "CloseButton"])
+    if type(close) == "table" then
+        if close.UnregisterAllEvents then close:UnregisterAllEvents() end
+        close:SetScript("OnClick", function() f:Hide() end)
+    end
+    return f
+end
+
 local function CopyEntry(e)
     local slots = {}
     for i, id in ipairs(e.slots) do slots[i] = id end

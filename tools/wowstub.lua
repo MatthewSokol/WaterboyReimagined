@@ -29,9 +29,18 @@ function CreateFrame(kind, name, parent, template)
   local f = stub(name or kind)
   frames[#frames + 1] = f
   if name then _G[name] = f end
-  if template == "BasicFrameTemplateWithInset" then rawset(f, "CloseButton", stub((name or kind) .. ".CloseButton")) end
+  if template == "BasicFrameTemplateWithInset" or template == "PortraitFrameTemplate" then
+    rawset(f, "CloseButton", stub((name or kind) .. ".CloseButton"))
+  end
+  if template == "PortraitFrameTemplate" then
+    -- remember what the portrait was set to, and the title, so tests can check them
+    rawset(f, "SetPortraitTextureRaw", function(self, tex) rawset(self, "__portrait", tex) end)
+    rawset(f, "SetTitle", function(self, text) rawset(self, "__title", text) end)
+  end
   return f
 end
+-- like modern clients (and Forever): the portrait frame template exists
+PortraitFrameMixin = {}
 function FIRE(event, ...)
   for _, f in ipairs(frames) do
     local ev = rawget(f, "__ev")

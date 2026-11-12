@@ -261,10 +261,15 @@ print("new player gets an entry: " .. tostring(me.players["newcomer"] ~= nil))
 for i = 1, 9 do def.players[string.format("zz player %02d", i)] = nil end
 me.players["newcomer"] = nil
 NS.OpenLoadouts("default")
--- every window carries the small logo
+-- the big windows are portrait frames with the logo in the portrait (like BugSack); small panels carry a logo
 FIRE("TRADE_SHOW"); FIRE("TRADE_CLOSED")
-print("logos: config " .. tostring(rawget(cfg, "logo") ~= nil)
-  .. ", conjure now " .. tostring(rawget(WaterboyReimaginedManualConjure, "logo") ~= nil)
-  .. ", timer " .. tostring(rawget(WaterboyReimaginedExtraTimer, "logo") ~= nil)
-  .. ", prompt " .. tostring(WaterboyReimaginedMorePrompt ~= nil and rawget(WaterboyReimaginedMorePrompt, "logo") ~= nil)
-  .. ", trade panel " .. tostring(WaterboyReimaginedTradePopup ~= nil and rawget(WaterboyReimaginedTradePopup, "logo") ~= nil))
+local function portrait(f) return f and (tostring(rawget(f, "__portrait") == NS.ICON) .. "/" .. tostring(rawget(f, "__title"))) end
+print("portraits: config " .. portrait(cfg) .. ", prompt " .. tostring(portrait(WaterboyReimaginedMorePrompt))
+  .. ", trade panel " .. tostring(portrait(WaterboyReimaginedTradePopup)))
+print("logos: conjure now " .. tostring(rawget(WaterboyReimaginedManualConjure, "logo") ~= nil)
+  .. ", timer " .. tostring(rawget(WaterboyReimaginedExtraTimer, "logo") ~= nil))
+-- the X on every window just hides it
+for _, w in ipairs({ cfg, WaterboyReimaginedMorePrompt, WaterboyReimaginedTradePopup }) do
+  w:Show(); rawget(w.CloseButton, "__s_OnClick")(w.CloseButton)
+  print("closed by X: " .. tostring(not w:IsShown()))
+end

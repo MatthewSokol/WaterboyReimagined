@@ -279,7 +279,7 @@ local function BuildGeneralPage()
     page:Hide()
     frame.general = page
 
-    Label(page, "General settings", "GameFontNormalLarge"):SetPoint("TOPLEFT", 14, -10)
+    Label(page, "General settings", "GameFontNormalLarge"):SetPoint("TOPLEFT", frame.portrait and 36 or 14, -10)
 
     page.checks = {}
     local function Check(y, text, help, get, set)
@@ -539,8 +539,7 @@ local function RefreshLoadoutsPage()
 end
 
 local function Build()
-    frame = CreateFrame("Frame", "WaterboyReimaginedConfig", UIParent, "BasicFrameTemplateWithInset")
-    frame:SetSize(540, 450)
+    frame = ns.CreateWindow("WaterboyReimaginedConfig", 540, 450, "Waterboy Reimagined")
     frame:SetPoint("CENTER")
     frame:SetMovable(true)
     frame:EnableMouse(true)
@@ -552,21 +551,13 @@ local function Build()
     end)
     -- the manual conjure buttons (Conjure.lua) sit beside this window on a mage
     frame:SetScript("OnShow", function(self) if ns.ShowManualConjure then ns.ShowManualConjure(self) end end)
-    -- The template's X calls HideUIPanel, which goes through Blizzard's protected panel manager and is
-    -- blocked in combat ("Interface action failed because of an addon"). Just hide, like Esc does.
-    local close = frame.CloseButton or _G["WaterboyReimaginedConfigCloseButton"]
-    if type(close) == "table" then close:SetScript("OnClick", function() frame:Hide() end) end
     frame:SetFrameStrata("DIALOG")
     frame:Hide()
     tinsert(UISpecialFrames, "WaterboyReimaginedConfig")
-    frame.title = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-    frame.title:SetPoint("TOP", 0, -5)
-    frame.title:SetText("Waterboy Reimagined")
-    frame.logo = ns.AddLogo(frame, frame.title)
 
-    -- profile: Default or one of the mages on this account
+    -- profile: Default or one of the mages on this account (the label sits right of the portrait logo)
     local prof = Label(frame, "Profile")
-    prof:SetPoint("TOPLEFT", 16, -34)
+    prof:SetPoint("TOPLEFT", frame.portrait and 40 or 16, -34)
     frame.profileLabel = prof
     local dd = CreateFrame("Frame", "WaterboyReimaginedProfileDropDown", frame, "UIDropDownMenuTemplate")
     dd:SetPoint("TOPLEFT", 0, -46)
