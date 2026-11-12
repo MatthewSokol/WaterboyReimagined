@@ -13,22 +13,33 @@ $src = Join-Path $root "WaterboyReimagined"
 $tag = $null
 if (-not $Version) {
     $ErrorActionPreference = "Continue"
-    $tag = git -C $root describe --tags --exact-match 2>$null
+    $tag = git -C $root describe --tags --exact-match --match "v[0-9]*" 2>$null
     $ErrorActionPreference = "Stop"
     if (-not $tag) { throw "HEAD has no release tag. Tag the release on main first (git tag vX.Y.Z), or pass -Version for a test build." }
     $Version = $tag -replace '^v', ''
 }
 $tocVersion = if ($tag) { $tag } else { $Version }
 
-# The release notes: this version's CHANGELOG.md entry, which must be there.
+# The release notes: every candidate's CHANGELOG.md entry since the last release (dev-routine gives each merged
+# change its own entry), from this version's entry down to the previous release tag's. A test build takes one entry.
 $changelog = [IO.File]::ReadAllText((Join-Path $root "CHANGELOG.md"))
-$m = [regex]::Match($changelog, "(?ms)^## \[" + [regex]::Escape($version) + "\][^\n]*\n(.*?)(?=^## \[|\z)")
-if (-not $m.Success) { throw "CHANGELOG.md has no '## [$version]' entry" }
+$start = [regex]::Match($changelog, "(?m)^## \[" + [regex]::Escape($version) + "\]")
+if (-not $start.Success) { throw "CHANGELOG.md has no '## [$version]' entry" }
+$rest = $changelog.Substring($start.Index)
+$prev = $null
+if ($tag) {
+    $ErrorActionPreference = "Continue"
+    $prev = git -C $root describe --tags --abbrev=0 --match "v[0-9]*" "$tag^" 2>$null
+    $ErrorActionPreference = "Stop"
+}
+$next = if ($tag -and $prev) { "(?m)^## \[" + [regex]::Escape(($prev -replace '^v', '')) + "\]" } elseif ($tag) { "(?!)" } else { "(?m)(?<!\A)^## \[" }
+$end = [regex]::Match($rest, $next)
+$notes = if ($end.Success) { $rest.Substring(0, $end.Index) } else { $rest }
 
 $dist = Join-Path $root "dist"
 New-Item -ItemType Directory -Force $dist | Out-Null
 $notesPath = Join-Path $dist "WaterboyReimagined-$version-changelog.md"
-[IO.File]::WriteAllText($notesPath, $m.Groups[1].Value.Trim() + "`n")
+[IO.File]::WriteAllText($notesPath, $notes.Trim() + "`n")
 $zipPath = Join-Path $dist "WaterboyReimagined-$version.zip"
 if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
 

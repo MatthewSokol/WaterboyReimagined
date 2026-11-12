@@ -63,7 +63,7 @@ if (release) {
   const version = (changelog.match(/^## \[(?!Unreleased\])([^\]]+)\]/m) || [])[1];
   check("CHANGELOG has a release entry", !!version, version ? `top entry ${version}` : "no ## [x.y.z] - date entry");
   const pending = (changelog.match(/^## \[Unreleased\][^\n]*\n([\s\S]*?)(?=^## \[|(?![\s\S]))/m) || [])[1] || "";
-  check("[Unreleased] is empty", pending.trim() === "", pending.trim() ? "rename it to the new version first" : "yes");
+  check("[Unreleased] is empty", pending.trim() === "", pending.trim() ? "merge it as a candidate first (dev-routine)" : "yes");
   check("working tree clean", git("status", "--porcelain") === "", git("status", "--porcelain") || "clean");
   const branch = git("branch", "--show-current");
   check("on main", branch === "main", branch);
