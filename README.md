@@ -26,6 +26,17 @@ WoW Forever.
 
 It's an independent addon, not affiliated with the original Waterboy or its author.
 
+## Screenshots
+
+| | |
+|---|---|
+| ![General tab](docs/screenshots/general.png) | ![Loadouts tab on a mage's profile](docs/screenshots/loadouts-profile.png) |
+| General tab | Loadouts on a mage's profile, with the macro and its icon picker |
+| ![Loadouts tab on the default profile](docs/screenshots/loadouts-default.png) | ![Trades tab on a mage's profile](docs/screenshots/trades-profile.png) |
+| Loadouts on the default profile | Trades: a class setting on a mage's profile |
+| ![Trades tab on the default profile](docs/screenshots/trades-default.png) | ![Trade panel next to the trade window](docs/screenshots/trade-panel.png) |
+| Trades: the same class on the default profile | With auto-fill off: the panel beside the trade window |
+
 ## Coming soon
 
 Planned, in no particular order:
@@ -40,6 +51,7 @@ Planned, in no particular order:
 - **WoW Classic support:** the same addon on the Classic clients.
 - **Vending machine:** a Vend mode with a minimum tip per stack. While the tip is too low, a stack comes back
   out of the trade every 3 seconds.
+- **Water expiration timer (hopefully):** how long your conjured water has left.
 - **Your requests (maybe):** ideas are welcome as
   [GitHub issues](https://github.com/MatthewSokol/WaterboyReimagined/issues). No promises.
 
