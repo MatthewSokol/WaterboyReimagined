@@ -27,8 +27,10 @@ WoW Forever.
 
 ### Thank you, Gello
 
-The original Waterboy was written by **Gello** and came out on WoWInterface in August 2005
-([archived page](https://web.archive.org/web/20070423035115/http://www.wowinterface.com:80/downloads/info4118-Waterboy.html)).
+The original Waterboy was written by **Gello** and came out on WoWInterface in August 2005, after a
+[beta on the WoWInterface forums](https://www.wowinterface.com/forums/showthread.php?t=1400). The download is long
+gone, but its page survives in the Internet Archive:
+[Waterboy 1.1, as archived in 2007](https://web.archive.org/web/20070423035115/http://www.wowinterface.com:80/downloads/info4118-Waterboy.html).
 You set up your usual handout once and every trade handed it over; a Make button conjured whatever the handout
 was short of; it merged part stacks as you went; and it lived in a bucket on the minimap, with `/wb` to open it.
 Those ideas are the heart of Waterboy Reimagined. Thank you, Gello, for Waterboy, and for the many addons since
