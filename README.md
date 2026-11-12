@@ -132,6 +132,8 @@ mages on this account), **Trades** (below) and **Loadouts** (see Conjuring). On 
 - **Classes / Players:** pick what to edit. Add a player override by typing a name (Add), or from your
   current **Target** or the player you have a **Trade** open with. Target and Trade use the full name
   ("Grimbold Stonebrook"); a setting under just a first name still applies to everyone with that first name.
+  If the player already has a setting, Add, Target and Trade just select it. The Players list shows five at a
+  time: scroll it with the mouse wheel or the arrows beside it.
 - **Fake trade window:** the 6 slots that player or class gets. On a mage's profile, settings it doesn't
   override show the default's slots dimmed; changing a slot makes that mage's own copy.
 - **Palette:** water (left) and food (right): highest / 2nd / 3rd highest on top (badges `top`, `-1`, `-2`),

@@ -224,3 +224,40 @@ CALL("click buckets button", rawget(lp.iconButtons[3], "__s_OnClick"), lp.iconBu
 CALL("hover buckets button", rawget(lp.iconButtons[3], "__s_OnEnter"), lp.iconButtons[3])
 print("after click: " .. tostring(WaterboyReimaginedDB.macroIcon) .. " / " .. tostring(STUB_MACRO_ICON))
 CALL("icon back to drop", NS.SetMacroIcon, "drop")
+-- the Players list scrolls: 5 rows, mouse wheel and arrows, newly selected players scrolled into view
+local def = NS.Profile("default")
+for i = 1, 9 do def.players[string.format("zz player %02d", i)] = { slots = {} } end
+NS.OpenLoadouts("default")
+CALL("players: open on default", NS.OpenConfig, "classes", "WARRIOR")
+local function rows()
+  local t = {}
+  for _, b in ipairs(cfg.playerButtons) do if b:IsShown() then t[#t + 1] = tostring(b.key) end end
+  return table.concat(t, ", ")
+end
+print("players visible: " .. rows() .. " | " .. cfg.morePlayers:GetText())
+CALL("wheel down", rawget(cfg.playerButtons[1], "__s_OnMouseWheel"), cfg.playerButtons[1], -1)
+print("after wheel: " .. cfg.morePlayers:GetText())
+CALL("down arrow", rawget(cfg.playersDown, "__s_OnClick"), cfg.playersDown)
+print("after arrow: " .. cfg.morePlayers:GetText())
+for i = 1, 5 do rawget(cfg.playersDown, "__s_OnClick")(cfg.playersDown) end
+print("at the end: " .. cfg.morePlayers:GetText() .. " | last row " .. tostring(cfg.playerButtons[5].key))
+CALL("wheel far up", rawget(cfg.playerButtons[1], "__s_OnMouseWheel"), cfg.playerButtons[1], 99)
+print("back at top: " .. cfg.morePlayers:GetText())
+CALL("open on the last player", NS.OpenConfig, "players", "zz player 09")
+print("revealed: " .. rows() .. " | " .. cfg.morePlayers:GetText())
+CALL("wheel up after reveal", rawget(cfg.playerButtons[1], "__s_OnMouseWheel"), cfg.playerButtons[1], 2)
+print("stays where scrolled: " .. cfg.morePlayers:GetText())
+-- Add / Target on a mage's profile: an existing default player is selected, not copied
+NS.OpenLoadouts(NS.CharKey())
+CALL("trades on the mage's profile", NS.OpenConfig, "classes", "WARRIOR")
+local me = NS.Profile("me", true)
+me.players["zz player 05"] = nil
+CALL("add an existing default player", cfg.addPlayer, "zz player 05")
+print("selected without copying: " .. tostring(cfg.heading:GetText()) .. ", own copy " .. tostring(me.players["zz player 05"] ~= nil))
+CALL("add a first-name setting by full name", cfg.addPlayer, "Grimbold Somebody")
+print("picked the first-name setting: " .. tostring(cfg.heading:GetText()))
+CALL("add a new player", cfg.addPlayer, "Newcomer")
+print("new player gets an entry: " .. tostring(me.players["newcomer"] ~= nil))
+for i = 1, 9 do def.players[string.format("zz player %02d", i)] = nil end
+me.players["newcomer"] = nil
+NS.OpenLoadouts("default")

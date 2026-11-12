@@ -24,7 +24,9 @@ local PAGES = { "general", "trades", "loadouts" }
 local PAGE_NAMES = { general = "General", trades = "Trades", loadouts = "Loadouts" }
 
 local frame
-local state = { page = "trades", profile = "default", field = "classes", key = "WARRIOR" }
+-- playerOffset: how far the Players list is scrolled (rows hidden above the first visible one)
+local state = { page = "trades", profile = "default", field = "classes", key = "WARRIOR", playerOffset = 0 }
+local revealedKey -- the player last scrolled into view, so scrolling by hand doesn't snap back to them
 local slotButtons, classButtons, playerButtons = {}, {}, {}
 local dragIcon, drag -- drag = { id = itemID, from = slot index or nil }
 
@@ -609,13 +611,29 @@ local function Build()
     add:SetSize(50, 22)
     add:SetPoint("LEFT", box, "RIGHT", 4, 0)
     add:SetText("Add")
+    -- The key of a player who already has a setting on the profile being edited (or, on a mage's profile, the
+    -- default's): their full name, else their first name alone (settings typed by first name).
+    local function ExistingPlayerKey(name)
+        local full = ns.PlayerKey(name)
+        local first = full:match("^(%S+) ")
+        local own = ns.Profile(state.profile)
+        local function has(k)
+            return (own and own.players[k]) or (state.profile ~= "default" and ns.Profile("default").players[k])
+        end
+        if has(full) then return full end
+        if first and has(first) then return first end
+    end
+    -- Add / Target / Trade: a player who already has a setting is just selected (nothing is copied; editing a
+    -- slot is what gives a mage its own copy). Only a new name gets a new, empty setting.
     local function AddPlayer(name)
         name = strtrim(name or "")
         if name == "" then return end
-        state.field, state.key = "players", ns.PlayerKey(name)
-        EditableEntry()
+        local key = ExistingPlayerKey(name)
+        state.field, state.key = "players", key or ns.PlayerKey(name)
+        if not key then EditableEntry() end
         Refresh()
     end
+    frame.addPlayer = AddPlayer -- also used by the smoke test
     local function AddTyped()
         local name = box:GetText()
         box:SetText("")
@@ -651,14 +669,39 @@ local function Build()
         b:SetScript("OnLeave", GameTooltip_Hide)
     end
 
+    -- the Players list: MAX_PLAYERS rows that scroll (mouse wheel over the list, or the arrows beside it)
+    local function ScrollPlayers(rows)
+        state.playerOffset = state.playerOffset + rows
+        Refresh()
+    end
+    local function Wheel(_, delta) ScrollPlayers(-delta) end
     for i = 1, MAX_PLAYERS do
-        local b = MakeListButton(tp, 160)
+        local b = MakeListButton(tp, 150)
         b:SetPoint("TOPLEFT", 12, -328 - (i - 1) * 18)
         b:SetScript("OnClick", function(self) Select("players", self.key) end)
+        b:EnableMouseWheel(true)
+        b:SetScript("OnMouseWheel", Wheel)
         playerButtons[i] = b
     end
+    local function Arrow(dir, y)
+        local b = CreateFrame("Button", nil, tp)
+        b:SetSize(16, 16)
+        b:SetPoint("TOPLEFT", 166, y)
+        local base = "Interface\\Buttons\\UI-ScrollBar-Scroll" .. (dir < 0 and "Up" or "Down") .. "Button-"
+        b:SetNormalTexture(base .. "Up")
+        b:SetPushedTexture(base .. "Down")
+        b:SetDisabledTexture(base .. "Disabled")
+        b:SetHighlightTexture(base .. "Highlight", "ADD")
+        b:SetScript("OnClick", function() ScrollPlayers(dir * (MAX_PLAYERS - 1)) end)
+        b:EnableMouseWheel(true)
+        b:SetScript("OnMouseWheel", Wheel)
+        return b
+    end
+    frame.playersUp = Arrow(-1, -329)
+    frame.playersDown = Arrow(1, -401)
+    frame.playerButtons = playerButtons
     frame.morePlayers = Label(tp, "", "GameFontDisableSmall")
-    frame.morePlayers:SetPoint("TOPLEFT", 18, -328 - MAX_PLAYERS * 18)
+    frame.morePlayers:SetPoint("TOPLEFT", 18, -420)
 
     -- fake trade window
     local trade = CreateFrame("Frame", nil, tp, "InsetFrameTemplate")
@@ -826,8 +869,21 @@ local function RefreshTradesPage()
 
     local players = PlayerList()
     local own = ns.Profile(state.profile)
+    -- a newly selected player (Add, Target, Trade, Edit setting) is scrolled into view
+    if state.field == "players" and state.key ~= revealedKey then
+        for i, name in ipairs(players) do
+            if name == state.key then
+                if i <= state.playerOffset then state.playerOffset = i - 1
+                elseif i > state.playerOffset + MAX_PLAYERS then state.playerOffset = i - MAX_PLAYERS end
+                break
+            end
+        end
+    end
+    revealedKey = state.field == "players" and state.key or nil
+    local maxOffset = math.max(0, #players - MAX_PLAYERS)
+    state.playerOffset = math.min(math.max(state.playerOffset, 0), maxOffset)
     for i, b in ipairs(playerButtons) do
-        local name = players[i]
+        local name = players[state.playerOffset + i]
         b.key = name
         b:SetShown(name ~= nil)
         if name then
@@ -836,7 +892,13 @@ local function RefreshTradesPage()
             b.sel:SetShown(state.field == "players" and state.key == name)
         end
     end
-    frame.morePlayers:SetText(#players > MAX_PLAYERS and ("+" .. (#players - MAX_PLAYERS) .. " more (/wbr list)") or "")
+    local scrolls = #players > MAX_PLAYERS
+    frame.playersUp:SetShown(scrolls)
+    frame.playersDown:SetShown(scrolls)
+    frame.playersUp:SetEnabled(state.playerOffset > 0)
+    frame.playersDown:SetEnabled(state.playerOffset < maxOffset)
+    frame.morePlayers:SetText(scrolls and string.format("%d-%d of %d (scroll for more)", state.playerOffset + 1,
+        math.min(state.playerOffset + MAX_PLAYERS, #players), #players) or "")
 
     local entry, inherited = CurrentEntry()
     if state.field == "classes" then
