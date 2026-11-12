@@ -2,7 +2,8 @@
 
 <img src="docs/logo.png" alt="Waterboy Reimagined logo: a glowing water drop above a violet rune circle" width="160" align="right">
 
-A WoW Forever addon for mages who hand out water.
+A WoW Forever addon for mages who hand out water, inspired by [Gello's original Waterboy](#thank-you-gello)
+from 2005.
 
 - **Trades:** when someone opens a trade, it fills in the stacks of water and food their class wants, with
   per-player overrides.
@@ -24,7 +25,16 @@ Waterboy addon. It fell out of support, and the addons that copied it later were
 Reimagined is strongly inspired by that first version and by my time handing out water to the guild, rebuilt for
 WoW Forever.
 
-It's an independent addon, not affiliated with the original Waterboy or its author.
+### Thank you, Gello
+
+The original Waterboy was written by **Gello** and came out on WoWInterface in August 2005
+([archived page](https://web.archive.org/web/20070423035115/http://www.wowinterface.com:80/downloads/info4118-Waterboy.html)).
+You set up your usual handout once and every trade handed it over; a Make button conjured whatever the handout
+was short of; it merged part stacks as you went; and it lived in a bucket on the minimap, with `/wb` to open it.
+Those ideas are the heart of Waterboy Reimagined. Thank you, Gello, for Waterboy, and for the many addons since
+([Gello on WoWInterface](https://www.wowinterface.com/downloads/author-2953.html)).
+
+Waterboy Reimagined is written from scratch and isn't affiliated with Gello or the original Waterboy.
 
 ## Screenshots
 
