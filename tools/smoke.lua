@@ -3,10 +3,10 @@ FIRE("PLAYER_LOGIN")
 FIRE("SPELLS_CHANGED")
 FIRE("PLAYER_ENTERING_WORLD")
 print("db.version=" .. tostring(WaterboyReimaginedDB.version))
-CALL("/mw help", SlashCmdList.WATERBOYREIMAGINED, "help")
-CALL("/mw", SlashCmdList.WATERBOYREIMAGINED, "")
-CALL("/mw list", SlashCmdList.WATERBOYREIMAGINED, "list")
-CALL("/mw test priest", SlashCmdList.WATERBOYREIMAGINED, "test priest")
+CALL("/wbr help", SlashCmdList.WATERBOYREIMAGINED, "help")
+CALL("/wbr", SlashCmdList.WATERBOYREIMAGINED, "")
+CALL("/wbr list", SlashCmdList.WATERBOYREIMAGINED, "list")
+CALL("/wbr test priest", SlashCmdList.WATERBOYREIMAGINED, "test priest")
 local cfg = WaterboyReimaginedConfig
 CALL("config OnShow", rawget(cfg, "__s_OnShow"), cfg)
 print("manual panel shown: " .. tostring(WaterboyReimaginedManualConjure:IsShown()))
@@ -21,19 +21,19 @@ if cfg and rawget(cfg, "tabs") then
   CALL("trades tab again", rawget(cfg.tabs[2], "__s_OnClick"))
 end
 if NS.OpenConfig then CALL("OpenConfig priest", NS.OpenConfig, "classes", "PRIEST") end
-if NS.PrintLoadout then CALL("/mw loadout", SlashCmdList.WATERBOYREIMAGINED, "loadout")
-CALL("/mw macro", SlashCmdList.WATERBOYREIMAGINED, "macro") end
+if NS.PrintLoadout then CALL("/wbr loadout", SlashCmdList.WATERBOYREIMAGINED, "loadout")
+CALL("/wbr macro", SlashCmdList.WATERBOYREIMAGINED, "macro") end
 if WaterboyReimaginedConjure then CALL("conjure PreClick", rawget(WaterboyReimaginedConjure, "__s_PreClick"), WaterboyReimaginedConjure, "LeftButton", false) end
 FIRE("UNIT_SPELLCAST_SUCCEEDED", "player", "guid", NS.SPELLS.water[7])
 FIRE("BAG_UPDATE_DELAYED")
 FIRE("BAG_UPDATE_DELAYED")
-CALL("/mw off", SlashCmdList.WATERBOYREIMAGINED, "off")
+CALL("/wbr off", SlashCmdList.WATERBOYREIMAGINED, "off")
 FIRE("TRADE_SHOW")
 FIRE("TRADE_CLOSED")
-CALL("/mwb toggles closed", SlashCmdList.WATERBOYREIMAGINED, "")
+CALL("/wb toggles closed", SlashCmdList.WATERBOYREIMAGINED, "")
 print("slash: " .. tostring(SLASH_WATERBOYREIMAGINED1) .. " " .. tostring(SLASH_WATERBOYREIMAGINED2) .. " " .. tostring(SLASH_WATERBOYREIMAGINED3))
 -- loadout complete -> 3 presses -> prompt -> Temporary / Update loadout
-CALL("/mw on", SlashCmdList.WATERBOYREIMAGINED, "on")
+CALL("/wbr on", SlashCmdList.WATERBOYREIMAGINED, "on")
 local press = function(t, label)
   STUB_TIME = t
   CALL(label, rawget(WaterboyReimaginedConjure, "__s_PreClick"), WaterboyReimaginedConjure, "LeftButton", false)
@@ -50,7 +50,7 @@ CALL("timer drag stop", rawget(WaterboyReimaginedExtraTimer, "__s_OnDragStop"), 
 press(13, "press (extra)")
 STUB_ITEMS[8079] = 60
 FIRE("UNIT_SPELLCAST_SUCCEEDED", "player", "guid", NS.SPELLS.water[7]); FIRE("BAG_UPDATE_DELAYED")
-CALL("/mw loadout (extra)", SlashCmdList.WATERBOYREIMAGINED, "loadout")
+CALL("/wbr loadout (extra)", SlashCmdList.WATERBOYREIMAGINED, "loadout")
 STUB_TIME = 200
 CALL("timer tick (expired)", rawget(WaterboyReimaginedExtraTimer, "__s_OnUpdate"), WaterboyReimaginedExtraTimer, 1)
 print("timer shown after expiry: " .. tostring(WaterboyReimaginedExtraTimer:IsShown()))
@@ -70,11 +70,11 @@ print("mage record: " .. tostring(WaterboyReimaginedDB.mages[NS.CharKey()].name)
 CALL("general tab", rawget(cfg.tabs[1], "__s_OnClick"))
 print("general me: " .. tostring(cfg.general.me:GetText()))
 print("general mages: " .. tostring(cfg.general.mages:GetText()))
-CALL("/mw list", SlashCmdList.WATERBOYREIMAGINED, "list")
+CALL("/wbr list", SlashCmdList.WATERBOYREIMAGINED, "list")
 -- player settings by full name, with first-name settings still matching
 print("full name: " .. tostring(NS.UnitFullName("target")))
 print("display: " .. NS.PlayerName("grimbold stonebrook"))
-CALL("/mw set Grimbold 1 1", SlashCmdList.WATERBOYREIMAGINED, "set Grimbold 1 1")
+CALL("/wbr set Grimbold 1 1", SlashCmdList.WATERBOYREIMAGINED, "set Grimbold 1 1")
 print("first-name match: " .. NS.FindPlayerKey("Grimbold Stonebrook") .. " / " .. select(2, NS.Want("Grimbold Stonebrook", "PRIEST")))
 NS.Profile("default").players["grimbold stonebrook"] = { slots = {} }
 print("full-name match: " .. NS.FindPlayerKey("Grimbold Stonebrook") .. " / " .. select(2, NS.Want("Grimbold Stonebrook", "PRIEST")))
@@ -113,7 +113,7 @@ CALL("X click", rawget(cfg.CloseButton, "__s_OnClick"), cfg.CloseButton)
 print("open after X: " .. tostring(cfg:IsShown()))
 -- the macro shows the next conjure (#showtooltip), its tooltip shows the loadout, combat presses explain themselves
 STUB_ITEMS = {}
-CALL("/mw macro (create)", SlashCmdList.WATERBOYREIMAGINED, "macro")
+CALL("/wbr macro (create)", SlashCmdList.WATERBOYREIMAGINED, "macro")
 FIRE("BAG_UPDATE_DELAYED")
 print("macro icon: " .. tostring(STUB_MACRO_ICON))
 print("macro body: " .. tostring(STUB_MACRO_BODY):gsub("\n", " | "))
@@ -192,7 +192,7 @@ print("type (desc 4, room 3): " .. tostring(WaterboyReimaginedConjure:GetAttribu
 STUB_DESC, STUB_FREE, STUB_ITEMS = nil, nil, {}
 -- the macro's icon is the addon's Icon file (by ID); without an ID it falls back to the question mark
 STUB_MACRO_BODY, STUB_MACRO_ICON, STUB_MACRO_EDITS = nil, nil, 0
-CALL("/mw macro (icon by ID)", SlashCmdList.WATERBOYREIMAGINED, "macro")
+CALL("/wbr macro (icon by ID)", SlashCmdList.WATERBOYREIMAGINED, "macro")
 print("macro icon by ID: " .. tostring(STUB_MACRO_ICON))
 STUB_MACRO_ICON = 134400 -- as if the saved icon were lost: the next sync puts it back
 FIRE("BAG_UPDATE_DELAYED")
@@ -201,7 +201,7 @@ local e = STUB_MACRO_EDITS
 FIRE("BAG_UPDATE_DELAYED"); FIRE("BAG_UPDATE_DELAYED")
 print("no edits when icon and body match: " .. tostring(STUB_MACRO_EDITS == e))
 STUB_NO_FILEID = true
-CALL("/mw macro (fallback)", SlashCmdList.WATERBOYREIMAGINED, "macro")
+CALL("/wbr macro (fallback)", SlashCmdList.WATERBOYREIMAGINED, "macro")
 print("fallback icon: " .. tostring(STUB_MACRO_ICON))
 STUB_MACRO_ICON = 134400 -- the game reports the question mark as an ID
 e = STUB_MACRO_EDITS

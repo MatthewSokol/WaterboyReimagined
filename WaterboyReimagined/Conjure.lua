@@ -503,7 +503,7 @@ end
 
 function ns.MacroText() return MACRO_BODY end -- the copyable part; the made macro adds #showtooltip
 
--- Lines describing what the macro aims for right now (for /mw loadout and the config window).
+-- Lines describing what the macro aims for right now (for /wbr loadout and the config window).
 function ns.LoadoutStatus()
     local need, group, members, rounds = CurrentNeed(false)
     local lines = { "Now: " .. group .. (members > 0 and (" (" .. members .. " players' trade settings added)") or "") }

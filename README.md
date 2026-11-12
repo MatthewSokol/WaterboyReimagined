@@ -42,7 +42,7 @@ Planned, in no particular order:
 
 ## Conjuring
 
-The **Loadouts** tab of `/mw` sets how many **stacks** to keep in your bags, per profile:
+The **Loadouts** tab of `/wbr` sets how many **stacks** to keep in your bags, per profile:
 
 | Loadout | Default |
 |---|---|
@@ -53,7 +53,7 @@ The **Loadouts** tab of `/mw` sets how many **stacks** to keep in your bags, per
 Columns are the highest and 2nd highest rank of water and food the mage knows. **+ group's trades** adds what
 everyone in the group would get in a trade (their class or player setting) on top of the row's stacks.
 
-**Macro:** click **Put macro on cursor** (or `/mw macro`) to create the account macro "Waterboy" and drop it
+**Macro:** click **Put macro on cursor** (or `/wbr macro`) to create the account macro "Waterboy" and drop it
 on a bar. Its text, shown in the Loadouts tab, is:
 
 ```
@@ -65,7 +65,7 @@ on a bar. Its text, shown in the Loadouts tab, is:
 one conjure for the first thing you're short of: water before food, highest rank first. It says
 `Casting water (rank 7)...` on the press, and once the cast finishes and the items land, how many stacks you
 have of how many (plus "Loadout complete" when nothing is left). When everything's there a press just says the
-loadout is complete. `/mw loadout` prints the current targets. With no bag space for the next conjure, a
+loadout is complete. `/wbr loadout` prints the current targets. With no bag space for the next conjure, a
 press casts nothing and says `Bags full: no room for water (rank 7)...`; if a conjure still adds nothing, it
 says so.
 
@@ -78,7 +78,7 @@ addon's own icon file for a macro, the macro shows the next conjure's spell icon
 started; chat says so (`In combat: casting water (rank 7) again...`), and the loadout is rechecked when combat
 ends.
 
-**Conjure now:** on a mage, a small panel beside the `/mw` window has a button each for your highest and
+**Conjure now:** on a mage, a small panel beside the `/wbr` window has a button each for your highest and
 2nd highest water and food, with how many you're carrying. One click casts it once; it doesn't change your
 loadout.
 
@@ -99,7 +99,7 @@ On a mage, when a trade opens the addon puts in the stacks set up for the other 
 6 trade slots, each holding one rank of conjured water or food. If you have no stack of that rank, the next rank
 down is used, then higher ranks.
 
-With **Fill trades automatically** off (General tab of `/mw`, or `/mw off`), opening a trade on a mage shows a
+With **Fill trades automatically** off (General tab of `/wbr`, or `/wbr off`), opening a trade on a mage shows a
 panel next to the trade window instead: who you're trading with, which setting applies and its 6 slots.
 **Add to trade** puts the stacks in; right-click a slot to leave it out of this trade; **Edit setting** opens
 the config on that setting. **Vend** is a placeholder until the vending machine lands.
@@ -119,7 +119,7 @@ shaman 3/1, druid 3/1, priest 4/0, mage 0/0.
 
 Settings can be changed on any character; trades are only filled on mages.
 
-### Config window (`/mw`)
+### Config window (`/wbr`)
 
 Three tabs along the bottom: **General** (fill trades automatically, debug messages, this character and the
 mages on this account), **Trades** (below) and **Loadouts** (see Conjuring). On the Trades tab:
@@ -142,18 +142,18 @@ mages on this account), **Trades** (below) and **Loadouts** (see Conjuring). On 
 
 | Command | |
 |---|---|
-| `/mw` (or `config`, `settings`, `options`) | open the config window |
-| `/mw help` | list the commands |
-| `/mw list` | show the default profile and this character's overrides |
-| `/mw set [me] <class\|player> <water> <food>` | stacks to hand out; `me` = this character only |
-| `/mw clear [me] <class\|player>` | remove a setting |
-| `/mw test <class\|player>` | show what a trade would get |
-| `/mw on` / `off` | fill trades or not |
-| `/mw macro` | put the Waterboy conjure macro on your cursor |
-| `/mw loadout` | what the macro is aiming for right now |
-| `/mw debug` | toggle debug messages |
+| `/wbr` (or `config`, `settings`, `options`) | open the config window |
+| `/wbr help` | list the commands |
+| `/wbr list` | show the default profile and this character's overrides |
+| `/wbr set [me] <class\|player> <water> <food>` | stacks to hand out; `me` = this character only |
+| `/wbr clear [me] <class\|player>` | remove a setting |
+| `/wbr test <class\|player>` | show what a trade would get |
+| `/wbr on` / `off` | fill trades or not |
+| `/wbr macro` | put the Waterboy conjure macro on your cursor |
+| `/wbr loadout` | what the macro is aiming for right now |
+| `/wbr debug` | toggle debug messages |
 
-`/mwb` and `/waterboy` work too. Example: `/mw set Grimbold 1 1`.
+`/wb` works too. Example: `/wbr set Grimbold 1 1`.
 
 ## Install
 

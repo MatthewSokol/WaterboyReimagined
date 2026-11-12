@@ -1,4 +1,4 @@
--- Waterboy Reimagined: config window (/mw). Three tabs along the bottom:
+-- Waterboy Reimagined: config window (/wbr). Three tabs along the bottom:
 --   General  - addon-wide options (fill trades automatically, debug), this character and the known mages
 --   Trades   - what each class or player gets in a trade (below)
 --   Loadouts - how many stacks to keep in your bags (solo / party / raid) and the macro
@@ -298,7 +298,7 @@ local function BuildGeneralPage()
         "On a mage, when someone opens a trade, put in their stacks right away. When off, a panel next to "
             .. "the trade window shows what they'd get, with Add to trade.",
         function() return ns.DB().enabled end, function(v) ns.DB().enabled = v end)
-    Check(-96, "Debug messages", "Print what the addon is doing in chat (same as /mw debug).",
+    Check(-96, "Debug messages", "Print what the addon is doing in chat (same as /wbr debug).",
         function() return ns.DB().debug end, function(v) ns.DB().debug = v end)
 
     Label(page, "This character"):SetPoint("TOPLEFT", 14, -146)
@@ -315,8 +315,8 @@ local function BuildGeneralPage()
     page.mages:SetSpacing(2)
 
     Label(page, "Commands"):SetPoint("TOPLEFT", 14, -322)
-    local cmds = Label(page, "/mw, /mwb or /waterboy opens this window. /mw help lists the rest, "
-        .. "e.g. /mw set Grimbold 1 1.", "GameFontHighlightSmall")
+    local cmds = Label(page, "/wbr or /wb opens this window. /wbr help lists the rest, "
+        .. "e.g. /wbr set Grimbold 1 1.", "GameFontHighlightSmall")
     cmds:SetPoint("TOPLEFT", 18, -340)
     cmds:SetWidth(490)
     cmds:SetJustifyH("LEFT")
@@ -804,7 +804,7 @@ local function RefreshTradesPage()
             b.sel:SetShown(state.field == "players" and state.key == name)
         end
     end
-    frame.morePlayers:SetText(#players > MAX_PLAYERS and ("+" .. (#players - MAX_PLAYERS) .. " more (/mw list)") or "")
+    frame.morePlayers:SetText(#players > MAX_PLAYERS and ("+" .. (#players - MAX_PLAYERS) .. " more (/wbr list)") or "")
 
     local entry, inherited = CurrentEntry()
     if state.field == "classes" then

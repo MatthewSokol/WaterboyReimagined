@@ -11,8 +11,8 @@
 --   4. default profile, class setting
 --
 -- Configuration works on any character; trades are only filled on mages.
---   /mw            opens the config window (also /mw config, settings, options)
---   /mw help       lists the commands (/mwb and /waterboy work too)
+--   /wbr            opens the config window (also /wbr config, settings, options)
+--   /wbr help      lists the commands (/wb works too)
 
 local ADDON_NAME, ns = ...
 
@@ -78,7 +78,7 @@ local tradeToken = 0      -- bumps every trade so timers from an old trade stop
 
 local function Print(msg) print("|cff69ccf0Waterboy Reimagined|r: " .. msg) end
 local function Dbg(fmt, ...)
-    if db and db.debug then print("|cff69ccf0MW debug|r: " .. string.format(fmt, ...)) end
+    if db and db.debug then print("|cff69ccf0Waterboy debug|r: " .. string.format(fmt, ...)) end
 end
 
 local function CopyEntry(e)
@@ -449,15 +449,15 @@ local function ListProfile(which)
 end
 
 local HELP = {
-    "/mw - open the config window (also /mw config, settings, options)",
-    "/mw list - show the default profile and this character's overrides",
-    "/mw set [me] <class|player> <water> <food> - stacks of the highest rank to hand out (\"me\" = this character only)",
-    "/mw clear [me] <class|player> - remove a setting",
-    "/mw test <class|player> - show what a trade would get",
-    "/mw on | off - fill trades or not (now: %s)",
-    "/mw macro - put the Waterboy conjure macro on your cursor",
-    "/mw loadout - what the conjure macro is aiming for right now",
-    "/mw debug - toggle debug messages",
+    "/wbr - open the config window (also /wbr config, settings, options)",
+    "/wbr list - show the default profile and this character's overrides",
+    "/wbr set [me] <class|player> <water> <food> - stacks of the highest rank to hand out (\"me\" = this character only)",
+    "/wbr clear [me] <class|player> - remove a setting",
+    "/wbr test <class|player> - show what a trade would get",
+    "/wbr on | off - fill trades or not (now: %s)",
+    "/wbr macro - put the Waterboy conjure macro on your cursor",
+    "/wbr loadout - what the conjure macro is aiming for right now",
+    "/wbr debug - toggle debug messages",
 }
 
 local OPEN = { [""] = true, config = true, settings = true, options = true, show = true }
@@ -526,13 +526,12 @@ end
 ---------------------------------------------------------------------------------------------------
 
 -- Slash commands first, so they exist even if something below fails.
-SLASH_WATERBOYREIMAGINED1 = "/waterboy"
-SLASH_WATERBOYREIMAGINED2 = "/mw"
-SLASH_WATERBOYREIMAGINED3 = "/mwb"
+SLASH_WATERBOYREIMAGINED1 = "/wbr"
+SLASH_WATERBOYREIMAGINED2 = "/wb"
 SlashCmdList.WATERBOYREIMAGINED = Slash
 
 -- RegisterEvent throws on an event this client doesn't have (e.g. LEARNED_SPELL_IN_TAB on Forever), which
--- would stop the whole file loading. Register through pcall and say which ones failed under /mw debug.
+-- would stop the whole file loading. Register through pcall and say which ones failed under /wbr debug.
 function ns.RegisterEvents(frame, events)
     for _, event in ipairs(events) do
         if not pcall(frame.RegisterEvent, frame, event) then
