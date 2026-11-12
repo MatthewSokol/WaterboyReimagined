@@ -1,6 +1,6 @@
 # Waterboy Reimagined
 
-<img src="docs/logo.png" alt="Waterboy Reimagined logo: an arcane purple water cooler with a glowing water-drop rune and a dripping tap" width="160" align="right">
+<img src="docs/logo.png" alt="Waterboy Reimagined logo: a glowing water drop above a violet rune circle" width="160" align="right">
 
 A WoW Forever addon for mages who hand out water.
 
@@ -69,10 +69,12 @@ loadout is complete. `/wbr loadout` prints the current targets. With no bag spac
 press casts nothing and says `Bags full: no room for water (rank 7)...`; if a conjure still adds nothing, it
 says so.
 
-The macro the button makes has the addon's icon (a glowing drop over a rune circle), and a `#showtooltip` line that the addon keeps
-on the next conjure, so on your bar it fades like that spell when you can't cast it (out of mana, say).
-Hovering it shows the spell, then the next press and the loadout's stack counts. (If your client can't use the
-addon's own icon file for a macro, the macro shows the next conjure's spell icon instead.)
+The macro the button makes has a `#showtooltip` line that the addon keeps on the next conjure, so on your bar
+it fades like that spell when you can't cast it (out of mana, say). Hovering it shows the spell, then the next
+press and the loadout's stack counts. Pick its icon under **Macro icon** on the Loadouts tab: the glowing drop
+(the default), an arcane water cooler, water buckets, or **Next conjure**, which shows the water or food spell the
+next press casts. (If your client can't use the addon's own pictures for a macro, it shows the next conjure's
+icon instead.)
 
 **In combat** the addon can't re-aim the macro, so every press repeats whatever it was set to when combat
 started; chat says so (`In combat: casting water (rank 7) again...`), and the loadout is rechecked when combat

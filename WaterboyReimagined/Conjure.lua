@@ -24,14 +24,36 @@ local MACRO_NAME = "Waterboy"
 local BUTTON_NAME = "WaterboyReimaginedConjure"
 -- Two lines so it works with "cast on key down" on or off: the button only acts on the one that matches.
 local MACRO_BODY = "/click " .. BUTTON_NAME .. " LeftButton 1\n/click " .. BUTTON_NAME
--- The macro's icon: the addon's own icon (Icon.tga in this folder, also shown in the AddOns list). The
--- #showtooltip line still drives the tooltip and the fading (out of mana, say). If the game can't give that file an
--- icon ID, fall back to the question mark, which lets #showtooltip show the next conjure's own icon instead.
-local MACRO_ICON_FILE = "Interface\\AddOns\\WaterboyReimagined\\Icon"
-local MACRO_ICON_FALLBACK = "INV_Misc_QuestionMark"
+-- The macro's icon, picked on the Loadouts tab (saved account-wide, like the macro): one of the addon's own images,
+-- or "spell", the question mark, which lets #showtooltip show the next conjure's own icon. Either way #showtooltip
+-- drives the tooltip and the fading (out of mana, say). If the game can't give an image an icon ID, it falls back
+-- to the question mark.
+local ICON_DIR = "Interface\\AddOns\\WaterboyReimagined\\"
+local MACRO_ICONS = {
+    { key = "drop", file = "Icon", label = "Glowing drop" },
+    { key = "cooler", file = "IconCooler", label = "Arcane water cooler" },
+    { key = "buckets", file = "IconBuckets", label = "Water buckets" },
+    { key = "spell", label = "Next conjure", tip = "Shows the spell the next press casts, water or food." },
+}
+local QUESTION_MARK, QUESTION_MARK_ID = "INV_Misc_QuestionMark", 134400
+ns.MACRO_ICONS = MACRO_ICONS
+
+local function IconChoice()
+    local key = ns.DB() and ns.DB().macroIcon
+    for _, opt in ipairs(MACRO_ICONS) do if opt.key == key then return opt end end
+    return MACRO_ICONS[1]
+end
+function ns.MacroIconChoice() return IconChoice().key end
+function ns.MacroIconTexture(opt) return opt.file and (ICON_DIR .. opt.file) or ("Interface\\Icons\\" .. QUESTION_MARK) end
+
+-- What to pass to CreateMacro/EditMacro, and the ID GetMacroInfo reports for it.
 local function MacroIcon()
-    local id = GetFileIDFromPath and (GetFileIDFromPath(MACRO_ICON_FILE .. ".tga") or GetFileIDFromPath(MACRO_ICON_FILE))
-    return id or MACRO_ICON_FALLBACK
+    local opt = IconChoice()
+    if opt.file and GetFileIDFromPath then
+        local id = GetFileIDFromPath(ICON_DIR .. opt.file .. ".tga") or GetFileIDFromPath(ICON_DIR .. opt.file)
+        if id then return id, id end
+    end
+    return QUESTION_MARK, QUESTION_MARK_ID
 end
 
 ns.LOADOUT_GROUPS, ns.LOADOUT_SLOTS = GROUPS, SLOTS
@@ -256,11 +278,22 @@ local function SyncMacro()
         local idx = GetMacroIndexByName(MACRO_NAME)
         if not idx or idx == 0 then return end
         local _, icon, body = GetMacroInfo(idx)
-        local want, wantIcon = MacroBody(), MacroIcon()
-        -- the icon is compared only as an ID: the fallback is a name, and the game reports icons as IDs
-        local iconOff = type(wantIcon) == "number" and icon ~= wantIcon
-        if body ~= want or iconOff then EditMacro(idx, MACRO_NAME, wantIcon, want) end
+        local want = MacroBody()
+        local wantIcon, wantID = MacroIcon()
+        -- the game reports icons as IDs, so compare the ID (the question mark is passed by name)
+        if body ~= want or icon ~= wantID then EditMacro(idx, MACRO_NAME, wantIcon, want) end
     end)
+end
+
+-- Pick the macro's icon (a key from MACRO_ICONS). Applied now, or when combat ends.
+function ns.SetMacroIcon(key)
+    if not ns.DB() then return end
+    ns.DB().macroIcon = key
+    SyncMacro()
+    local msg = "Macro icon: " .. IconChoice().label .. "."
+    if InCombatLockdown() then msg = msg .. " It changes when combat ends." end
+    if GetMacroIndexByName(MACRO_NAME) == 0 then msg = msg .. " Use Put macro on cursor to make the macro." end
+    ns.Print(msg)
 end
 
 local function Update(advance)
@@ -492,9 +525,9 @@ function ns.MakeMacro()
             ns.Print("No free account macro slots.")
             return
         end
-        idx = CreateMacro(MACRO_NAME, MacroIcon(), MacroBody(), nil)
+        idx = CreateMacro(MACRO_NAME, (MacroIcon()), MacroBody(), nil)
     else
-        EditMacro(idx, MACRO_NAME, MacroIcon(), MacroBody())
+        EditMacro(idx, MACRO_NAME, (MacroIcon()), MacroBody())
     end
     PickupMacro(idx)
     ns.Print("The \"" .. MACRO_NAME .. "\" macro is on your cursor: drop it on an action bar. "

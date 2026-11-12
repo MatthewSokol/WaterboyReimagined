@@ -208,3 +208,19 @@ e = STUB_MACRO_EDITS
 FIRE("BAG_UPDATE_DELAYED"); FIRE("BAG_UPDATE_DELAYED")
 print("fallback doesn't re-edit every update: " .. tostring(STUB_MACRO_EDITS == e))
 STUB_NO_FILEID = nil
+-- picking the macro icon: each image by its ID, the next conjure's spell as the question mark, no repeat edits
+STUB_NO_FILEID = nil
+CALL("/wbr macro (make it)", SlashCmdList.WATERBOYREIMAGINED, "macro")
+for _, key in ipairs({ "cooler", "buckets", "spell", "drop" }) do
+  CALL("icon " .. key, NS.SetMacroIcon, key)
+  local e = STUB_MACRO_EDITS
+  FIRE("BAG_UPDATE_DELAYED"); FIRE("BAG_UPDATE_DELAYED")
+  print("icon " .. key .. ": " .. tostring(STUB_MACRO_ICON) .. ", saved " .. tostring(WaterboyReimaginedDB.macroIcon) .. ", steady " .. tostring(STUB_MACRO_EDITS == e))
+end
+-- the picker on the Loadouts tab: four buttons, clicking one picks it
+local lp = cfg.loadouts
+print("icon buttons: " .. tostring(lp and lp.iconButtons and #lp.iconButtons))
+CALL("click buckets button", rawget(lp.iconButtons[3], "__s_OnClick"), lp.iconButtons[3])
+CALL("hover buckets button", rawget(lp.iconButtons[3], "__s_OnEnter"), lp.iconButtons[3])
+print("after click: " .. tostring(WaterboyReimaginedDB.macroIcon) .. " / " .. tostring(STUB_MACRO_ICON))
+CALL("icon back to drop", NS.SetMacroIcon, "drop")

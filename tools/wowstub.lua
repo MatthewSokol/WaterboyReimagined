@@ -81,8 +81,10 @@ GetMacroIndexByName = function() return STUB_MACRO_BODY and 1 or 0 end
 GetMacroInfo = function() if STUB_MACRO_BODY then return "Waterboy", STUB_MACRO_ICON, STUB_MACRO_BODY end end
 GetActionText = function(slot) if slot == 1 and STUB_MACRO_BODY then return "Waterboy" end end
 GetNumMacros = function() return 0, 0 end
-CreateMacro = function(n, icon, body) STUB_MACRO_ICON, STUB_MACRO_BODY = icon, body; return 1 end
-EditMacro = function(i, n, icon, body) STUB_MACRO_EDITS = (STUB_MACRO_EDITS or 0) + 1; STUB_MACRO_ICON, STUB_MACRO_BODY = icon or STUB_MACRO_ICON, body end
+-- like the game: an icon given by name is stored (and reported by GetMacroInfo) as its file ID
+local function StubIconID(icon) if icon == "INV_Misc_QuestionMark" then return 134400 end return icon end
+CreateMacro = function(n, icon, body) STUB_MACRO_ICON, STUB_MACRO_BODY = StubIconID(icon), body; return 1 end
+EditMacro = function(i, n, icon, body) STUB_MACRO_EDITS = (STUB_MACRO_EDITS or 0) + 1; STUB_MACRO_ICON, STUB_MACRO_BODY = StubIconID(icon) or STUB_MACRO_ICON, body end
 PickupMacro = function() end
 UIDropDownMenu_SetWidth = function() end
 UIDropDownMenu_Initialize = function(dd, fn) rawset(dd, "__init", fn) end
@@ -123,4 +125,10 @@ end
 -- tooltip lines, so tests can read what was added
 rawset(GameTooltip, "AddLine", function(self, text) STUB_TT = STUB_TT or {}; STUB_TT[#STUB_TT + 1] = text end)
 GetSpellDescription = function() return STUB_DESC end
-GetFileIDFromPath = function(p) if STUB_NO_FILEID then return nil end if p:find("WaterboyReimagined\\Icon", 1, true) then return -4242 end end
+-- each of the addon's images gets its own (session) file ID
+local STUB_FILE_IDS = { Icon = -4242, IconCooler = -4243, IconBuckets = -4244 }
+GetFileIDFromPath = function(p)
+  if STUB_NO_FILEID then return nil end
+  local name = p:match("WaterboyReimagined\\(%a+)")
+  return name and STUB_FILE_IDS[name]
+end

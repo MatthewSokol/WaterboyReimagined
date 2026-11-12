@@ -455,6 +455,34 @@ local function BuildLoadoutsPage()
     make:SetPoint("TOPLEFT", 14, -330)
     make:SetText("Put macro on cursor")
     make:SetScript("OnClick", function() ns.MakeMacro() end)
+
+    -- the macro's icon: the addon's images, or the next conjure's own icon; the chosen one has a gold border
+    local iconLabel = Label(page, "Macro icon", "GameFontHighlightSmall")
+    iconLabel:SetPoint("TOPLEFT", 262, -306)
+    page.iconButtons = {}
+    for i, opt in ipairs(ns.MACRO_ICONS) do
+        local b = CreateFrame("Button", nil, page)
+        b:SetSize(24, 24)
+        b:SetPoint("TOPLEFT", 330 + (i - 1) * 28, -300)
+        b.border = b:CreateTexture(nil, "BACKGROUND")
+        b.border:SetAllPoints()
+        b.icon = b:CreateTexture(nil, "ARTWORK")
+        b.icon:SetPoint("TOPLEFT", 2, -2)
+        b.icon:SetPoint("BOTTOMRIGHT", -2, 2)
+        b.icon:SetTexture(ns.MacroIconTexture(opt))
+        b:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square", "ADD")
+        b.key = opt.key
+        b:SetScript("OnClick", function() ns.SetMacroIcon(opt.key); Refresh() end)
+        b:SetScript("OnEnter", function(self)
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+            GameTooltip:SetText(opt.label)
+            GameTooltip:AddLine(opt.tip or "Use this picture as the Waterboy macro's icon.", 1, 1, 1, true)
+            GameTooltip:Show()
+        end)
+        b:SetScript("OnLeave", GameTooltip_Hide)
+        page.iconButtons[i] = b
+    end
+
     local text = CreateFrame("EditBox", nil, page)
     text:SetMultiLine(true)
     text:SetFontObject(ChatFontNormal)
@@ -502,6 +530,10 @@ local function RefreshLoadoutsPage()
     end
     page.status:SetText(ns.IsMage() and table.concat(ns.LoadoutStatus(), "\n")
         or "Not a mage: loadouts save, but only a mage conjures.")
+    local chosen = ns.MacroIconChoice()
+    for _, b in ipairs(page.iconButtons) do
+        if b.key == chosen then b.border:SetColorTexture(1, 0.82, 0) else b.border:SetColorTexture(0.15, 0.15, 0.15) end
+    end
 end
 
 local function Build()
