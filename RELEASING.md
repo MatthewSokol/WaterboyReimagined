@@ -35,8 +35,10 @@ From Waterboy Reimagined 1.0.0, SellAll, Faves and Azeroth Idle Cup:
   and log in. A brand-new addon folder needs a full game restart, not `/reload`.
 - **Test the zip you upload.** Install from the built zip (one `WaterboyReimagined\` folder, LICENSE inside, no
   `tools\`, docs or dev files) and log in once.
-- **One version everywhere:** `## Version:` in the .toc, the top `## [x.y.z]` entry in CHANGELOG.md and the
-  `vx.y.z` tag on `main`. Tag after merging. Never move a published tag: README-only changes after a release
+- **One version, from the tag:** the .toc says `## Version: @project-version@`, filled in from the `vx.y.z` tag by
+  `release.ps1` (and by `install.ps1` from `git describe`). Versions follow the dev-routine skill: every merged
+  change is its own candidate (`candidate/vx.y.z`, kept local) with its own `## [x.y.z]` CHANGELOG entry, and a release
+  promotes one candidate by pushing its `vx.y.z` tag. Tag after merging. Never move a published tag: README-only changes after a release
   don't need a new tag, because the README isn't in the zip.
 - **Neutral timestamps:** merge by fast-forward only (never GitHub's merge button); tag with a lightweight tag
   (annotated tags record the real time); `release.ps1` dates zip entries 00:00 UTC.
@@ -57,11 +59,10 @@ From Waterboy Reimagined 1.0.0, SellAll, Faves and Azeroth Idle Cup:
 
 Claude fills this in for each release:
 
-- [ ] Version picked: `x.y.z` (bug fixes: last digit; new features: middle digit)
-- [ ] Everything for this version is merged to `main`
-- [ ] Bump `## Version:` in the .toc and add the `## [x.y.z] - date` entry to CHANGELOG.md (a release PR)
-- [ ] `node tools/verify.js` passes on the release branch
-- [ ] Release PR merged (fast-forward), on `main`, pulled; `install.ps1`
+- [ ] Candidate picked: `x.y.z` (dev-routine `pipeline.js candidates`; default the newest). Everything for it is merged,
+      so its `## [x.y.z]` CHANGELOG entry already exists
+- [ ] Release prep passed (`pipeline.js prep x.y.z`), and `node tools/verify.js` passes
+- [ ] On `main` at the candidate's commit, pulled; `install.ps1`
 - [ ] TESTING.md run in game, as a GitHub issue; every box ticked
 - [ ] `/reload`, then `node tools/mechanic-report.js` is GREEN
 - [ ] `node tools/verify.js --release` is GREEN
@@ -71,10 +72,10 @@ Claude fills this in for each release:
 
 ### CurseForge (project 1799428)
 
-1. Tag and push: `git tag vx.y.z`, then `git push origin vx.y.z`. Use a lightweight tag: an annotated one
+1. Tag and push, after your go-ahead: `pipeline.js released x.y.z` (or `git tag vx.y.z`), then `git push origin vx.y.z`. Use a lightweight tag: an annotated one
    (`git tag -a`, or `mech release`) records the real time.
 2. Build: `powershell -ExecutionPolicy Bypass -File ./release.ps1`. It writes `dist\WaterboyReimagined-x.y.z.zip`
-   and `dist\WaterboyReimagined-x.y.z-changelog.md`.
+   and `dist\WaterboyReimagined-x.y.z-changelog.md`, which holds every candidate's entry since the last release.
 3. Install from the zip once (see Lessons) and log in.
 4. CurseForge, project, **Files**, **Upload file**:
    - File: the zip.

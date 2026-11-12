@@ -2,6 +2,13 @@
 
 Newest first. Each release is `## [version] - date` (the format Mechanic's `changelog.add` and `tools/verify.js --release` expect); `release.ps1` copies the top entry into `dist/` as the CurseForge release notes.
 
+## [Unreleased]
+
+### Added
+
+- **Optional Mechanic support:** with the Mechanic developer addon installed, Waterboy Reimagined logs to its
+  console and adds 7 self-tests to its Tests tab. Nothing changes without it.
+
 ## [1.0.0] - 2026-11-12
 
 First release.

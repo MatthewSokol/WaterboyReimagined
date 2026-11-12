@@ -20,7 +20,7 @@ Keep every change small: one feature request = one branch = one PR.
      when they have state worth checking in game.
    - Only register events that exist on Forever (add them to `KNOWN_EVENTS` in the stub only after
      checking), and register through `ns.RegisterEvents` (an unknown event throws and stops the file loading).
-2. **Install:** `powershell -ExecutionPolicy Bypass -File ./install.ps1` installs into `C:\Program Files (x86)\World of Warcraft\_forever_\Interface\AddOns\WaterboyReimagined`. Then verify each installed file with `diff --strip-trailing-cr -q`.
+2. **Install:** `powershell -ExecutionPolicy Bypass -File ./install.ps1` installs into `C:\Program Files (x86)\World of Warcraft\_forever_\Interface\AddOns\WaterboyReimagined`. Then verify each installed file with `diff -r --strip-trailing-cr -q -I '^## Version:'` (the install fills in the .toc's version).
 3. **Commit** on a feature/fix branch (not `main`), push, and open a PR or add to the open one. Update the PR title and description when its scope grows.
 4. **Don't merge** until the user has tested in game and says it's good. Then merge, switch to `main`, pull, and confirm the installed copy matches.
 5. **End every reply that changed the addon with "How to test"**: `/reload`, then concrete in-game steps and what should happen. Mention `/wbr debug` where it helps.
@@ -30,8 +30,8 @@ Keep every change small: one feature request = one branch = one PR.
 Follow [RELEASING.md](RELEASING.md) when the user says they're ready to release: apply its lessons (and any new
 ones from the user's other addons), give the task list, read `node tools/mechanic-report.js` after their in-game
 run, repeat until the green run, then give the deploy steps. Add new lessons to RELEASING.md and missing checks to
-TESTING.md. `release.ps1` builds `dist/WaterboyReimagined-<version>.zip` (version from the .toc, LICENSE included,
-entries dated 00:00 UTC) and the release notes from the matching `## [version]` CHANGELOG entry.
+TESTING.md. `release.ps1` builds `dist/WaterboyReimagined-<version>.zip` (version from the `vX.Y.Z` release tag on HEAD,
+LICENSE included, entries dated 00:00 UTC; the .toc says `@project-version@`) and the release notes from the matching `## [version]` CHANGELOG entry.
 
 ## Mechanic (dev tool, optional)
 
