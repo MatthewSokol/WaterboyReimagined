@@ -1,6 +1,7 @@
 // Loads the addon in a Lua VM (fengari) with stubbed WoW API, then runs a script that fires events and
-// slash commands. Usage: node tools/harness.js WaterboyReimagined [SavedVariables.lua] tools/smoke.lua
-// Setup once: (cd tools && npm install)
+// slash commands. Usage: node tools/harness.js WaterboyReimagined [pre.lua] tools/smoke.lua
+// pre.lua (or "") runs before the addon loads: a real SavedVariables file to test migrations, or extra stubs
+// such as tools/stub-mechanic.lua. tools/verify.js runs every combination. Setup once: (cd tools && npm install)
 const { lua, lauxlib, lualib, to_luastring } = require("fengari");
 const fs = require("fs"), path = require("path");
 const [dir, sv, ...script] = process.argv.slice(2);

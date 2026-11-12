@@ -76,9 +76,19 @@ local db, charKey
 local isMage = false
 local tradeToken = 0      -- bumps every trade so timers from an old trade stop
 
-local function Print(msg) print("|cff69ccf0Waterboy Reimagined|r: " .. msg) end
+-- ns.LogSink(kind, msg) is set by Mechanic.lua only when the Mechanic dev tool is installed: chat messages and
+-- debug lines then also go to Mechanic's console (debug lines even with /wbr debug off). Players never have it.
+local function Print(msg)
+    print("|cff69ccf0Waterboy Reimagined|r: " .. msg)
+    if ns.LogSink then ns.LogSink("chat", msg) end
+end
 local function Dbg(fmt, ...)
-    if db and db.debug then print("|cff69ccf0Waterboy debug|r: " .. string.format(fmt, ...)) end
+    local show = db and db.debug
+    if not show and not ns.LogSink then return end
+    local ok, msg = pcall(string.format, fmt, ...)
+    if not ok then msg = tostring(fmt) end
+    if show then print("|cff69ccf0Waterboy debug|r: " .. msg) end
+    if ns.LogSink then ns.LogSink("debug", msg) end
 end
 
 -- The addon's logo (the glowing drop, also its AddOns-list icon).

@@ -7,8 +7,10 @@
 ## X-Curse-Project-ID: 1799428
 ## SavedVariables: WaterboyReimaginedDB
 ## IconTexture: Interface\AddOns\WaterboyReimagined\Icon
+## OptionalDeps: !Mechanic
 
 WaterboyReimagined.lua
 Conjure.lua
 Config.lua
 TradePopup.lua
+Mechanic.lua
