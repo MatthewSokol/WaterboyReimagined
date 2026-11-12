@@ -81,6 +81,24 @@ local function Dbg(fmt, ...)
     if db and db.debug then print("|cff69ccf0Waterboy debug|r: " .. string.format(fmt, ...)) end
 end
 
+-- The addon's logo (the glowing drop, also its AddOns-list icon).
+ns.ICON = "Interface\\AddOns\\WaterboyReimagined\\Icon"
+-- A small logo just left of a window's title, enough to tell whose window it is. A title anchored at TOP is
+-- nudged right so the logo and title stay centred together.
+function ns.AddLogo(frame, title, size)
+    size = size or 14
+    local logo = frame:CreateTexture(nil, "OVERLAY")
+    logo:SetSize(size, size)
+    logo:SetTexture(ns.ICON)
+    logo:SetPoint("RIGHT", title, "LEFT", -4, 0)
+    local point, rel, relPoint, x, y = title:GetPoint(1)
+    if point == "TOP" then
+        title:ClearAllPoints()
+        title:SetPoint(point, rel, relPoint, (x or 0) + (size + 4) / 2, y or 0)
+    end
+    return logo
+end
+
 local function CopyEntry(e)
     local slots = {}
     for i, id in ipairs(e.slots) do slots[i] = id end

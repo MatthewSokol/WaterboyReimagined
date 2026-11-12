@@ -45,6 +45,7 @@ local function Build()
     popup.title = popup:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     popup.title:SetPoint("TOP", 0, -5)
     popup.title:SetText("Waterboy Reimagined")
+    popup.logo = ns.AddLogo(popup, popup.title)
 
     popup.heading = popup:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     popup.heading:SetPoint("TOP", 0, -32)

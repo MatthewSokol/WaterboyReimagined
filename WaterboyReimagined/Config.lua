@@ -562,6 +562,7 @@ local function Build()
     frame.title = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     frame.title:SetPoint("TOP", 0, -5)
     frame.title:SetText("Waterboy Reimagined")
+    frame.logo = ns.AddLogo(frame, frame.title)
 
     -- profile: Default or one of the mages on this account
     local prof = Label(frame, "Profile")

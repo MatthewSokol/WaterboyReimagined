@@ -261,3 +261,10 @@ print("new player gets an entry: " .. tostring(me.players["newcomer"] ~= nil))
 for i = 1, 9 do def.players[string.format("zz player %02d", i)] = nil end
 me.players["newcomer"] = nil
 NS.OpenLoadouts("default")
+-- every window carries the small logo
+FIRE("TRADE_SHOW"); FIRE("TRADE_CLOSED")
+print("logos: config " .. tostring(rawget(cfg, "logo") ~= nil)
+  .. ", conjure now " .. tostring(rawget(WaterboyReimaginedManualConjure, "logo") ~= nil)
+  .. ", timer " .. tostring(rawget(WaterboyReimaginedExtraTimer, "logo") ~= nil)
+  .. ", prompt " .. tostring(WaterboyReimaginedMorePrompt ~= nil and rawget(WaterboyReimaginedMorePrompt, "logo") ~= nil)
+  .. ", trade panel " .. tostring(WaterboyReimaginedTradePopup ~= nil and rawget(WaterboyReimaginedTradePopup, "logo") ~= nil))
