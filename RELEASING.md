@@ -25,7 +25,7 @@ A build is green when all three pass, with no code change in between:
 the `.toc` only lists it under `## OptionalDeps`, and CurseForge must not list it as a related project. Your own
 game needs `!Mechanic`, `Mechanic` and `!BugGrabber` (with BugSack) enabled for the report. Mechanic's desktop
 CLI (`mech`, Python 3.10+) isn't needed: the report reads the saved files directly. If you install the CLI later,
-`mech call addon.output` shows the same data, and the CHANGELOG format already suits `mech release`.
+`mech call addon.output` shows the same data. Don't use `mech release`: its tag is annotated (real time).
 
 ## Lessons from earlier releases
 
@@ -38,8 +38,8 @@ From Waterboy Reimagined 1.0.0, SellAll, Faves and Azeroth Idle Cup:
 - **One version everywhere:** `## Version:` in the .toc, the top `## [x.y.z]` entry in CHANGELOG.md and the
   `vx.y.z` tag on `main`. Tag after merging. Never move a published tag: README-only changes after a release
   don't need a new tag, because the README isn't in the zip.
-- **Neutral timestamps:** merge by fast-forward only (never GitHub's merge button); `release.ps1` dates zip
-  entries 00:00 UTC.
+- **Neutral timestamps:** merge by fast-forward only (never GitHub's merge button); tag with a lightweight tag
+  (annotated tags record the real time); `release.ps1` dates zip entries 00:00 UTC.
 - **No character or player names in anything public:** screenshots get names pixelated, and examples use
   made-up names.
 - **Taint:** after conjuring and trading, open the bank, the auction house and talents. There must be no "AddOn
@@ -71,7 +71,8 @@ Claude fills this in for each release:
 
 ### CurseForge (project 1799428)
 
-1. Tag and push: `git tag -a vx.y.z -m "Waterboy Reimagined x.y.z"`, then `git push origin vx.y.z`.
+1. Tag and push: `git tag vx.y.z`, then `git push origin vx.y.z`. Use a lightweight tag: an annotated one
+   (`git tag -a`, or `mech release`) records the real time.
 2. Build: `powershell -ExecutionPolicy Bypass -File ./release.ps1`. It writes `dist\WaterboyReimagined-x.y.z.zip`
    and `dist\WaterboyReimagined-x.y.z-changelog.md`.
 3. Install from the zip once (see Lessons) and log in.
