@@ -11,8 +11,15 @@ $toc = Get-Content (Join-Path $src "WaterboyReimagined.toc")
 $version = ($toc | Where-Object { $_ -match '^## Version:\s*(.+)$' } | ForEach-Object { $Matches[1].Trim() }) | Select-Object -First 1
 if (-not $version) { throw "No '## Version:' line in the .toc" }
 
+# The release notes: this version's CHANGELOG.md entry, which must be there.
+$changelog = [IO.File]::ReadAllText((Join-Path $root "CHANGELOG.md"))
+$m = [regex]::Match($changelog, "(?ms)^## \[" + [regex]::Escape($version) + "\][^\n]*\n(.*?)(?=^## \[|\z)")
+if (-not $m.Success) { throw "CHANGELOG.md has no '## [$version]' entry" }
+
 $dist = Join-Path $root "dist"
 New-Item -ItemType Directory -Force $dist | Out-Null
+$notesPath = Join-Path $dist "WaterboyReimagined-$version-changelog.md"
+[IO.File]::WriteAllText($notesPath, $m.Groups[1].Value.Trim() + "`n")
 $zipPath = Join-Path $dist "WaterboyReimagined-$version.zip"
 if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
 
@@ -33,3 +40,4 @@ try {
     }
 } finally { $zip.Dispose() }
 Write-Host "Built $zipPath ($($files.Count) files)"
+Write-Host "Release notes (paste into CurseForge): $notesPath"

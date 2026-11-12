@@ -195,7 +195,10 @@ powershell -ExecutionPolicy Bypass -File ./install.ps1
 
 ## Release
 
-1. Bump `## Version:` in `WaterboyReimagined/WaterboyReimagined.toc` and add a section to `CHANGELOG.md`.
+The full process (checks, the in-game checklist, deploying) is in [RELEASING.md](RELEASING.md). In short:
+
+1. Bump `## Version:` in `WaterboyReimagined/WaterboyReimagined.toc` and add a `## [version] - date` section to
+   `CHANGELOG.md`.
 2. Build the upload:
 
 ```

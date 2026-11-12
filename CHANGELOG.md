@@ -1,6 +1,8 @@
 # Changelog
 
-## 1.0.0
+Newest first. Each release is `## [version] - date` (the format Mechanic's `changelog.add` and `tools/verify.js --release` expect); `release.ps1` copies the top entry into `dist/` as the CurseForge release notes.
+
+## [1.0.0] - 2026-11-12
 
 First release.
 
