@@ -12,5 +12,6 @@ First release.
 - **Loadouts and macro:** how many stacks to keep for solo, party and raid (optionally plus the group's trades). The Waterboy macro restacks, then conjures one missing item per press. It says what it's casting, then reports your stacks once the cast finishes. Three presses after the loadout is complete ask whether to keep going: temporarily (until a minute without conjuring, with a countdown bar on screen), or by opening the Loadouts tab to change the loadout for good.
 - **The macro on your bar:** your pick of icon (Loadouts tab: the glowing drop, an arcane water cooler, water buckets, or the next conjure's own spell icon), faded like the next conjure's spell when you can't cast it (out of mana, say); its tooltip shows the next press and your stacks. In combat it says each press repeats the last cast until combat ends, and with no bag space it says so instead of casting.
 - **Conjure now:** buttons beside the config window for your highest and 2nd highest water and food, one cast per click. Ranks you haven't learned yet are greyed out.
-- **Icon:** a glowing drop over a rune circle in the AddOns list.
+- **Icon:** a glowing drop over a rune circle, in the AddOns list and in each window's corner.
+- **Minimap button:** left-click opens the window, right-click the Loadouts tab, hover for your loadout; drag it around the minimap, or hide it (General tab, `/wbr minimap`).
 - **WoW Forever names:** mages and players go by their full name (first name and surname), and mages show their ruleset and faction instead of the realm's long name.

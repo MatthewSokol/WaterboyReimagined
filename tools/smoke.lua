@@ -273,3 +273,36 @@ for _, w in ipairs({ cfg, WaterboyReimaginedMorePrompt, WaterboyReimaginedTradeP
   w:Show(); rawget(w.CloseButton, "__s_OnClick")(w.CloseButton)
   print("closed by X: " .. tostring(not w:IsShown()))
 end
+-- minimap button: made at login, placed on the edge, draggable, clickable, and hidden/shown by setting and command
+local mb = WaterboyReimaginedMinimapButton
+print("minimap button: " .. tostring(mb ~= nil) .. ", shown " .. tostring(mb and mb:IsShown()))
+rawset(mb, "SetPoint", function(self, p, rel, rp, x, y) rawset(self, "__pos", string.format("%s %.0f,%.0f", p, x, y)) end)
+STUB_CURSOR = { 1000, 900 } -- straight above the minimap
+CALL("drag start", rawget(mb, "__s_OnDragStart"), mb)
+CALL("drag move", rawget(mb, "__s_OnUpdate"), mb)
+CALL("drag stop", rawget(mb, "__s_OnDragStop"), mb)
+print("dragged to the top: angle " .. tostring(WaterboyReimaginedDB.minimap.angle) .. ", at " .. tostring(rawget(mb, "__pos")))
+GetMinimapShape = function() return "SQUARE" end
+STUB_CURSOR = { 1300, 900 } -- up and to the right: a square minimap puts it in the corner
+CALL("drag start (square)", rawget(mb, "__s_OnDragStart"), mb)
+CALL("drag on a square minimap", rawget(mb, "__s_OnUpdate"), mb)
+CALL("drag stop (square)", rawget(mb, "__s_OnDragStop"), mb)
+print("square corner: angle " .. string.format("%.0f", WaterboyReimaginedDB.minimap.angle) .. ", at " .. tostring(rawget(mb, "__pos")))
+GetMinimapShape = nil
+CALL("minimap tooltip", rawget(mb, "__s_OnEnter"), mb)
+cfg:Hide()
+CALL("left-click", rawget(mb, "__s_OnClick"), mb, "LeftButton")
+print("left-click opens the window: " .. tostring(cfg:IsShown()))
+CALL("left-click again", rawget(mb, "__s_OnClick"), mb, "LeftButton")
+print("and closes it: " .. tostring(not cfg:IsShown()))
+CALL("right-click", rawget(mb, "__s_OnClick"), mb, "RightButton")
+print("right-click opens the window: " .. tostring(cfg:IsShown()))
+CALL("/wbr minimap (hide)", SlashCmdList.WATERBOYREIMAGINED, "minimap")
+print("hidden: " .. tostring(not mb:IsShown()) .. ", saved " .. tostring(WaterboyReimaginedDB.minimap.hide))
+CALL("/wbr minimap (show)", SlashCmdList.WATERBOYREIMAGINED, "minimap")
+print("shown again: " .. tostring(mb:IsShown()))
+local gp = cfg.general
+print("General tab checkboxes: " .. tostring(gp and #gp.checks))
+CALL("untick Minimap button", function() local cb = gp.checks[3]; cb:SetChecked(false); rawget(cb, "__s_OnClick")(cb) end)
+print("hidden by the checkbox: " .. tostring(not mb:IsShown()))
+NS.SetMinimapButtonShown(true)

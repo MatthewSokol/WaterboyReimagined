@@ -302,24 +302,27 @@ local function BuildGeneralPage()
         function() return ns.DB().enabled end, function(v) ns.DB().enabled = v end)
     Check(-96, "Debug messages", "Print what the addon is doing in chat (same as /wbr debug).",
         function() return ns.DB().debug end, function(v) ns.DB().debug = v end)
+    Check(-152, "Minimap button",
+        "Show the Waterboy button around the minimap (same as /wbr minimap). Drag it to move it.",
+        function() return ns.MinimapButtonShown() end, function(v) ns.SetMinimapButtonShown(v) end)
 
-    Label(page, "This character"):SetPoint("TOPLEFT", 14, -146)
+    Label(page, "This character"):SetPoint("TOPLEFT", 14, -202)
     page.me = Label(page, "", "GameFontHighlightSmall")
-    page.me:SetPoint("TOPLEFT", 18, -164)
+    page.me:SetPoint("TOPLEFT", 18, -220)
     page.me:SetWidth(490)
     page.me:SetJustifyH("LEFT")
 
-    Label(page, "Mages on this account"):SetPoint("TOPLEFT", 14, -196)
+    Label(page, "Mages on this account"):SetPoint("TOPLEFT", 14, -248)
     page.mages = Label(page, "", "GameFontHighlightSmall")
-    page.mages:SetPoint("TOPLEFT", 18, -214)
+    page.mages:SetPoint("TOPLEFT", 18, -266)
     page.mages:SetWidth(490)
     page.mages:SetJustifyH("LEFT")
     page.mages:SetSpacing(2)
 
-    Label(page, "Commands"):SetPoint("TOPLEFT", 14, -322)
+    Label(page, "Commands"):SetPoint("TOPLEFT", 14, -352)
     local cmds = Label(page, "/wbr or /wb opens this window. /wbr help lists the rest, "
         .. "e.g. /wbr set Grimbold 1 1.", "GameFontHighlightSmall")
-    cmds:SetPoint("TOPLEFT", 18, -340)
+    cmds:SetPoint("TOPLEFT", 18, -370)
     cmds:SetWidth(490)
     cmds:SetJustifyH("LEFT")
 
@@ -984,3 +987,134 @@ function ns.OpenLoadouts(key)
     frame:Show()
     Refresh()
 end
+
+---------------------------------------------------------------------------------------------------
+-- Minimap button: left-click opens or closes the window, right-click opens the Loadouts tab, drag it around
+-- the minimap. Hidden with the General tab's "Minimap button" box or /wbr minimap. Saved account-wide in
+-- db.minimap = { hide = bool, angle = degrees }. Placed the way most addons place theirs (round minimaps keep it
+-- on the edge, square corners push it into the corner), so minimap-shape addons work.
+---------------------------------------------------------------------------------------------------
+
+-- which of the four quadrants of each minimap shape are round (the rest are square corners)
+local MINIMAP_SHAPES = {
+    ROUND = { true, true, true, true }, SQUARE = { false, false, false, false },
+    ["CORNER-TOPLEFT"] = { false, false, false, true }, ["CORNER-TOPRIGHT"] = { false, false, true, false },
+    ["CORNER-BOTTOMLEFT"] = { false, true, false, false }, ["CORNER-BOTTOMRIGHT"] = { true, false, false, false },
+    ["SIDE-LEFT"] = { false, true, false, true }, ["SIDE-RIGHT"] = { true, false, true, false },
+    ["SIDE-TOP"] = { false, false, true, true }, ["SIDE-BOTTOM"] = { true, true, false, false },
+    ["TRICORNER-TOPLEFT"] = { false, true, true, true }, ["TRICORNER-TOPRIGHT"] = { true, false, true, true },
+    ["TRICORNER-BOTTOMLEFT"] = { true, true, false, true }, ["TRICORNER-BOTTOMRIGHT"] = { true, true, true, false },
+}
+local atan2 = math.atan2 or math.atan
+local minimapButton
+
+local function MinimapSettings()
+    local db = ns.DB()
+    db.minimap = db.minimap or {}
+    return db.minimap
+end
+
+local function PlaceMinimapButton()
+    if not minimapButton then return end
+    local angle = math.rad(MinimapSettings().angle or 200)
+    local x, y, q = math.cos(angle), math.sin(angle), 1
+    if x < 0 then q = q + 1 end
+    if y > 0 then q = q + 2 end
+    local round = (MINIMAP_SHAPES[GetMinimapShape and GetMinimapShape() or "ROUND"] or MINIMAP_SHAPES.ROUND)[q]
+    local w, h = Minimap:GetWidth() / 2 + 5, Minimap:GetHeight() / 2 + 5
+    if round then
+        x, y = x * w, y * h
+    else
+        local dw, dh = math.sqrt(2 * w * w) - 10, math.sqrt(2 * h * h) - 10
+        x = math.max(-w, math.min(x * dw, w))
+        y = math.max(-h, math.min(y * dh, h))
+    end
+    minimapButton:ClearAllPoints()
+    minimapButton:SetPoint("CENTER", Minimap, "CENTER", x, y)
+end
+
+local function MinimapTooltip(self)
+    GameTooltip:SetOwner(self, "ANCHOR_LEFT")
+    GameTooltip:SetText("Waterboy Reimagined")
+    if ns.IsMage() then
+        for _, line in ipairs(ns.LoadoutStatus()) do GameTooltip:AddLine(line, 0.85, 0.85, 0.85) end
+    end
+    GameTooltip:AddLine(" ")
+    GameTooltip:AddLine("Left-click: open or close the window", 1, 1, 1)
+    GameTooltip:AddLine("Right-click: Loadouts tab", 1, 1, 1)
+    GameTooltip:AddLine("Drag: move this button", 1, 1, 1)
+    GameTooltip:Show()
+end
+
+local function CreateMinimapButton()
+    if minimapButton or not Minimap then return end
+    local b = CreateFrame("Button", "WaterboyReimaginedMinimapButton", Minimap)
+    b:SetSize(31, 31)
+    b:SetFrameStrata("MEDIUM")
+    b:SetFrameLevel(8)
+    b:RegisterForClicks("AnyUp")
+    b:RegisterForDrag("LeftButton")
+    b:SetHighlightTexture("Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight")
+    -- the usual minimap-button art; clients with the addon compartment use the newer, centred layout
+    local modern = AddonCompartmentFrame ~= nil
+    local border = b:CreateTexture(nil, "OVERLAY")
+    border:SetTexture("Interface\\Minimap\\MiniMap-TrackingBorder")
+    border:SetSize(modern and 50 or 53, modern and 50 or 53)
+    border:SetPoint("TOPLEFT")
+    local bg = b:CreateTexture(nil, "BACKGROUND")
+    bg:SetTexture("Interface\\Minimap\\UI-Minimap-Background")
+    local icon = b:CreateTexture(nil, "ARTWORK")
+    icon:SetTexture(ns.ICON)
+    icon:SetTexCoord(0.05, 0.95, 0.05, 0.95)
+    if modern then
+        bg:SetSize(24, 24); bg:SetPoint("CENTER")
+        icon:SetSize(18, 18); icon:SetPoint("CENTER")
+    else
+        bg:SetSize(20, 20); bg:SetPoint("TOPLEFT", 7, -5)
+        icon:SetSize(17, 17); icon:SetPoint("TOPLEFT", 7, -6)
+    end
+    b:SetScript("OnClick", function(_, button)
+        if button == "RightButton" then ns.OpenLoadouts(ns.IsMage() and ns.CharKey() or "default")
+        else ns.ToggleConfig() end
+    end)
+    b:SetScript("OnDragStart", function(self)
+        GameTooltip:Hide()
+        self:LockHighlight()
+        self:SetScript("OnUpdate", function()
+            local mx, my = Minimap:GetCenter()
+            local px, py = GetCursorPosition()
+            local scale = Minimap:GetEffectiveScale()
+            MinimapSettings().angle = math.deg(atan2(py / scale - my, px / scale - mx)) % 360
+            PlaceMinimapButton()
+        end)
+    end)
+    b:SetScript("OnDragStop", function(self)
+        self:SetScript("OnUpdate", nil)
+        self:UnlockHighlight()
+    end)
+    b:SetScript("OnEnter", MinimapTooltip)
+    b:SetScript("OnLeave", GameTooltip_Hide)
+    minimapButton = b
+end
+
+-- Show or hide the button per the setting (called at login, and after the setting changes).
+function ns.UpdateMinimapButton()
+    if not ns.DB() then return end
+    if MinimapSettings().hide then
+        if minimapButton then minimapButton:Hide() end
+        return
+    end
+    CreateMinimapButton()
+    if not minimapButton then return end
+    minimapButton:Show()
+    PlaceMinimapButton()
+    -- once more a moment later, for minimap addons that set their shape after logging in
+    C_Timer.After(2, PlaceMinimapButton)
+end
+
+function ns.SetMinimapButtonShown(shown)
+    MinimapSettings().hide = not shown
+    ns.UpdateMinimapButton()
+end
+
+function ns.MinimapButtonShown() return not (ns.DB() and MinimapSettings().hide) end

@@ -503,6 +503,7 @@ local HELP = {
     "/wbr on | off - fill trades or not (now: %s)",
     "/wbr macro - put the Waterboy conjure macro on your cursor",
     "/wbr loadout - what the conjure macro is aiming for right now",
+    "/wbr minimap - show or hide the minimap button",
     "/wbr debug - toggle debug messages",
 }
 
@@ -559,6 +560,9 @@ local function Slash(input)
         db.enabled = cmd == "on"
         Print("Trade filling " .. (db.enabled and "on" or "off"))
         if ns.RefreshConfig then ns.RefreshConfig() end
+    elseif cmd == "minimap" then
+        ns.SetMinimapButtonShown(not ns.MinimapButtonShown())
+        Print("Minimap button " .. (ns.MinimapButtonShown() and "shown" or "hidden") .. ".")
     elseif cmd == "debug" then
         db.debug = not db.debug
         Print("Debug " .. (db.debug and "on" or "off"))
@@ -595,6 +599,7 @@ f:SetScript("OnEvent", function(_, event, arg1)
     elseif event == "PLAYER_LOGIN" then
         isMage = select(2, UnitClass("player")) == "MAGE"
         RecordMage()
+        if ns.UpdateMinimapButton then ns.UpdateMinimapButton() end
     elseif event == "SPELLS_CHANGED" then
         RecordMage() -- learned a new rank
     elseif event == "TRADE_SHOW" then

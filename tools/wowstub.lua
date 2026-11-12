@@ -141,3 +141,10 @@ GetFileIDFromPath = function(p)
   local name = p:match("WaterboyReimagined\\(%a+)")
   return name and STUB_FILE_IDS[name]
 end
+-- a 140x140 minimap centred at (1000, 600), and a cursor the tests can move (STUB_CURSOR = { x, y })
+Minimap = CreateFrame("Frame", "Minimap")
+rawset(Minimap, "GetWidth", function() return 140 end)
+rawset(Minimap, "GetHeight", function() return 140 end)
+rawset(Minimap, "GetCenter", function() return 1000, 600 end)
+rawset(Minimap, "GetEffectiveScale", function() return 1 end)
+GetCursorPosition = function() local c = STUB_CURSOR or { 0, 0 }; return c[1], c[2] end

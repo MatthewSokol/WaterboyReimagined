@@ -12,6 +12,9 @@ A WoW Forever addon for mages who hand out water.
 - **Conjure now:** buttons beside the config window to cast your top two ranks of water and food once.
 - **Drag-and-drop config** on a fake trade window.
 
+**Minimap button:** left-click opens the window, right-click the Loadouts tab, and hovering it shows your
+loadout. Drag it around the minimap; hide it on the General tab or with `/wbr minimap`.
+
 What's planned next: see [Coming soon](#coming-soon).
 
 ## Why this addon
@@ -123,8 +126,8 @@ Settings can be changed on any character; trades are only filled on mages.
 
 ### Config window (`/wbr`)
 
-Three tabs along the bottom: **General** (fill trades automatically, debug messages, this character and the
-mages on this account), **Trades** (below) and **Loadouts** (see Conjuring). On the Trades tab:
+Three tabs along the bottom: **General** (fill trades automatically, debug messages, the minimap button, this
+character and the mages on this account), **Trades** (below) and **Loadouts** (see Conjuring). On the Trades tab:
 
 - **Profile:** a dropdown with Default and every mage on this account (each mage is added the first time it
   logs in with the addon), listed by full name, level, ruleset and faction ("Aldren Brightwater, level 60 - PvP
@@ -155,6 +158,7 @@ mages on this account), **Trades** (below) and **Loadouts** (see Conjuring). On 
 | `/wbr on` / `off` | fill trades or not |
 | `/wbr macro` | put the Waterboy conjure macro on your cursor |
 | `/wbr loadout` | what the macro is aiming for right now |
+| `/wbr minimap` | show or hide the minimap button |
 | `/wbr debug` | toggle debug messages |
 
 `/wb` works too. Example: `/wbr set Grimbold 1 1`.
