@@ -1,0 +1,8 @@
+{
+  "name": "waterboy-reimagined-tools",
+  "private": true,
+  "description": "Dev checks for the addon: Lua VM smoke test",
+  "dependencies": {
+    "fengari": "0.1.4"
+  }
+}
