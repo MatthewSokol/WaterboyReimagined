@@ -13,4 +13,12 @@ if (-not (Test-Path $addons)) {
 $dst = Join-Path $addons "WaterboyReimagined"
 New-Item -ItemType Directory -Force $dst | Out-Null
 Copy-Item -Path (Join-Path $src "*") -Destination $dst -Recurse -Force
-Write-Host "Installed WaterboyReimagined to $dst"
+
+# Fill the .toc's @project-version@ the way the BigWigs packager does from the release tag.
+$version = git -C $PSScriptRoot describe --tags --always --dirty 2>$null
+if (-not $version) { $version = "dev" }
+Get-ChildItem $dst -Filter *.toc | ForEach-Object {
+    $text = [IO.File]::ReadAllText($_.FullName)
+    [IO.File]::WriteAllText($_.FullName, $text.Replace("@project-version@", $version))
+}
+Write-Host "Installed WaterboyReimagined ($version) to $dst"

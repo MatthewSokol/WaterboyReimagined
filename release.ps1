@@ -1,15 +1,24 @@
 # Builds the CurseForge upload: dist\WaterboyReimagined-<version>.zip with one top-level WaterboyReimagined\ folder
-# (the addon files plus LICENSE). The version comes from the .toc. Zip entries use forward slashes, which
+# (the addon files plus LICENSE). The version comes from the vX.Y.Z tag on HEAD and fills the .toc's @project-version@. Zip entries use forward slashes, which
 # Compress-Archive on Windows PowerShell 5.1 doesn't. Every entry is dated 00:00 UTC of today, like the
 # commits, so the zip doesn't show when you worked.
+# Test build from an untagged commit: -Version 1.2.3-test
+param([string]$Version)
 $ErrorActionPreference = "Stop"
 Add-Type -AssemblyName System.IO.Compression, System.IO.Compression.FileSystem
 
 $root = $PSScriptRoot
 $src = Join-Path $root "WaterboyReimagined"
-$toc = Get-Content (Join-Path $src "WaterboyReimagined.toc")
-$version = ($toc | Where-Object { $_ -match '^## Version:\s*(.+)$' } | ForEach-Object { $Matches[1].Trim() }) | Select-Object -First 1
-if (-not $version) { throw "No '## Version:' line in the .toc" }
+# The release tag on HEAD gives the version (v1.2.3 -> 1.2.3). git's stderr must not stop the script.
+$tag = $null
+if (-not $Version) {
+    $ErrorActionPreference = "Continue"
+    $tag = git -C $root describe --tags --exact-match 2>$null
+    $ErrorActionPreference = "Stop"
+    if (-not $tag) { throw "HEAD has no release tag. Tag the release on main first (git tag vX.Y.Z), or pass -Version for a test build." }
+    $Version = $tag -replace '^v', ''
+}
+$tocVersion = if ($tag) { $tag } else { $Version }
 
 # The release notes: this version's CHANGELOG.md entry, which must be there.
 $changelog = [IO.File]::ReadAllText((Join-Path $root "CHANGELOG.md"))
@@ -36,7 +45,12 @@ try {
         $entry.LastWriteTime = $stamp
         $out = $entry.Open()
         $in = [System.IO.File]::OpenRead($f.Path)
-        try { $in.CopyTo($out) } finally { $in.Dispose(); $out.Dispose() }
+        try {
+            if ($f.Path -like '*.toc') {
+                $bytes = [Text.Encoding]::UTF8.GetBytes([IO.File]::ReadAllText($f.Path).Replace('@project-version@', $tocVersion))
+                $out.Write($bytes, 0, $bytes.Length)
+            } else { $in.CopyTo($out) }
+        } finally { $in.Dispose(); $out.Dispose() }
     }
 } finally { $zip.Dispose() }
 Write-Host "Built $zipPath ($($files.Count) files)"

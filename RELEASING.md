@@ -35,8 +35,9 @@ From Waterboy Reimagined 1.0.0, SellAll, Faves and Azeroth Idle Cup:
   and log in. A brand-new addon folder needs a full game restart, not `/reload`.
 - **Test the zip you upload.** Install from the built zip (one `WaterboyReimagined\` folder, LICENSE inside, no
   `tools\`, docs or dev files) and log in once.
-- **One version everywhere:** `## Version:` in the .toc, the top `## [x.y.z]` entry in CHANGELOG.md and the
-  `vx.y.z` tag on `main`. Tag after merging. Never move a published tag: README-only changes after a release
+- **One version, from the tag:** the .toc says `## Version: @project-version@`, filled in from the `vx.y.z` tag by
+  `release.ps1` (and by `install.ps1` from `git describe`). The top `## [x.y.z]` CHANGELOG entry matches the tag.
+  PRs don't bump versions: each adds a line under `## [Unreleased]` and states its bump level. Tag after merging. Never move a published tag: README-only changes after a release
   don't need a new tag, because the README isn't in the zip.
 - **Neutral timestamps:** merge by fast-forward only (never GitHub's merge button); tag with a lightweight tag
   (annotated tags record the real time); `release.ps1` dates zip entries 00:00 UTC.
@@ -57,9 +58,10 @@ From Waterboy Reimagined 1.0.0, SellAll, Faves and Azeroth Idle Cup:
 
 Claude fills this in for each release:
 
-- [ ] Version picked: `x.y.z` (bug fixes: last digit; new features: middle digit)
+- [ ] Version picked: `x.y.z`, the highest bump level among the PRs since the last tag (patch: fixes; minor: new
+      features or options; major: removed features, changed commands, SavedVariables changes or resets)
 - [ ] Everything for this version is merged to `main`
-- [ ] Bump `## Version:` in the .toc and add the `## [x.y.z] - date` entry to CHANGELOG.md (a release PR)
+- [ ] Rename `## [Unreleased]` to `## [x.y.z] - date` in CHANGELOG.md and add a new empty `## [Unreleased]` (a release PR)
 - [ ] `node tools/verify.js` passes on the release branch
 - [ ] Release PR merged (fast-forward), on `main`, pulled; `install.ps1`
 - [ ] TESTING.md run in game, as a GitHub issue; every box ticked

@@ -21,8 +21,9 @@ const git = (...args) => {
 // 1. The .toc and the files it loads
 const toc = fs.readFileSync(path.join(addon, "WaterboyReimagined.toc"), "utf8");
 const tocFiles = toc.split(/\r?\n/).filter((l) => l.trim() && !l.startsWith("#")).map((l) => l.trim());
-const version = (toc.match(/^## Version:\s*(.+)$/m) || [])[1]?.trim();
-check(".toc version", !!version, version || "no ## Version: line");
+// The packager (and release.ps1, install.ps1) fill the version in from the git tag.
+const tocVersion = (toc.match(/^## Version:\s*(.+)$/m) || [])[1]?.trim();
+check(".toc version", tocVersion === "@project-version@", tocVersion ? `## Version: ${tocVersion}` : "no ## Version: line");
 const missing = tocFiles.filter((f) => !fs.existsSync(path.join(addon, f)));
 check(".toc files exist", missing.length === 0, missing.length ? "missing: " + missing.join(", ") : tocFiles.length + " files");
 const luaOnDisk = fs.readdirSync(addon).filter((f) => f.endsWith(".lua"));
@@ -58,14 +59,17 @@ if (!fs.existsSync(path.join(__dirname, "node_modules", "fengari"))) {
 // 4. Ready to ship (--release only)
 if (release) {
   const changelog = fs.readFileSync(path.join(root, "CHANGELOG.md"), "utf8");
-  const first = (changelog.match(/^## \[([^\]]+)\]/m) || [])[1];
-  check("CHANGELOG has this version on top", first === version, `top entry ${first}, .toc ${version}`);
+  // The version being released is the top ## [x.y.z] entry; the tag vx.y.z comes from it.
+  const version = (changelog.match(/^## \[(?!Unreleased\])([^\]]+)\]/m) || [])[1];
+  check("CHANGELOG has a release entry", !!version, version ? `top entry ${version}` : "no ## [x.y.z] - date entry");
+  const pending = (changelog.match(/^## \[Unreleased\][^\n]*\n([\s\S]*?)(?=^## \[|(?![\s\S]))/m) || [])[1] || "";
+  check("[Unreleased] is empty", pending.trim() === "", pending.trim() ? "rename it to the new version first" : "yes");
   check("working tree clean", git("status", "--porcelain") === "", git("status", "--porcelain") || "clean");
   const branch = git("branch", "--show-current");
   check("on main", branch === "main", branch);
   const tagged = git("rev-parse", "-q", "--verify", `refs/tags/v${version}^{commit}`);
   check(`tag v${version}`, !tagged || tagged === git("rev-parse", "HEAD"),
-    tagged ? (tagged === git("rev-parse", "HEAD") ? "on this commit" : "already used by another commit: bump the version") : "not made yet");
+    tagged ? (tagged === git("rev-parse", "HEAD") ? "on this commit" : "already used by another commit: pick the next version") : "not made yet");
 }
 
 let green = true;
