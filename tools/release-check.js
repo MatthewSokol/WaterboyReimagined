@@ -111,7 +111,8 @@ if (!data) {
   for (const l of logs.slice(-15)) console.log("  " + String(l).replace(/\r?\n/g, " / "));
 }
 
-// 5. The test journal: steps this build proved since the newest code change (TESTING.md's [journal: id] rows)
+// 5. The test journal: steps this build proved since the newest code change (TESTING.md's
+//    `[auto validated · journal: id]` rows, which Claude ticks on the checklist page once they show ok)
 const svFile = path.join(svDir, ADDON + ".lua");
 const journal = fs.existsSync(svFile) ? arr(readSV(svFile, "WaterboyReimaginedDB").journal) : [];
 const current = journal.filter((e) => e && e.v === version && e.t * 1000 >= newestCode - 2000);
@@ -121,8 +122,7 @@ for (const e of current) {
   if (e.ok) s.ok++; else { s.fail++; problems.push(`journal: ${e.step} failed: ${e.info}`); }
   s.info = e.info;
 }
-const wanted = [...new Set([...fs.readFileSync(path.join(root, "TESTING.md"), "utf8").matchAll(/\[journal: ([\w-]+)\]/g)].map((m) => m[1]))]
-  .filter((id) => id !== "id"); // the intro's placeholder
+const wanted = [...new Set([...fs.readFileSync(path.join(root, "TESTING.md"), "utf8").matchAll(/journal: ([\w-]+)\]/g)].map((m) => m[1]))];
 console.log(`\nTest journal (${current.length} entries for ${version}, ${journal.length} kept):`);
 for (const id of wanted) {
   const s = steps[id];

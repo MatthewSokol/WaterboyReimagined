@@ -19,8 +19,8 @@ A build is green when all three pass, with no code change in between:
 | Check | How | Green means |
 |---|---|---|
 | Offline | `node tools/verify.js --release` | Every line `ok` (the .toc's files, brackets, the smoke, migration and Mechanic tests in a Lua VM, the changelog entry, a clean `main`, a free tag) |
-| In game, by hand | [TESTING.md](TESTING.md), as a GitHub issue so the boxes can be ticked | Every box ticked |
-| In game, the gate | Exit the game after the checklist; Claude has `wow-env.js watch -- node tools/release-check.js` running | `GREEN`: results newer than the code, installed copy matches, all 7 self-tests pass, no failed test-journal entry for this build (the journal also ticks `[journal: id]` rows), no Waterboy Reimagined Lua errors in BugGrabber |
+| In game, the checklist | [TESTING.md](TESTING.md) on the Waterboy Release Checklist page | Every row ticked (auto validated rows by Claude once their proof passes) or overridden by you with a note, and no open problems |
+| In game, the gate | Exit the game after the checklist; Claude has `wow-env.js watch -- node tools/release-check.js` running | `GREEN`: results newer than the code, installed copy matches, all 7 self-tests pass, no failed test-journal entry for this build, no Waterboy Reimagined Lua errors in BugGrabber |
 
 **Mechanic is a dev tool, never a dependency.** Players don't have it: `Mechanic.lua` returns at once without it,
 the `.toc` only lists it under `## OptionalDeps`, and CurseForge must not list it as a related project. Your own
@@ -56,6 +56,15 @@ From Waterboy Reimagined 1.0.0, SellAll, Faves and Azeroth Idle Cup:
 - **Checklist gaps you've found before:** a step missing from TESTING.md (as the clean install once was) gets added
   there, so the next release has it.
 
+## Checklist rows and problems
+
+TESTING.md tags each row: **auto executed · trigger** (Claude runs it unasked when the trigger is met),
+**auto validated · proof** (a check proves it; Claude ticks it, and you can only Override it with a note), both,
+or none (yours). A problem you note on a row is a failed test: it blocks the release until it's fixed and
+re-tested, unless you defer it or the row itself was wrong. **Known issues:** the note of every overridden row
+and every deferred problem. Claude adds them under `### Known issues` in the changelog file `release.ps1`
+writes, before you upload.
+
 ## Task list template
 
 Claude fills this in for each release:
@@ -65,7 +74,8 @@ Claude fills this in for each release:
 - [ ] Release prep passed (`pipeline.js prep x.y.z`: in a clean checkout, `tools/verify.js`, a test build with
       `release.ps1 -Version x.y.z`, and `tools/check-zip.js` on that zip)
 - [ ] On `main` at the candidate's commit, pulled; `install.ps1`
-- [ ] TESTING.md run in game (stages 1–3, with `wow-env` test profiles), as a GitHub issue; every box ticked
+- [ ] TESTING.md run in game (stages 1–3, with `wow-env` test profiles) on the checklist page: every row ticked or
+      overridden, every problem fixed and re-tested, deferred by you, or the row corrected (TESTING.md, Problems)
 - [ ] The gate (`node tools/release-check.js`, run when the game exits) is GREEN
 - [ ] `node tools/verify.js --release` is GREEN
 - [ ] Deploy (below)
@@ -84,7 +94,7 @@ Claude fills this in for each release:
    - Display name: `Waterboy Reimagined x.y.z`.
    - Release type: **Release**.
    - Game version: **WoW Forever**.
-   - Changelog: the changelog `.md` file's text. If the box doesn't take Markdown, drop the `**` marks.
+   - Changelog: the changelog `.md` file's text, known issues included. If the box doesn't take Markdown, drop the `**` marks.
    - Related projects: none.
 5. If features changed, update the description (README "What it does" and Coming soon) and the screenshots
    (names pixelated).
