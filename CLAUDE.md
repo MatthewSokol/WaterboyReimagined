@@ -4,7 +4,12 @@ WoW **Forever** addon (interface 16001, modern `C_Container` API) for mages: han
 
 ## Workflow after every edit (always, without being asked)
 
-Keep every change small: one feature request = one branch = one PR.
+Pipeline: `.devroutine/pipeline.json`, run with the dev-routine skill (`pipeline.js loop` runs steps 1–2 below:
+bracket check, `tools/verify.js`, `install.ps1`, and the installed copy checked by wow-mod-dev's `install.js --verify`).
+Requests to pick from live in GitHub issues and `BACKLOG.md`.
+
+Keep every change small: about 100 changed lines per PR, 500 at most (`pipeline.js size`). One request is one unit
+of work: one candidate version, often several stacked PRs.
 
 1. **Check** (there's no Lua interpreter on this machine): `node tools/verify.js` runs everything below and must
    say GREEN.

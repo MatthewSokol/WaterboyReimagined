@@ -61,7 +61,8 @@ Claude fills this in for each release:
 
 - [ ] Candidate picked: `x.y.z` (dev-routine `pipeline.js candidates`; default the newest). Everything for it is merged,
       so its `## [x.y.z]` CHANGELOG entry already exists
-- [ ] Release prep passed (`pipeline.js prep x.y.z`), and `node tools/verify.js` passes
+- [ ] Release prep passed (`pipeline.js prep x.y.z`: in a clean checkout, `tools/verify.js`, a test build with
+      `release.ps1 -Version x.y.z`, and `tools/check-zip.js` on that zip)
 - [ ] On `main` at the candidate's commit, pulled; `install.ps1`
 - [ ] TESTING.md run in game, as a GitHub issue; every box ticked
 - [ ] `/reload`, then `node tools/mechanic-report.js` is GREEN
