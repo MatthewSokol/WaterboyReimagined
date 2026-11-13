@@ -75,6 +75,7 @@ local TESTS = {
             local parts = {
                 ["WaterboyReimagined.lua"] = ns.DB ~= nil, ["Conjure.lua"] = ns.MakeMacro ~= nil,
                 ["Config.lua"] = ns.ToggleConfig ~= nil, ["TradePopup.lua"] = ns.ShowTradePopup ~= nil,
+                ["Journal.lua"] = ns.Journal ~= nil,
             }
             for file, ok in pairs(parts) do Detail(d, file, ok and "loaded" or "didn't finish loading", ok and "pass" or "fail") end
             local slash = SlashCmdList.WATERBOYREIMAGINED ~= nil and SLASH_WATERBOYREIMAGINED1 == "/wbr"
@@ -289,6 +290,8 @@ local function Register()
         },
     })
     ns.Dbg("registered with Mechanic: %d self-tests", #TESTS)
+    local passed, total = RunAll()
+    ns.Journal("selftest", passed == total, passed .. "/" .. total)
 end
 
 local f = CreateFrame("Frame")

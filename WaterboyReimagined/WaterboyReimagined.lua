@@ -166,6 +166,7 @@ local function Migrate(list, oldVersion)
 end
 
 local function InitDB()
+    local fresh = WaterboyReimaginedDB == nil
     WaterboyReimaginedDB = WaterboyReimaginedDB or {}
     db = WaterboyReimaginedDB
     if db.enabled == nil then db.enabled = true end
@@ -196,6 +197,8 @@ local function InitDB()
         end
     end
     if ns.InitLoadouts then ns.InitLoadouts(db) end
+    if fresh then ns.Journal("install-clean", true, "no saved settings")
+    else ns.Journal("install-upgrade", true, "saved settings v" .. oldVersion .. ", now v" .. db.version) end
 end
 
 -- "Aldren Brightwater" on Forever (UnitName's second value is the surname there), else just the name.
@@ -445,9 +448,10 @@ local function AddToTrade(entry, label)
     if missing > 0 then msg = msg .. string.format(" - %d stack(s) short", missing) end
     Print(msg)
 
-    if #queue == 0 then return end
+    if #queue == 0 then return 0, missing end
     local token = tradeToken
     C_Timer.After(0.1, function() PlaceNext(queue, 1, token) end)
+    return #queue, missing
 end
 
 -- Trade opened: fill it right away, or (with "Fill trades automatically" off) show the trade popup.
@@ -459,7 +463,9 @@ local function OnTradeShow()
     if not name or not class then Dbg("no trade partner info"); return end
     local want, src = Want(name, class)
     if db.enabled then
-        AddToTrade(want, string.format("%s (%s) [%s]", name, class:lower(), src))
+        local placed, short = AddToTrade(want, string.format("%s (%s) [%s]", name, class:lower(), src))
+        local info = string.format("%s, %d stacks, %d short", class:lower(), placed, short)
+        ns.Journal(src:find(", player ", 1, true) and "trade-override" or "trade-auto", true, info)
     else
         Dbg("auto-fill off, showing the trade popup")
         ns.ShowTradePopup(name, class, want, src)

@@ -36,7 +36,7 @@ for (const f of luaOnDisk) {
   check("brackets " + f, r.ok, r.ok ? "balanced" : r.out.trim());
 }
 
-// 3. The addon in a Lua VM: smoke, migration, and the Mechanic hooks
+// 3. The addon in a Lua VM: smoke, migration, the Mechanic hooks and the test journal
 if (!fs.existsSync(path.join(__dirname, "node_modules", "fengari"))) {
   check("Lua VM tests", false, "run (cd tools && npm install) first");
 } else {
@@ -45,6 +45,7 @@ if (!fs.existsSync(path.join(__dirname, "node_modules", "fengari"))) {
     ["smoke", "", "smoke.lua"],
     ["migration", "", "smoke-migrate.lua"],
     ["Mechanic hooks", path.join("tools", "stub-mechanic.lua"), "smoke-mechanic.lua"],
+    ["test journal", "", "smoke-journal.lua"],
   ];
   for (const [name, pre, script] of runs) {
     const r = node([path.join("tools", "harness.js"), "WaterboyReimagined", pre, path.join("tools", script)]);

@@ -86,7 +86,8 @@ local function Build()
     add:SetPoint("BOTTOMLEFT", 12, 38)
     add:SetText("Add to trade")
     add:SetScript("OnClick", function()
-        ns.AddToTrade(current.entry, current.name)
+        local placed, short = ns.AddToTrade(current.entry, current.name)
+        ns.Journal("trade-panel", true, string.format("%d stacks, %d short", placed, short))
     end)
     popup.add = add
 

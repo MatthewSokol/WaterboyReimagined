@@ -10,6 +10,7 @@
 ## OptionalDeps: !Mechanic
 
 WaterboyReimagined.lua
+Journal.lua
 Conjure.lua
 Config.lua
 TradePopup.lua
