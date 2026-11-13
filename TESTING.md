@@ -48,6 +48,8 @@ friend or an alt on another account). Keep BugSack and Mechanic (`/mech`) enable
 - [ ] 1.2 `install.ps1`, and the installed copy matches (`pipeline.js run tryout verify`)
       `[auto executed · after prep passes]` `[auto validated · install.js --verify]`
 - [ ] 1.3 `wow-env snapshot pre-smoke` `[auto executed · game closed, before the smoke pass]`
+- [ ] 1.4 The listing draft (`docs/listing.md`) matches the TOC and README and lints clean (wow-mod-seo)
+      `[auto executed · after prep passes]` `[auto validated · lint-listing.js]`
 
 ## 2 Stage 2: smoke
 
@@ -63,7 +65,9 @@ friend or an alt on another account). Keep BugSack and Mechanic (`/mech`) enable
 - [ ] 2.7 **Upgrade:** Claude runs `wow-env restore`, then `wow-env profile upgrade --addon WaterboyReimagined --from
       v<previous>`; log in: settings, loadouts and the macro icon are kept `[auto validated · journal: install-upgrade]`
 - [ ] 2.8 `/reload` a few times: no errors
-- [ ] 2.9 `wow-env restore` `[auto executed · when you say the smoke pass is done]`
+- [ ] 2.9 At the character screen, **AddOns** lists "Waterboy Reimagined (Mage Water & Food)" with the drop icon,
+      and hovering it shows the one-sentence summary
+- [ ] 2.10 `wow-env restore` `[auto executed · when you say the smoke pass is done]`
 
 ## Stage 2: acceptance
 
@@ -126,4 +130,9 @@ friend or an alt on another account). Keep BugSack and Mechanic (`/mech`) enable
 - [ ] 8.2 `wow-env profile zip dist\WaterboyReimagined-x.y.z.zip` (Claude, game closed); log in once: no errors,
       self-tests pass `[auto validated · journal: selftest]`
 - [ ] 8.3 `wow-env restore` `[auto executed · when the game exits after the zip test]`
-- [ ] 8.4 Upload to CurseForge (RELEASING.md)
+- [ ] 8.4 Record a 5–15 second GIF of a trade filling itself (open a trade, the stacks go in), every name hidden
+- [ ] 8.5 Upload to CurseForge (RELEASING.md)
+- [ ] 8.6 Update the CurseForge listing from `docs/listing.md`: name, summary, description (paste the README),
+      the screenshots' titles, and the GIF
+- [ ] 8.7 The GitHub repo's description and topics match `docs/listing.md`
+      `[auto executed · after you OK the listing update]`
