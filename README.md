@@ -1,42 +1,38 @@
-# Waterboy Reimagined
+# Waterboy Reimagined (Mage Water & Food)
 
 <img src="docs/logo.png" alt="Waterboy Reimagined logo: a glowing water drop above a violet rune circle" width="160" align="right">
 
-A WoW Forever addon for mages who hand out water, inspired by [Gello's original Waterboy](#thank-you-gello)
-from 2005.
+Fills the trade window with the water and food each class or friend wants, and conjures your mage's loadout one
+macro press at a time. Mage water and food, handed out and kept in stock, on WoW Forever, inspired by
+[Gello's original Waterboy](#thank-you-gello) from 2005.
 
-- **Trades:** when someone opens a trade, it fills in the stacks of water and food their class wants, with
-  per-player overrides.
-- **Profiles:** a default profile, plus one per mage that overrides it (trades and loadouts).
-- **Loadouts:** how much to keep in your bags solo, in a party and in a raid, and one macro that conjures
-  whatever is missing and restacks.
-- **Conjure now:** buttons beside the config window to cast your top two ranks of water and food once.
-- **Drag-and-drop config** on a fake trade window.
+![The trade panel beside the trade window: the stacks a warlock gets, with Add to trade](docs/screenshots/trade-panel.png)
 
-**Minimap button:** left-click opens the window, right-click the Loadouts tab, and hovering it shows your
-loadout. Drag it around the minimap; hide it on the General tab or with `/wbr minimap`.
+## Features
 
-What's planned next: see [Coming soon](#coming-soon).
+- **Trades fill themselves:** when someone opens a trade with your mage, the stacks of water and food their
+  class wants go in, highest rank first. You check them and press Trade.
+- **Per-player settings:** a friend who only wants 1 water and 1 food gets exactly that, whatever their class.
+- **One conjure macro:** each press restacks, then conjures one thing your solo, party or raid loadout is
+  short of, until it says Loadout complete.
+- **Profiles:** one default for every mage on the account, and per-mage overrides, set up by dragging water and
+  food onto a fake trade window.
+- **Conjure now and a minimap button:** cast your top two ranks with one click, and see your loadout on hover.
 
-## Why this addon
+## How to use it
 
-Back in vanilla, in 2005 and 2006, I played a mage and was my guild's waterboy, and I really liked the original
-Waterboy addon. It fell out of support, and the addons that copied it later were missing features. Waterboy
-Reimagined is strongly inspired by that first version and by my time handing out water to the guild, rebuilt for
-WoW Forever.
+1. On your mage, type `/wbr` or click the minimap button.
+2. **Trades** tab: keep the class defaults, or drag water and food onto a class's slots. Add friends under
+   Players.
+3. **Loadouts** tab: click **Put macro on cursor**, drop the Waterboy macro on a bar, and press it until chat says
+   Loadout complete.
+4. When someone opens a trade, their water and food are already in it: press Trade.
 
-### Thank you, Gello
+## Game version and the rules
 
-The original Waterboy was written by **Gello** and came out on WoWInterface in August 2005, after a
-[beta on the WoWInterface forums](https://www.wowinterface.com/forums/showthread.php?t=1400). The download is long
-gone, but its page survives in the Internet Archive:
-[Waterboy 1.1, as archived in 2007](https://web.archive.org/web/20070423035115/http://www.wowinterface.com:80/downloads/info4118-Waterboy.html).
-You set up your usual handout once and every trade handed it over; a Make button conjured whatever the handout
-was short of; it merged part stacks as you went; and it lived in a bucket on the minimap, with `/wb` to open it.
-Those ideas are the heart of Waterboy Reimagined. Thank you, Gello, for Waterboy, and for the many addons since
-([Gello on WoWInterface](https://www.wowinterface.com/downloads/author-2953.html)).
-
-Waterboy Reimagined is written from scratch and isn't affiliated with Gello or the original Waterboy.
+WoW Forever. Every conjure is one press of the macro or a button, as Blizzard requires, and the addon never
+presses Trade for you: it only puts the stacks in the trade window. With **Fill trades automatically** off, a
+panel beside the trade window shows what they'd get, and **Add to trade** puts it in.
 
 ## Screenshots
 
@@ -48,24 +44,6 @@ Waterboy Reimagined is written from scratch and isn't affiliated with Gello or t
 | Loadouts on the default profile | Trades: a class setting on a mage's profile |
 | ![Trades tab on the default profile](docs/screenshots/trades-default.png) | ![Trade panel next to the trade window](docs/screenshots/trade-panel.png) |
 | Trades: the same class on the default profile | With auto-fill off: the panel beside the trade window |
-
-## Coming soon
-
-Planned, in no particular order:
-
-- **Blocklist:** players who never get an automatic trade, whatever their class or setting. Not only for people
-  you'd rather not serve: handy for levelling buddies who don't need your water.
-- **Auto-fill by situation:** turn automatic trades on or off depending on where you are, e.g. on in cities and
-  off in dungeons and raids.
-- **Block levels:** choose how far a block goes: no automatic trade, no trade panel either, or decline their
-  trades altogether.
-- **Mana gems:** conjure mana gems with the macro and keep them in your loadout.
-- **WoW Classic support:** the same addon on the Classic clients.
-- **Vending machine:** a Vend mode with a minimum tip per stack. While the tip is too low, a stack comes back
-  out of the trade every 3 seconds.
-- **Water expiration timer (hopefully):** how long your conjured water has left.
-- **Your requests (maybe):** ideas are welcome as
-  [GitHub issues](https://github.com/MatthewSokol/WaterboyReimagined/issues). No promises.
 
 ## Conjuring
 
@@ -187,25 +165,56 @@ character and the mages on this account), **Trades** (below) and **Loadouts** (s
 
 `/wb` works too. Example: `/wbr set Grimbold 1 1`.
 
-## Install
+## Coming soon
 
-```
-powershell -ExecutionPolicy Bypass -File ./install.ps1
-```
+Planned, in no particular order:
 
-## Release
+- **Blocklist:** players who never get an automatic trade, whatever their class or setting. Not only for people
+  you'd rather not serve: handy for levelling buddies who don't need your water.
+- **Auto-fill by situation:** turn automatic trades on or off depending on where you are, e.g. on in cities and
+  off in dungeons and raids.
+- **Block levels:** choose how far a block goes: no automatic trade, no trade panel either, or decline their
+  trades altogether.
+- **Mana gems:** conjure mana gems with the macro and keep them in your loadout.
+- **WoW Classic support:** the same addon on the Classic clients.
+- **Vending machine:** a Vend mode with a minimum tip per stack. While the tip is too low, a stack comes back
+  out of the trade every 3 seconds.
+- **Water expiration timer (hopefully):** how long your conjured water has left.
+- **Your requests (maybe):** ideas are welcome as
+  [GitHub issues](https://github.com/MatthewSokol/WaterboyReimagined/issues). No promises.
 
-The full process (checks, the in-game checklist, deploying) is in [RELEASING.md](RELEASING.md). In short:
+## Support
 
-1. Bump `## Version:` in `WaterboyReimagined/WaterboyReimagined.toc` and add a `## [version] - date` section to
-   `CHANGELOG.md`.
-2. Build the upload:
+Bugs and ideas: [GitHub issues](https://github.com/MatthewSokol/WaterboyReimagined/issues) or the comments on
+[CurseForge](https://www.curseforge.com/wow/addons/waterboy-reimagined).
 
-```
-powershell -ExecutionPolicy Bypass -File ./release.ps1
-```
+## Credits
 
-That writes `dist/WaterboyReimagined-<version>.zip`: one `WaterboyReimagined/` folder with the addon files and
-`LICENSE` (no `tools/`, scripts or docs). Upload it to CurseForge and paste the changelog section.
+### Why this addon
 
-Licensed under MIT (see `LICENSE`).
+Back in vanilla, in 2005 and 2006, I played a mage and was my guild's waterboy, and I really liked the original
+Waterboy addon. It fell out of support, and the addons that copied it later were missing features. Waterboy
+Reimagined is strongly inspired by that first version and by my time handing out water to the guild, rebuilt for
+WoW Forever.
+
+### Thank you, Gello
+
+The original Waterboy was written by **Gello** and came out on WoWInterface in August 2005, after a
+[beta on the WoWInterface forums](https://www.wowinterface.com/forums/showthread.php?t=1400). The download is long
+gone, but its page survives in the Internet Archive:
+[Waterboy 1.1, as archived in 2007](https://web.archive.org/web/20070423035115/http://www.wowinterface.com:80/downloads/info4118-Waterboy.html).
+You set up your usual handout once and every trade handed it over; a Make button conjured whatever the handout
+was short of; it merged part stacks as you went; and it lived in a bucket on the minimap, with `/wb` to open it.
+Those ideas are the heart of Waterboy Reimagined. Thank you, Gello, for Waterboy, and for the many addons since
+([Gello on WoWInterface](https://www.wowinterface.com/downloads/author-2953.html)).
+
+Waterboy Reimagined is written from scratch and isn't affiliated with Gello or the original Waterboy.
+
+## License
+
+MIT (see `LICENSE`).
+
+## Development
+
+Install the working copy into the game with `powershell -ExecutionPolicy Bypass -File ./install.ps1`. Checks,
+the in-game release checklist and deploying are in [RELEASING.md](RELEASING.md) and [TESTING.md](TESTING.md).

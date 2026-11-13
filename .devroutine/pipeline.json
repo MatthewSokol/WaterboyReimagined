@@ -25,7 +25,8 @@
       "node \"{skills}/wow-mod-dev/scripts/install.js\" WaterboyReimagined --verify"
     ],
     "changeTests": [
-      "node tools/verify.js"
+      "node tools/verify.js",
+      "node \"{skills}/wow-mod-seo/scripts/lint-listing.js\" docs/listing.md --toc WaterboyReimagined/WaterboyReimagined.toc --readme README.md"
     ],
     "package": [
       "powershell -NoProfile -ExecutionPolicy Bypass -File release.ps1 -Version {version}"
@@ -65,6 +66,15 @@
     {
       "title": "Upload to CurseForge (project 1799428)",
       "manual": "Files > Upload file: dist/WaterboyReimagined-{version}.zip, display name 'Waterboy Reimagined {version}', release type Release, game version WoW Forever, changelog from dist/WaterboyReimagined-{version}-changelog.md, no related projects. See RELEASING.md."
+    },
+    {
+      "title": "Update the CurseForge listing",
+      "manual": "Project > Edit: name, summary, categories and description (the README) from docs/listing.md; screenshot titles from its captions; add the GIF. See RELEASING.md step 5."
+    },
+    {
+      "title": "Match the GitHub repo",
+      "manual": "After your OK: gh repo edit --description \"<summary from docs/listing.md>\" --add-topic class (topics as listed).",
+      "mode": "github"
     }
   ],
   "intake": [
