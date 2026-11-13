@@ -9,6 +9,11 @@ Newest first. Each release is `## [version] - date` (the format Mechanic's `chan
 - **Optional Mechanic support:** with the Mechanic developer addon installed, Waterboy Reimagined logs to its
   console and adds 7 self-tests to its Tests tab. Nothing changes without it.
 
+### Changed
+
+- **AddOn list:** the addon shows as "Waterboy Reimagined (Mage Water & Food)", its tooltip says what it does in
+  one sentence, and it links to its CurseForge page.
+
 ## [1.0.0] - 2026-11-12
 
 First release.
