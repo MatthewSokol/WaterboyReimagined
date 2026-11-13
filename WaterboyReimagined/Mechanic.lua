@@ -4,7 +4,7 @@
 -- With Mechanic installed:
 --   * chat messages and debug lines (even with /wbr debug off) go to Mechanic's Console;
 --   * self-tests show in Mechanic's Tests tab (Run all). Mechanic also runs them and saves the results, with the
---     last 50 log lines, on every /reload and logout; tools/mechanic-report.js reads that file for the release
+--     last 50 log lines, on every /reload and logout; tools/release-check.js reads that file for the release
 --     check (RELEASING.md);
 --   * "Debug messages" and "Fill trades automatically" appear in Mechanic's settings.
 -- MechanicLib comes from the !Mechanic addon (## OptionalDeps: !Mechanic loads it first). It isn't embedded here.

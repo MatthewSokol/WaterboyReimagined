@@ -33,7 +33,7 @@ of work: one candidate version, often several stacked PRs.
 ## Release
 
 Follow [RELEASING.md](RELEASING.md) when the user says they're ready to release: apply its lessons (and any new
-ones from the user's other addons), give the task list, read `node tools/mechanic-report.js` after their in-game
+ones from the user's other addons), give the task list, read `node tools/release-check.js` after their in-game
 run, repeat until the green run, then give the deploy steps. Add new lessons to RELEASING.md and missing checks to
 TESTING.md. `release.ps1` builds `dist/WaterboyReimagined-<version>.zip` (version from the `vX.Y.Z` release tag on HEAD,
 LICENSE included, entries dated 00:00 UTC; the .toc says `@project-version@`) and the release notes from the matching `## [version]` CHANGELOG entry.
@@ -43,8 +43,15 @@ LICENSE included, entries dated 00:00 UTC; the .toc says `@project-version@`) an
 `Mechanic.lua` hooks into [Mechanic](https://github.com/Falkicon/Mechanic) when the user has it installed: chat and
 debug lines go to its Console, and 7 self-tests show in its Tests tab and are saved on every `/reload`. It must
 never become a dependency: it returns at once without `LibStub("MechanicLib-1.0", true)`, isn't embedded (GPL),
-and is only an `## OptionalDeps`. After the user reloads, `node tools/mechanic-report.js` reads the saved
+and is only an `## OptionalDeps`. After the user reloads or exits, `node tools/release-check.js` (the release gate) reads the saved
 results and BugGrabber's errors (no Python or `mech` CLI needed).
+
+## Test journal
+
+`Journal.lua` keeps a capped log in `WaterboyReimaginedDB.journal` of events that prove TESTING.md steps (the
+`[journal: id]` rows): `ns.Journal(stepId, ok, info)`, with counts, ranks or results in `info` and never a player
+name. A new feature with a checklist row that the code can prove gets a journal call and the `[journal: id]` tag;
+`tools/smoke-journal.lua` covers it, and `tools/release-check.js` reports it.
 
 ## Notes
 
