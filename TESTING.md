@@ -23,6 +23,9 @@ smoke rows and every row the fix touches, and start again from stage 1.
 
 ## Problems
 
+Every row starts with an outline id (`3.2`), so you can say "3.2 is in trouble". The page uses the same ids;
+Fix and Re-test rows go under their step as `3.2.fix` and `3.2.retest`. Ids only need to hold for the pass under way.
+
 Press **Problem** on any row and note what happened: that's a failed test. Claude triages every open problem the
 next time it reads the page (when you finish a pass, or ask):
 
@@ -38,91 +41,89 @@ The gate needs zero open problems.
 You need a mage of level 40 or more (higher ranks to compare), a second character, and someone to trade with (a
 friend or an alt on another account). Keep BugSack and Mechanic (`/mech`) enabled unless a row says otherwise.
 
-## Stage 1: automated
+## 1 Stage 1: automated
 
-- [ ] `pipeline.js prep x.y.z` passed, and `node tools/verify.js --release` is GREEN
+- [ ] 1.1 `pipeline.js prep x.y.z` passed, and `node tools/verify.js --release` is GREEN
       `[auto executed · when you say you're ready]` `[auto validated · verify.js]`
-- [ ] `install.ps1`, and the installed copy matches (`pipeline.js run tryout verify`)
+- [ ] 1.2 `install.ps1`, and the installed copy matches (`pipeline.js run tryout verify`)
       `[auto executed · after prep passes]` `[auto validated · install.js --verify]`
-- [ ] `wow-env snapshot pre-smoke` `[auto executed · game closed, before the smoke pass]`
+- [ ] 1.3 `wow-env snapshot pre-smoke` `[auto executed · game closed, before the smoke pass]`
 
-## Stage 2: smoke
+## 2 Stage 2: smoke
 
-- [ ] **Clean install:** `wow-env profile clean --addon WaterboyReimagined` (Claude, game closed); start the
+- [ ] 2.1 **Clean install:** `wow-env profile clean --addon WaterboyReimagined` (Claude, game closed); start the
       game, log in on the mage: no Lua errors, the minimap button is there `[auto validated · journal: install-clean]`
-- [ ] Self-tests pass at login `[auto validated · journal: selftest]`
-- [ ] `/mech`, **Tests**, **Run all** shows 7 passing (a warning such as "no macro yet" is fine)
-- [ ] `/wbr list` shows the default class settings; `/wbr test priest` says what a priest gets
-- [ ] **Without Mechanic:** exit the game; Claude runs `wow-env profile disable !Mechanic Mechanic`; log in: no
+- [ ] 2.2 Self-tests pass at login `[auto validated · journal: selftest]`
+- [ ] 2.3 `/mech`, **Tests**, **Run all** shows 7 passing (a warning such as "no macro yet" is fine)
+- [ ] 2.4 `/wbr list` shows the default class settings; `/wbr test priest` says what a priest gets
+- [ ] 2.5 **Without Mechanic:** exit the game; Claude runs `wow-env profile disable !Mechanic Mechanic`; log in: no
       Lua errors, spot-check a trade and a macro press `[auto validated · journal: install-no-mechanic]`
-- [ ] Gate without Mechanic: `release-check.js --no-mechanic` is GREEN
+- [ ] 2.6 Gate without Mechanic: `release-check.js --no-mechanic` is GREEN
       `[auto executed · when the game exits]` `[auto validated · gate]`
-- [ ] **Upgrade:** Claude runs `wow-env restore`, then `wow-env profile upgrade --addon WaterboyReimagined --from
+- [ ] 2.7 **Upgrade:** Claude runs `wow-env restore`, then `wow-env profile upgrade --addon WaterboyReimagined --from
       v<previous>`; log in: settings, loadouts and the macro icon are kept `[auto validated · journal: install-upgrade]`
-- [ ] `/reload` a few times: no errors
-- [ ] `wow-env restore` `[auto executed · when you say the smoke pass is done]`
+- [ ] 2.8 `/reload` a few times: no errors
+- [ ] 2.9 `wow-env restore` `[auto executed · when you say the smoke pass is done]`
 
 ## Stage 2: acceptance
 
-### Trades (on the mage)
+### 3 Trades (on the mage)
 
-- [ ] A priest opens a trade with you: their default stacks go in, highest rank first
+- [ ] 3.1 A priest opens a trade with you: their default stacks go in, highest rank first
       `[auto validated · journal: trade-auto]`
-- [ ] A player override (`/wbr set <name> 1 1`) beats their class setting `[auto validated · journal: trade-override]`
-- [ ] With too few stacks of a rank, the next rank down is used
-- [ ] **Fill trades automatically** off (General tab, or `/wbr off`): a trade shows the panel beside the trade
+- [ ] 3.2 A player override (`/wbr set <name> 1 1`) beats their class setting `[auto validated · journal: trade-override]`
+- [ ] 3.3 With too few stacks of a rank, the next rank down is used
+- [ ] 3.4 **Fill trades automatically** off (General tab, or `/wbr off`): a trade shows the panel beside the trade
       window instead; **Add to trade** fills it `[auto validated · journal: trade-panel]`
-- [ ] On the panel, right-click a slot: it's left out of this trade only
-- [ ] **Edit setting** on the panel opens the config on that player or class
-- [ ] On a non-mage character, a trade is left alone and `/wbr list` says settings still save
+- [ ] 3.5 On the panel, right-click a slot: it's left out of this trade only
+- [ ] 3.6 **Edit setting** on the panel opens the config on that player or class
+- [ ] 3.7 On a non-mage character, a trade is left alone and `/wbr list` says settings still save
 
-### Config window (`/wbr`)
+### 4 Config window (`/wbr`)
 
-- [ ] Opens with `/wbr` and `/wb`, the minimap button (left-click) and Esc closes it
-- [ ] Trades tab: drag a palette item onto a slot, click one to fill the next slot, drag slots to swap, drag one
+- [ ] 4.1 Opens with `/wbr` and `/wb`, the minimap button (left-click) and Esc closes it
+- [ ] 4.2 Trades tab: drag a palette item onto a slot, click one to fill the next slot, drag slots to swap, drag one
       off or right-click it to remove it
-- [ ] Profile dropdown lists Default and every mage on the account; a mage's overrides are marked `*`, Use default
+- [ ] 4.3 Profile dropdown lists Default and every mage on the account; a mage's overrides are marked `*`, Use default
       removes them
-- [ ] Players: add by name, from your Target and from an open Trade; the list scrolls past five players
-- [ ] Reset, Delete player and Give nothing do what they say
+- [ ] 4.4 Players: add by name, from your Target and from an open Trade; the list scrolls past five players
+- [ ] 4.5 Reset, Delete player and Give nothing do what they say
 
-### Conjuring (on the mage)
+### 5 Conjuring (on the mage)
 
-- [ ] **Put macro on cursor** (or `/wbr macro`) gives the Waterboy macro; drop it on a bar
-- [ ] Each press restacks part stacks, then casts one conjure: water before food, highest rank first; chat says
+- [ ] 5.1 **Put macro on cursor** (or `/wbr macro`) gives the Waterboy macro; drop it on a bar
+- [ ] 5.2 Each press restacks part stacks, then casts one conjure: water before food, highest rank first; chat says
       what it's casting, then your stack counts once the items land `[auto validated · journal: conjure-cast]`
-- [ ] When the loadout is full a press says so `[auto validated · journal: loadout-complete]`
-- [ ] Three more presses ask about making extra: Cancel, Temporary (countdown bar, ends after a minute without
+- [ ] 5.3 When the loadout is full a press says so `[auto validated · journal: loadout-complete]`
+- [ ] 5.4 Three more presses ask about making extra: Cancel, Temporary (countdown bar, ends after a minute without
       conjuring, right-click stops it) and Update loadout
-- [ ] In a party with **+ group's trades**, the target grows by each member's trade setting
-- [ ] With full bags, a press casts nothing and says why
-- [ ] In combat, a press repeats the last cast and says so; the loadout is rechecked after combat
-- [ ] Macro icon: each choice on the Loadouts tab shows on the bar (drop, cooler, buckets, next conjure); the
+- [ ] 5.5 In a party with **+ group's trades**, the target grows by each member's trade setting
+- [ ] 5.6 With full bags, a press casts nothing and says why
+- [ ] 5.7 In combat, a press repeats the last cast and says so; the loadout is rechecked after combat
+- [ ] 5.8 Macro icon: each choice on the Loadouts tab shows on the bar (drop, cooler, buckets, next conjure); the
       macro fades when you can't cast (out of mana)
-- [ ] **Conjure now** buttons cast one of each rank; unlearned ranks are greyed out
-- [ ] After conjuring and trading, open the bank, the auction house and talents: no "AddOn has been blocked"
+- [ ] 5.9 **Conjure now** buttons cast one of each rank; unlearned ranks are greyed out
+- [ ] 5.10 After conjuring and trading, open the bank, the auction house and talents: no "AddOn has been blocked"
       `[auto validated · journal: no-taint]`
 
-### Minimap button
+### 6 Minimap button and Mechanic console
 
-- [ ] Left-click opens the window, right-click the Loadouts tab, hover shows your loadout
-- [ ] Drag it around the minimap; its spot is kept after `/reload`
-- [ ] `/wbr minimap` (and the General tab box) hides and shows it
+- [ ] 6.1 Left-click opens the window, right-click the Loadouts tab, hover shows your loadout
+- [ ] 6.2 Drag it around the minimap; its spot is kept after `/reload`
+- [ ] 6.3 `/wbr minimap` (and the General tab box) hides and shows it
 
-### Mechanic console
+- [ ] 6.4 **Console** tab shows the addon's chat messages and debug lines from this session
 
-- [ ] **Console** tab shows the addon's chat messages and debug lines from this session
+### 7 Gate
 
-### Gate
+- [ ] 7.1 `node tools/release-check.js` is GREEN `[auto executed · when the game exits]` `[auto validated · gate]`
+- [ ] 7.2 No row is still flagged as a Problem `[auto validated · checklist page]`
 
-- [ ] `node tools/release-check.js` is GREEN `[auto executed · when the game exits]` `[auto validated · gate]`
-- [ ] No row is still flagged as a Problem `[auto validated · checklist page]`
+## 8 Stage 3: the upload
 
-## Stage 3: the upload
-
-- [ ] `release.ps1` builds the zip from the tag, and `tools/check-zip.js` passes
+- [ ] 8.1 `release.ps1` builds the zip from the tag, and `tools/check-zip.js` passes
       `[auto executed · after you OK the release and the tag]` `[auto validated · check-zip.js]`
-- [ ] `wow-env profile zip dist\WaterboyReimagined-x.y.z.zip` (Claude, game closed); log in once: no errors,
+- [ ] 8.2 `wow-env profile zip dist\WaterboyReimagined-x.y.z.zip` (Claude, game closed); log in once: no errors,
       self-tests pass `[auto validated · journal: selftest]`
-- [ ] `wow-env restore` `[auto executed · when the game exits after the zip test]`
-- [ ] Upload to CurseForge (RELEASING.md)
+- [ ] 8.3 `wow-env restore` `[auto executed · when the game exits after the zip test]`
+- [ ] 8.4 Upload to CurseForge (RELEASING.md)

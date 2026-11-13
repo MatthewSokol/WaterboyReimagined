@@ -69,16 +69,16 @@ writes, before you upload.
 
 Claude fills this in for each release:
 
-- [ ] Candidate picked: `x.y.z` (dev-routine `pipeline.js candidates`; default the newest). Everything for it is merged,
+- [ ] 1 Candidate picked: `x.y.z` (dev-routine `pipeline.js candidates`; default the newest). Everything for it is merged,
       so its `## [x.y.z]` CHANGELOG entry already exists
-- [ ] Release prep passed (`pipeline.js prep x.y.z`: in a clean checkout, `tools/verify.js`, a test build with
+- [ ] 2 Release prep passed (`pipeline.js prep x.y.z`: in a clean checkout, `tools/verify.js`, a test build with
       `release.ps1 -Version x.y.z`, and `tools/check-zip.js` on that zip)
-- [ ] On `main` at the candidate's commit, pulled; `install.ps1`
-- [ ] TESTING.md run in game (stages 1–3, with `wow-env` test profiles) on the checklist page: every row ticked or
+- [ ] 3 On `main` at the candidate's commit, pulled; `install.ps1`
+- [ ] 4 TESTING.md run in game (stages 1–3, with `wow-env` test profiles) on the checklist page: every row ticked or
       overridden, every problem fixed and re-tested, deferred by you, or the row corrected (TESTING.md, Problems)
-- [ ] The gate (`node tools/release-check.js`, run when the game exits) is GREEN
-- [ ] `node tools/verify.js --release` is GREEN
-- [ ] Deploy (below)
+- [ ] 5 The gate (`node tools/release-check.js`, run when the game exits) is GREEN
+- [ ] 6 `node tools/verify.js --release` is GREEN
+- [ ] 7 Deploy (below)
 
 ## Deploy
 
