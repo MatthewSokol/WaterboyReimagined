@@ -6,7 +6,8 @@ written so either of you can follow them.
 1. **You say you're ready to release** (and which version, if you have one in mind).
 2. **Claude applies the lessons** below, plus anything new from your other addons' releases.
 3. **Claude gives you a task list**: this file's checklist with the version, the changes and anything new filled in.
-4. **Claude reads Mechanic's output** (`node tools/mechanic-report.js`) after your in-game run, and explains
+4. **Claude reads the game's output** (`node tools/release-check.js`: Mechanic's self-tests, the test journal,
+   BugGrabber), run by `wow-env watch` when you exit the game, and explains
    anything that isn't green.
 5. **Green run**: repeat until every check below passes on the same build.
 6. **Claude gives you the deploy steps** for CurseForge (and any other site you pick).
@@ -19,7 +20,7 @@ A build is green when all three pass, with no code change in between:
 |---|---|---|
 | Offline | `node tools/verify.js --release` | Every line `ok` (the .toc's files, brackets, the smoke, migration and Mechanic tests in a Lua VM, the changelog entry, a clean `main`, a free tag) |
 | In game, by hand | [TESTING.md](TESTING.md), as a GitHub issue so the boxes can be ticked | Every box ticked |
-| In game, Mechanic | `/reload` after the checklist, then `node tools/mechanic-report.js` | `GREEN`: results newer than the code, installed copy matches, all 7 self-tests pass, no Waterboy Reimagined Lua errors in BugGrabber |
+| In game, the gate | Exit the game after the checklist; Claude has `wow-env.js watch -- node tools/release-check.js` running | `GREEN`: results newer than the code, installed copy matches, all 7 self-tests pass, no failed test-journal entry for this build (the journal also ticks `[journal: id]` rows), no Waterboy Reimagined Lua errors in BugGrabber |
 
 **Mechanic is a dev tool, never a dependency.** Players don't have it: `Mechanic.lua` returns at once without it,
 the `.toc` only lists it under `## OptionalDeps`, and CurseForge must not list it as a related project. Your own
@@ -64,8 +65,8 @@ Claude fills this in for each release:
 - [ ] Release prep passed (`pipeline.js prep x.y.z`: in a clean checkout, `tools/verify.js`, a test build with
       `release.ps1 -Version x.y.z`, and `tools/check-zip.js` on that zip)
 - [ ] On `main` at the candidate's commit, pulled; `install.ps1`
-- [ ] TESTING.md run in game, as a GitHub issue; every box ticked
-- [ ] `/reload`, then `node tools/mechanic-report.js` is GREEN
+- [ ] TESTING.md run in game (stages 1–3, with `wow-env` test profiles), as a GitHub issue; every box ticked
+- [ ] The gate (`node tools/release-check.js`, run when the game exits) is GREEN
 - [ ] `node tools/verify.js --release` is GREEN
 - [ ] Deploy (below)
 

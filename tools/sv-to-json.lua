@@ -1,4 +1,4 @@
--- Turns the global named by __WANT_NAME into JSON in __OUT (used by mechanic-report.js to read SavedVariables).
+-- Turns the global named by __WANT_NAME into JSON in __OUT (used by release-check.js to read SavedVariables).
 local function str(s)
   return '"' .. (s:gsub('[%c"\\]', function(c) return string.format("\\u%04x", c:byte()) end)) .. '"'
 end
