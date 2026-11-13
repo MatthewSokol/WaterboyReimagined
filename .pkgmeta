@@ -1,0 +1,20 @@
+# For the BigWigs packager, if CurseForge or Wago ever build from tags (today the zip is uploaded by hand: RELEASING.md).
+package-as: WaterboyReimagined
+
+move-folders:
+  WaterboyReimagined/WaterboyReimagined: WaterboyReimagined
+
+manual-changelog:
+  filename: CHANGELOG.md
+  markup-type: markdown
+
+ignore:
+  - tools
+  - docs
+  - dist
+  - .devroutine
+  - "*.ps1"
+  - CLAUDE.md
+  - RELEASING.md
+  - TESTING.md
+  - BACKLOG.md

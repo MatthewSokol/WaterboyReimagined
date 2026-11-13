@@ -1,0 +1,86 @@
+{
+  "$doc": "dev-routine pipeline. Stages run in the repo root (prep: in a clean checkout of the candidate). Placeholders: {skill} {skills} {root} {version} {out}.",
+  "type": "wow-addon",
+  "mode": "github",
+  "tags": {
+    "candidate": "candidate/v{version}",
+    "pushCandidate": false,
+    "release": "v{version}"
+  },
+  "versionFiles": [],
+  "stages": {
+    "setup": [
+      "npm --prefix tools install --no-audit --no-fund"
+    ],
+    "check": [
+      "node \"{skills}/wow-mod-dev/scripts/check-brackets.js\" WaterboyReimagined"
+    ],
+    "test": [
+      "node tools/verify.js"
+    ],
+    "tryout": [
+      "powershell -NoProfile -ExecutionPolicy Bypass -File install.ps1"
+    ],
+    "verify": [
+      "node \"{skills}/wow-mod-dev/scripts/install.js\" WaterboyReimagined --verify"
+    ],
+    "changeTests": [
+      "node tools/verify.js"
+    ],
+    "package": [
+      "powershell -NoProfile -ExecutionPolicy Bypass -File release.ps1 -Version {version}"
+    ],
+    "verifyPackage": [
+      "node tools/check-zip.js dist/WaterboyReimagined-{version}.zip --version {version}"
+    ]
+  },
+  "artifacts": [
+    "dist/WaterboyReimagined-*.zip",
+    "dist/WaterboyReimagined-*-changelog.md"
+  ],
+  "deploy": [
+    {
+      "title": "Tag the release",
+      "run": "git tag {tag}",
+      "note": "Lightweight tag on the candidate's commit on main (an annotated tag records the real time). pipeline.js released does this."
+    },
+    {
+      "title": "Push the release tag",
+      "run": "git push origin {tag}",
+      "mode": "github",
+      "note": "No packager is linked to this repo, so this doesn't publish by itself."
+    },
+    {
+      "title": "Build from the tag",
+      "run": "powershell -NoProfile -ExecutionPolicy Bypass -File release.ps1"
+    },
+    {
+      "title": "Check the zip",
+      "run": "node tools/check-zip.js dist/WaterboyReimagined-{version}.zip --version {version}"
+    },
+    {
+      "title": "Test the zip in game",
+      "manual": "With the game closed: node <wow-mod-dev>/scripts/wow-env.js profile zip dist/WaterboyReimagined-{version}.zip --client _forever_; log in once, no errors; then wow-env.js restore --client _forever_."
+    },
+    {
+      "title": "Upload to CurseForge (project 1799428)",
+      "manual": "Files > Upload file: dist/WaterboyReimagined-{version}.zip, display name 'Waterboy Reimagined {version}', release type Release, game version WoW Forever, changelog from dist/WaterboyReimagined-{version}-changelog.md, no related projects. See RELEASING.md."
+    }
+  ],
+  "intake": [
+    {
+      "name": "GitHub issues and comments",
+      "kind": "github"
+    },
+    {
+      "name": "CurseForge comments",
+      "kind": "web",
+      "url": "https://www.curseforge.com/wow/addons/waterboy-reimagined/comments",
+      "note": "Check the real slug once the project is approved."
+    },
+    {
+      "name": "Backlog",
+      "kind": "backlog"
+    }
+  ]
+}
