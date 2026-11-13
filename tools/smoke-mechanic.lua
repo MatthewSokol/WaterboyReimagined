@@ -54,3 +54,12 @@ print("debug via settings: " .. tostring(WaterboyReimaginedDB.debug) .. " / " ..
 caps.settings.enabled.set(nil, false)
 print("fill trades via settings: " .. tostring(WaterboyReimaginedDB.enabled))
 caps.settings.enabled.set(nil, true)
+-- the test journal: the login self-test run is recorded; "without Mechanic" isn't
+local st, nomech
+for _, e in ipairs(WaterboyReimaginedDB.journal or {}) do
+  if e.step == "selftest" then st = e end
+  if e.step == "install-no-mechanic" then nomech = e end
+end
+print("journal selftest: " .. tostring(st and st.ok) .. " " .. tostring(st and st.info))
+if not (st and st.ok) then print("ERROR: no passing selftest in the journal") end
+if nomech then print("ERROR: install-no-mechanic journaled with Mechanic loaded") end

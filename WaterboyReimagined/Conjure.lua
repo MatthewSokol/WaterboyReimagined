@@ -409,9 +409,10 @@ local function ReportConjured(final)
     local msg = string.format("Conjured %s (rank %d): %d / %d stacks", item.kind, item.rank,
         math.floor(ItemCount(p.id) / size), math.ceil((need[p.id] or 0) / size))
     if rounds > 0 then msg = msg .. " (extra round " .. rounds .. ")" end
+    ns.Journal("conjure-cast", true, string.format("%s rank %d", item.kind, item.rank))
     if not NextConjure(need) then
         if rounds > 0 then msg = msg .. ". Extra round " .. rounds .. " done: press again for another."
-        else msg = msg .. ". Loadout complete (" .. group .. ")." end
+        else msg = msg .. ". Loadout complete (" .. group .. ")."; ns.Journal("loadout-complete", true, group) end
     end
     ns.Print(msg)
 end
