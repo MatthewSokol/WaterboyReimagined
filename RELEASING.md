@@ -53,6 +53,9 @@ From Waterboy Reimagined 1.0.0, SellAll, Faves and Azeroth Idle Cup:
   - Upload as **Release** (Beta and Alpha don't reach players unless they opt in), for the **WoW Forever** game
     version.
   - Mechanic isn't a related project.
+- **Listing (wow-mod-seo):** the name every search reads carries the keywords ("Mage Water & Food"), the
+  summary starts with a verb, and `docs/listing.md` is the one draft for every site. Release prep lints it; a
+  changed feature, screenshot or command updates the draft, the README and the TOC together.
 - **Checklist gaps you've found before:** a step missing from TESTING.md (as the clean install once was) gets added
   there, so the next release has it.
 
@@ -64,6 +67,12 @@ or none (yours). A problem you note on a row is a failed test: it blocks the rel
 re-tested, unless you defer it or the row itself was wrong. **Known issues:** the note of every overridden row
 and every deferred problem. Claude adds them under `### Known issues` in the changelog file `release.ps1`
 writes, before you upload.
+
+**The checklist is standing.** TESTING.md and the page keep one list for the next release: when a unit of work
+starts, Claude adds its group under 2.2 (`2.2.n <title> (#PR or issue)`) with the rows that test it, keeps it
+current as the PRs change, and puts the candidate version in its header once it merges. The header counts
+what's waiting ("3 changes, 5 rows"), so you can cut a release when it gets long. After a release ships, Claude
+removes the released groups and unticks the standing rows.
 
 ## Task list template
 
@@ -96,8 +105,12 @@ Claude fills this in for each release:
    - Game version: **WoW Forever**.
    - Changelog: the changelog `.md` file's text, known issues included. If the box doesn't take Markdown, drop the `**` marks.
    - Related projects: none.
-5. If features changed, update the description (README "What it does" and Coming soon) and the screenshots
-   (names pixelated).
+5. Update the listing from `docs/listing.md` (CurseForge, project, **Edit**):
+   - Name and summary: exactly as in `docs/listing.md` (the TOC's `## Title` and `## Notes` say the same).
+   - Description: paste the README (Markdown).
+   - Categories: main and additional as listed.
+   - Images: the listed screenshots with their captions as titles, plus the GIF (every name hidden).
+   The first release with these changes renames the project to "Waterboy Reimagined (Mage Water & Food)".
 6. Check the file goes from "Under Review" to approved, then install it with the CurseForge app on a clean
    profile.
 

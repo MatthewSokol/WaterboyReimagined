@@ -1,11 +1,23 @@
 ## Interface: 16001
-## Title: Waterboy Reimagined
-## Notes: Mage water service: fills trades with the water and food each class (or friend) wants, and conjures your loadout with one macro.
+## Title: Waterboy Reimagined (Mage Water & Food)
+## Notes: Fills the trade window with the water and food each class or friend wants, and conjures your mage's loadout one macro press at a time.
 ## Author: MatthewSokol
 ## Version: @project-version@
 ## X-License: MIT
+## X-Website: https://www.curseforge.com/wow/addons/waterboy-reimagined
 ## X-Curse-Project-ID: 1799428
 ## SavedVariables: WaterboyReimaginedDB
+## Category: Other
+## Category-deDE: Anderes
+## Category-esES: Otros
+## Category-esMX: Otros
+## Category-frFR: Autre
+## Category-itIT: Altro
+## Category-koKR: 기타
+## Category-ptBR: Outro
+## Category-ruRU: Другое
+## Category-zhCN: 其它
+## Category-zhTW: 其他
 ## IconTexture: Interface\AddOns\WaterboyReimagined\Icon
 ## OptionalDeps: !Mechanic
 
