@@ -68,6 +68,12 @@ re-tested, unless you defer it or the row itself was wrong. **Known issues:** th
 and every deferred problem. Claude adds them under `### Known issues` in the changelog file `release.ps1`
 writes, before you upload.
 
+**The checklist is standing.** TESTING.md and the page keep one list for the next release: when a unit of work
+starts, Claude adds its group under 2.2 (`2.2.n <title> (#PR or issue)`) with the rows that test it, keeps it
+current as the PRs change, and puts the candidate version in its header once it merges. The header counts
+what's waiting ("3 changes, 5 rows"), so you can cut a release when it gets long. After a release ships, Claude
+removes the released groups and unticks the standing rows.
+
 ## Task list template
 
 Claude fills this in for each release:
