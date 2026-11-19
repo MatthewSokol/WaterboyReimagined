@@ -60,8 +60,12 @@ friend or an alt on another account). Keep BugSack and Mechanic (`/mech`) enable
 - [ ] 1.2 `install.ps1`, and the installed copy matches (`pipeline.js run tryout verify`)
       `[auto executed · after prep passes]` `[auto validated · install.js --verify]`
 - [ ] 1.3 `wow-env snapshot pre-smoke` `[auto executed · game closed, before the smoke pass]`
-- [ ] 1.4 The listing draft (`docs/listing.md`) matches the TOC and README and lints clean (wow-mod-seo)
-      `[auto executed · after prep passes]` `[auto validated · lint-listing.js]`
+- [ ] 1.4 SEO tuned for this release (wow-mod-seo): the keywords re-checked against what's new since the last
+      release and what players search on CurseForge now; name, summary, description, categories and screenshot
+      captions refreshed in `docs/listing.md`, the README and the TOC; out-of-date screenshots and the GIF
+      listed for 3.3–3.4. You OK the changes `[auto executed · after prep passes]`
+- [ ] 1.5 The listing draft (`docs/listing.md`) matches the TOC and README and lints clean (wow-mod-seo)
+      `[auto executed · after the SEO tune]` `[auto validated · lint-listing.js]`
 
 </details>
 
