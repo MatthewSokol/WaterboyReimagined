@@ -14,6 +14,7 @@ print("mage records gem rank: " .. tostring(NS.DB().mages[NS.CharKey()].gem))
 
 STUB_ITEMS = {}
 expect("gems first (default): the top gem before any water", RUBY)
+solo.counts.gem2 = 0 -- the top gem only, until "with Gem -1 too"
 STUB_ITEMS = { [RUBY] = 1 }
 expect("top gem in the bags: on to water", W)
 solo.counts.gem2 = 1
