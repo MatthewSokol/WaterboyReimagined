@@ -54,8 +54,9 @@ From Waterboy Reimagined 1.0.0, SellAll, Faves and Azeroth Idle Cup:
     version.
   - Mechanic isn't a related project.
 - **Listing (wow-mod-seo):** the name every search reads carries the keywords ("Mage Water & Food"), the
-  summary starts with a verb, and `docs/listing.md` is the one draft for every site. Release prep lints it; a
-  changed feature, screenshot or command updates the draft, the README and the TOC together.
+  summary starts with a verb, and `docs/listing.md` is the one draft for every site. Every release tunes it
+  (task list step 3: new features bring new search words) and lints it; a changed feature, screenshot or command
+  updates the draft, the README and the TOC together.
 - **Checklist gaps you've found before:** a step missing from TESTING.md (as the clean install once was) gets added
   there, so the next release has it.
 
@@ -82,12 +83,15 @@ Claude fills this in for each release:
       so its `## [x.y.z]` CHANGELOG entry already exists
 - [ ] 2 Release prep passed (`pipeline.js prep x.y.z`: in a clean checkout, `tools/verify.js`, a test build with
       `release.ps1 -Version x.y.z`, and `tools/check-zip.js` on that zip)
-- [ ] 3 On `main` at the candidate's commit, pulled; `install.ps1`
-- [ ] 4 TESTING.md run in game (stages 1–3, with `wow-env` test profiles) on the checklist page: every row ticked or
+- [ ] 3 SEO tuned (wow-mod-seo): keywords re-checked against the release's changes and current CurseForge
+      searches; `docs/listing.md`, the README and the TOC updated together and linted; screenshots and the GIF
+      that no longer match listed for retaking. You OK the changes before they're committed
+- [ ] 4 On `main` at the candidate's commit, pulled; `install.ps1`
+- [ ] 5 TESTING.md run in game (stages 1–3, with `wow-env` test profiles) on the checklist page: every row ticked or
       overridden, every problem fixed and re-tested, deferred by you, or the row corrected (TESTING.md, Problems)
-- [ ] 5 The gate (`node tools/release-check.js`, run when the game exits) is GREEN
-- [ ] 6 `node tools/verify.js --release` is GREEN
-- [ ] 7 Deploy (below)
+- [ ] 6 The gate (`node tools/release-check.js`, run when the game exits) is GREEN
+- [ ] 7 `node tools/verify.js --release` is GREEN
+- [ ] 8 Deploy (below)
 
 ## Deploy
 
