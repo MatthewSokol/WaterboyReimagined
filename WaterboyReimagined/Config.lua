@@ -358,7 +358,7 @@ end
 local GROUP_NAMES = { solo = "Solo", party = "Party", raid = "Raid" }
 local SLOT_HEADERS = { water1 = "Water", water2 = "Water -1", food1 = "Food", food2 = "Food -1", gem1 = "Gem", gem2 = "Gem -1" }
 local COL_X = { water1 = 216, water2 = 262, food1 = 308, food2 = 354, gem1 = 400, gem2 = 446 }
--- What each conjure order does, for the order button's tooltip.
+-- What each conjure order does, for its choice's tooltip in the Order dropdown.
 local ORDER_TIPS = {
     ratio = "Conjures whatever keeps your bags closest to this row's mix (2 water to 1 food stays 2:1 as you go). "
         .. "Counts what's in your bags, so it works however much one conjure makes at your level.",
@@ -367,6 +367,23 @@ local ORDER_TIPS = {
         .. "trades). Roles are guessed: the game's role if set, else bear druids and party warriors tank, and "
         .. "priests, druids, paladins and shamans heal.",
 }
+
+-- A dropdown menu of `choices()` = { { value, text, tip }, ... }, checked at `cur()`; picking one calls
+-- `set(value)` and refreshes the window. Each choice's tip shows when you hover it in the open menu.
+local function ChoiceDropDown(name, parent, width, choices, cur, set)
+    local dd = CreateFrame("Frame", name, parent, "UIDropDownMenuTemplate")
+    UIDropDownMenu_SetWidth(dd, width)
+    UIDropDownMenu_Initialize(dd, function(_, level)
+        for _, c in ipairs(choices()) do
+            local info = UIDropDownMenu_CreateInfo()
+            info.text, info.arg1, info.checked = c.text, c.value, cur() == c.value
+            info.tooltipTitle, info.tooltipText, info.tooltipOnButton = c.text, c.tip, true
+            info.func = function(_, v) set(v); CloseDropDownMenus(); Refresh() end
+            UIDropDownMenu_AddButton(info, level)
+        end
+    end)
+    return dd
+end
 
 local function EditableLoadout(group)
     local p = ns.Profile(state.profile, true)
@@ -392,26 +409,21 @@ local function BuildLoadoutsPage()
     -- where mana gems go in the macro's order (per profile)
     local gemLabel = Label(page, "Mana gems", "GameFontHighlightSmall")
     gemLabel:SetPoint("TOPLEFT", 14, -62)
-    local gemOrder = CreateFrame("Button", nil, page, "UIPanelButtonTemplate")
-    gemOrder:SetSize(170, 20)
-    gemOrder:SetPoint("TOPLEFT", 14, -76)
-    gemOrder:SetScript("OnClick", function()
-        local cur = ns.GemOrder(state.profile)
-        ns.Profile(state.profile, true).gemOrder = cur == "first" and "last" or "first"
-        Refresh()
-    end)
-    gemOrder:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-        GameTooltip:SetText("Mana gems in the macro's order")
-        GameTooltip:AddLine("Before water and food (the default): one or two quick casts, and a gem in your bags "
-            .. "can refill your mana during a long conjuring session.", 1, 1, 1, true)
-        GameTooltip:AddLine("After water and food: the water and food come first, the gems once they're done.",
-            1, 1, 1, true)
-        GameTooltip:AddLine("Gems are never part of the ratio: you carry at most one of each. Set how many in the "
-            .. "Gem and Gem -1 columns (0 or 1). Click to switch.", 0.6, 0.8, 1, true)
-        GameTooltip:Show()
-    end)
-    gemOrder:SetScript("OnLeave", GameTooltip_Hide)
+    local GEM_TIPS = {
+        first = "One or two quick casts, and a gem in your bags can refill your mana during a long conjuring "
+            .. "session. (The default.)",
+        last = "The water and food come first, the gems once they're done.",
+    }
+    local gemOrder = ChoiceDropDown("WaterboyReimaginedGemOrderDropDown", page, 150, function()
+        local list = {}
+        for _, o in ipairs({ "first", "last" }) do
+            list[#list + 1] = { value = o, text = ns.GEM_ORDER_NAMES[o], tip = GEM_TIPS[o]
+                .. " Gems are never part of the ratio: you carry at most one of each." }
+        end
+        return list
+    end, function() return (ns.GemOrder(state.profile)) end,
+    function(v) ns.Profile(state.profile, true).gemOrder = v end)
+    gemOrder:SetPoint("TOPLEFT", -2, -70)
     page.gemOrder = gemOrder
 
     page.headers = {}
@@ -470,34 +482,22 @@ local function BuildLoadoutsPage()
             box:SetScript("OnEditFocusLost", function() Refresh() end)
             row.boxes[slot] = box
         end
-        -- the conjure order: a button that steps through the orders this group offers
+        -- the conjure order: a dropdown of the orders this group offers
         local orderLabel = Label(page, "Order", "GameFontHighlightSmall")
         orderLabel:SetPoint("TOPLEFT", 30, y - 30)
-        local ob = CreateFrame("Button", nil, page, "UIPanelButtonTemplate")
-        ob:SetSize(124, 20)
-        ob:SetPoint("TOPLEFT", 68, y - 26)
-        ob:SetScript("OnClick", function()
-            local lo = EditableLoadout(group)
-            local list, cur, at = ns.LOADOUT_ORDERS[group], ns.LoadoutOrder(lo, group), 1
-            for k, o in ipairs(list) do if o == cur then at = k end end
-            lo.order = list[at % #list + 1]
-            Refresh()
-        end)
-        ob:SetScript("OnEnter", function(self)
-            local lo = ns.Loadout(group, state.profile)
-            local cur = ns.LoadoutOrder(lo, group)
-            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-            GameTooltip:SetText(ns.ORDER_NAMES[cur])
-            GameTooltip:AddLine(ORDER_TIPS[cur], 1, 1, 1, true)
-            if cur == "character" and not lo.makeup then
-                GameTooltip:AddLine("Turn on + group's trades for this to count anyone but you.", 1, 0.5, 0.25, true)
+        local ob = ChoiceDropDown("WaterboyReimaginedOrderDropDown_" .. group, page, 100, function()
+            local list, lo = {}, ns.Loadout(group, state.profile)
+            for _, o in ipairs(ns.LOADOUT_ORDERS[group]) do
+                local tip = ORDER_TIPS[o]
+                if o == "character" and not lo.makeup then
+                    tip = tip .. " Turn on + group's trades for this to count anyone but you."
+                end
+                list[#list + 1] = { value = o, text = ns.ORDER_NAMES[o], tip = tip }
             end
-            local names = {}
-            for _, o in ipairs(ns.LOADOUT_ORDERS[group]) do names[#names + 1] = ns.ORDER_NAMES[o] end
-            GameTooltip:AddLine("Click for the next: " .. table.concat(names, ", ") .. ".", 0.6, 0.8, 1, true)
-            GameTooltip:Show()
-        end)
-        ob:SetScript("OnLeave", GameTooltip_Hide)
+            return list
+        end, function() return ns.LoadoutOrder(ns.Loadout(group, state.profile), group) end,
+        function(v) EditableLoadout(group).order = v end)
+        ob:SetPoint("TOPLEFT", 52, y - 21)
         row.order = ob
         local reset = CreateFrame("Button", nil, page, "UIPanelButtonTemplate")
         reset:SetSize(84, 22)
@@ -581,7 +581,7 @@ local function RefreshLoadoutsPage()
     local page = frame.loadouts
     for slot, icon in pairs(page.headers) do icon:SetTexture(SlotIcon(slot)) end
     local gemOrder, gemInherited = ns.GemOrder(state.profile)
-    page.gemOrder:SetText(ns.GEM_ORDER_NAMES[gemOrder])
+    UIDropDownMenu_SetText(page.gemOrder, ns.GEM_ORDER_NAMES[gemOrder])
     page.gemOrder:SetAlpha(gemInherited and 0.6 or 1)
     for group, row in pairs(page.rows) do
         local lo, inherited = ns.Loadout(group, state.profile)
@@ -591,7 +591,7 @@ local function RefreshLoadoutsPage()
             row.makeup:SetChecked(lo.makeup)
             row.makeup:SetAlpha(alpha)
         end
-        row.order:SetText(ns.ORDER_NAMES[ns.LoadoutOrder(lo, group)])
+        UIDropDownMenu_SetText(row.order, ns.ORDER_NAMES[ns.LoadoutOrder(lo, group)])
         row.order:SetAlpha(alpha)
         for slot, box in pairs(row.boxes) do
             if not box:HasFocus() then box:SetText(tostring(lo.counts[slot] or 0)) end

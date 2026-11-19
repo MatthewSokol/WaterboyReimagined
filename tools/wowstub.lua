@@ -97,9 +97,9 @@ EditMacro = function(i, n, icon, body) STUB_MACRO_EDITS = (STUB_MACRO_EDITS or 0
 PickupMacro = function() end
 UIDropDownMenu_SetWidth = function() end
 UIDropDownMenu_Initialize = function(dd, fn) rawset(dd, "__init", fn) end
-UIDropDownMenu_SetText = function() end
+UIDropDownMenu_SetText = function(dd, t) rawset(dd, "__text", t) end
 UIDropDownMenu_CreateInfo = function() return {} end
-UIDropDownMenu_AddButton = function() end
+UIDropDownMenu_AddButton = function(info) STUB_MENU = STUB_MENU or {}; STUB_MENU[#STUB_MENU + 1] = info end
 CloseDropDownMenus = function() end
 UISpecialFrames = {}
 tinsert = table.insert
