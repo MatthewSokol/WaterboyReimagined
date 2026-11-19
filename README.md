@@ -52,9 +52,9 @@ The **Loadouts** tab of `/wbr` sets how many **stacks** to keep in your bags, pe
 
 | Loadout | Default |
 |---|---|
-| Solo | 2 highest water, 1 highest food, your top mana gem |
-| Party | 2 highest water, 1 highest food, your top mana gem **+ group's trades** |
-| Raid | 8 highest water, 4 2nd-highest water, 2 highest food, your top mana gem |
+| Solo | 2 highest water, 1 highest food, your top two mana gems |
+| Party | 3 highest water, 1 highest food, your top two mana gems **+ group's trades** |
+| Raid | 4 highest water, 2 highest food, your top two mana gems **+ group's trades** |
 
 Columns are the highest and 2nd highest rank of water and food the mage knows, and the highest and 2nd highest
 mana gem (**Gem** and **Gem -1**: 0 or 1, since you can only carry one of each). **+ group's trades** adds what

@@ -12,7 +12,7 @@ local function expect(label, want)
   print((got == want and "ok " or "ERROR: ") .. label .. ": next " .. tostring(got) .. ", expected " .. tostring(want))
 end
 local function press() CALL("press", rawget(WaterboyReimaginedConjure, "__s_PreClick"), WaterboyReimaginedConjure, "LeftButton", false); STUB_TIME = STUB_TIME + 0.01 end
-for _, g in ipairs(NS.LOADOUT_GROUPS) do NS.Profile("default").loadouts[g].counts.gem1 = 0 end
+for _, g in ipairs(NS.LOADOUT_GROUPS) do NS.Profile("default").loadouts[g].counts.gem1 = 0; NS.Profile("default").loadouts[g].counts.gem2 = 0 end
 STUB_TIME = 100
 
 -- solo 2 water : 1 food = 40 : 20, by ratio. Bags 30 water, 10 food -> food is behind.

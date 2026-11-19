@@ -12,11 +12,14 @@ Newest first. Each release is `## [version] - date` (the format Mechanic's `chan
   your bags at the loadout's mix, counting what's in them, so 2 water to 1 food stays 2:1 at any level. **By
   category** is the old order: all the water, then the food. **By character** (party and raid, with + group's
   trades) makes your own stacks first, then the healers', then the tanks', then everyone else's.
-- **Mana gems:** loadouts keep your top mana gem (Gem and Gem -1 columns, 0 or 1 each), conjured before the water
+- **Mana gems:** loadouts keep your top two mana gems (Gem and Gem -1 columns, 0 or 1 each), conjured before the water
   and food by default or after them (the Mana gems dropdown). Conjure now has a button for every gem rank.
 
 ### Changed
 
+- **Loadout defaults:** party makes 3 water to 1 food, and raid 4 water to 2 food with + group's trades on (it
+  was 8 + 4 water and 2 food without them). Loadouts you saved stay as they are; Reset brings the new ones.
+- **Loadouts tab:** each group fits on one line again, so the window is back to about its 1.0.0 size.
 - **AddOn list:** the addon shows as "Waterboy Reimagined (Mage Water & Food)", its tooltip says what it does in
   one sentence, and it links to its CurseForge page.
 

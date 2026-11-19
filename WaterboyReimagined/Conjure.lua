@@ -24,11 +24,11 @@ local ADDON_NAME, ns = ...
 local GROUPS = { "solo", "party", "raid" }
 local SLOTS = { "water1", "water2", "food1", "food2", "gem1", "gem2" }
 -- Mana gems ("gem1" = the highest gem you can conjure, "gem2" = one rank down) are 0 or 1: a mage can only carry
--- one of each. Every loadout keeps your top gem by default.
+-- one of each. Every loadout keeps your top two gems by default.
 local DEFAULT_LOADOUTS = {
-    solo  = { makeup = false, order = "ratio", counts = { water1 = 2, food1 = 1, gem1 = 1 } },
-    party = { makeup = true,  order = "ratio", counts = { water1 = 2, food1 = 1, gem1 = 1 } },
-    raid  = { makeup = false, order = "ratio", counts = { water1 = 8, water2 = 4, food1 = 2, gem1 = 1 } },
+    solo  = { makeup = false, order = "ratio", counts = { water1 = 2, food1 = 1, gem1 = 1, gem2 = 1 } },
+    party = { makeup = true,  order = "ratio", counts = { water1 = 3, food1 = 1, gem1 = 1, gem2 = 1 } },
+    raid  = { makeup = true,  order = "ratio", counts = { water1 = 4, food1 = 2, gem1 = 1, gem2 = 1 } },
 }
 -- Where mana gems go in the macro's order (per profile, default "first"). They stay out of the ratio: you can
 -- only hold one of each, so there's no mix to keep, and each is a single cast.
@@ -123,10 +123,12 @@ function ns.InitLoadouts(db)
     for _, g in ipairs(GROUPS) do
         if not def[g] then def[g] = ns.DefaultLoadout(g) end
     end
-    -- Loadouts saved before mana gems existed keep your top gem from now on (a 0 you set stays 0).
+    -- Loadouts saved before mana gems existed keep your top two gems from now on (a 0 you set stays 0).
     for _, p in pairs(db.profiles) do
         for _, lo in pairs(p.loadouts) do
-            if type(lo) == "table" and type(lo.counts) == "table" and lo.counts.gem1 == nil then lo.counts.gem1 = 1 end
+            if type(lo) == "table" and type(lo.counts) == "table" and lo.counts.gem1 == nil then
+                lo.counts.gem1, lo.counts.gem2 = 1, lo.counts.gem2 or 1
+            end
         end
     end
 end
@@ -733,17 +735,19 @@ function ns.LoadoutStatus()
         if x.kind ~= y.kind then return rank[x.kind] < rank[y.kind] end
         return x.rank > y.rank
     end)
+    local gems = {} -- all the gems share one line
     for _, id in ipairs(ids) do
         local size = StackSize(id)
         local have = ItemCount(id)
         local color = have >= need[id] and "|cff40ff40" or "|cffffd040"
         if IsGem(id) then
-            lines[#lines + 1] = string.format("%s%s: %d / %d|r", color, ns.NAMES[id], math.min(have, 1), need[id])
+            gems[#gems + 1] = string.format("%s%s: %d / %d|r", color, ns.NAMES[id], math.min(have, 1), need[id])
         else
             lines[#lines + 1] = string.format("%s%s: %d / %d stacks|r", color, ns.NAMES[id],
                 math.floor(have / size), math.ceil(need[id] / size))
         end
     end
+    if #gems > 0 then lines[#lines + 1] = table.concat(gems, ", ") end
     if #ids == 0 then lines[#lines + 1] = "nothing to conjure" end
     return lines
 end

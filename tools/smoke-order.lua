@@ -10,7 +10,7 @@ local function expect(label, want)
 end
 local solo = NS.Profile("default").loadouts.solo -- 2 water, 1 food: 40 and 20 items
 -- mana gems have their own test (smoke-gems.lua): none here
-for _, g in ipairs(NS.LOADOUT_GROUPS) do NS.Profile("default").loadouts[g].counts.gem1 = 0 end
+for _, g in ipairs(NS.LOADOUT_GROUPS) do NS.Profile("default").loadouts[g].counts.gem1 = 0; NS.Profile("default").loadouts[g].counts.gem2 = 0 end
 
 -- default is by ratio
 print("solo order: " .. NS.LoadoutOrder(solo, "solo"))
@@ -51,6 +51,7 @@ end
 print("role party1: " .. NS.GuessRole("party1") .. ", party2: " .. NS.GuessRole("party2"))
 local party = NS.Profile("default").loadouts.party
 party.order = "character"
+party.counts.water1 = 2 -- the self share these cases count on: 2 water (40), 1 food (20)
 STUB_ITEMS = { [W] = 20 }
 expect("character, own water short: water (self first)", W)
 STUB_ITEMS = { [W] = 40 }

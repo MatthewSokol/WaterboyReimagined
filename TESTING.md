@@ -5,7 +5,7 @@ happens: each change gets its own group under 2.2 when the work starts, so you c
 release when it gets too long. Claude keeps it on the Waterboy Release Checklist page, where you tick rows and
 note problems. Every in-game action here is a click or key press of yours: nothing is automated.
 
-**Waiting since 1.0.0:** 7 changes, 18 rows (the page counts them for you).
+**Waiting since 1.0.0:** 8 changes, 21 rows (the page counts them for you).
 
 **Build under test:** `<commit>` (`<git describe>`), stamped `<date>`. A fix restamps it: untick stage 1, the
 smoke rows and every row the fix touches, and start again from stage 1.
@@ -155,6 +155,17 @@ friend or an alt on another account). Keep BugSack and Mechanic (`/mech`) enable
 
 - [ ] 2.2.7.1 Loadouts tab: **Order** (each row) and **Mana gems** are dropdowns; the current choice is ticked,
       picking one changes it at once, and on a character profile an inherited one stays faded until you pick
+
+</details>
+
+<details open>
+<summary><b>2.2.8 Defaults and a tighter window (#20)</b> · open PR</summary>
+
+- [ ] 2.2.8.1 Loadouts tab fits on one screen at 540 wide: each group is one line (name, Order, + trades box,
+      stacks, Reset), Mana gems sits under the rows, and nothing overlaps (status lines, macro section)
+- [ ] 2.2.8.2 **Reset** on each Default row gives solo 2 water 1 food, party 3 water 1 food + trades, raid
+      4 water 2 food + trades, all with Gem and Gem -1 at 1
+- [ ] 2.2.8.3 The Trades and General tabs still fit the smaller window
 
 </details>
 
