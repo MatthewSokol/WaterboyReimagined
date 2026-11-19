@@ -14,10 +14,11 @@ macro press at a time. Mage water and food, handed out and kept in stock, on WoW
   class wants go in, highest rank first. You check them and press Trade.
 - **Per-player settings:** a friend who only wants 1 water and 1 food gets exactly that, whatever their class.
 - **One conjure macro:** each press restacks, then conjures one thing your solo, party or raid loadout is
-  short of, until it says Loadout complete.
+  short of (water, food and a mana gem), by ratio, by category or by character, until it says Loadout complete.
 - **Profiles:** one default for every mage on the account, and per-mage overrides, set up by dragging water and
   food onto a fake trade window.
-- **Conjure now and a minimap button:** cast your top two ranks with one click, and see your loadout on hover.
+- **Conjure now and a minimap button:** cast your top two ranks of water and food, or any mana gem, with one
+  click, and see your loadout on hover.
 
 ## How to use it
 
@@ -51,12 +52,26 @@ The **Loadouts** tab of `/wbr` sets how many **stacks** to keep in your bags, pe
 
 | Loadout | Default |
 |---|---|
-| Solo | 2 highest water, 1 highest food |
-| Party | 2 highest water, 1 highest food **+ group's trades** |
-| Raid | 8 highest water, 4 2nd-highest water, 2 highest food |
+| Solo | 2 highest water, 1 highest food, your top mana gem |
+| Party | 2 highest water, 1 highest food, your top mana gem **+ group's trades** |
+| Raid | 8 highest water, 4 2nd-highest water, 2 highest food, your top mana gem |
 
-Columns are the highest and 2nd highest rank of water and food the mage knows. **+ group's trades** adds what
+Columns are the highest and 2nd highest rank of water and food the mage knows, and the highest and 2nd highest
+mana gem (**Gem** and **Gem -1**: 0 or 1, since you can only carry one of each). **+ group's trades** adds what
 everyone in the group would get in a trade (their class or player setting) on top of the row's stacks.
+
+**Order:** each row's **Order** button picks what the macro makes next:
+
+- **By ratio** (the default): whatever keeps your bags closest to the row's mix, so 2 water to 1 food stays 2:1
+  as you go. It counts what's in your bags, so it works however much one conjure makes at your level.
+- **By category:** all the water, then the food, highest rank first.
+- **By character** (party and raid, with **+ group's trades**): your own stacks first, then each healer's, then
+  each tank's, then everyone else's. Roles are guessed: the game's role if one is set, a raid's main tanks, then
+  by class (bear-form druids, and warriors in a party, tank; priests, other druids, paladins and shamans heal).
+
+**Mana gems** (the **Mana gems** button, per profile) go **before water and food** by default: one or two quick
+casts, and a gem in your bags can refill your mana during a long conjuring session. Switch it to **after water and
+food** to make them last. Gems are never part of the ratio, and extra rounds don't make more of them.
 
 **Macro:** click **Put macro on cursor** (or `/wbr macro`) to create the account macro "Waterboy" and drop it
 on a bar. Its text, shown in the Loadouts tab, is:
@@ -67,7 +82,7 @@ on a bar. Its text, shown in the Loadouts tab, is:
 ```
 
 (Two lines so it works whether "cast on key down" is on or off.) Each press merges partial stacks, then casts
-one conjure for the first thing you're short of: water before food, highest rank first. It says
+one conjure for the next thing you're short of, in the row's order. It says
 `Casting water (rank 7)...` on the press, and once the cast finishes and the items land, how many stacks you
 have of how many (plus "Loadout complete" when nothing is left). When everything's there a press just says the
 loadout is complete. `/wbr loadout` prints the current targets. With no bag space for the next conjure, a
@@ -86,8 +101,8 @@ started; chat says so (`In combat: casting water (rank 7) again...`), and the lo
 ends.
 
 **Conjure now:** on a mage, a small panel beside the `/wbr` window has a button each for your highest and
-2nd highest water and food, with how many you're carrying. One click casts it once; it doesn't change your
-loadout.
+2nd highest water and food, with how many you're carrying, and one for every mana gem rank (Ruby, Citrine, Jade,
+Agate; ranks you haven't learned are greyed out). One click casts it once; it doesn't change your loadout.
 
 **Making more than the loadout:** press the macro 3 more times once the loadout is complete (it counts `Keep pressing to
 override 1/3`, `2/3`) and it asks whether to keep making stuff in the same ratio:

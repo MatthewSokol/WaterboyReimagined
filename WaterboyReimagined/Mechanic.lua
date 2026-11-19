@@ -91,7 +91,7 @@ local TESTS = {
         description = "Every conjured item and Conjure spell rank the addon knows about exists in this client.",
         run = function(d)
             local items, spells = 0, 0
-            for _, list in ipairs({ ns.WATER, ns.FOOD }) do
+            for _, list in ipairs({ ns.WATER, ns.FOOD, ns.GEMS }) do
                 for rank, id in ipairs(list) do
                     local ok = not ItemInstant or ItemInstant(id) ~= nil
                     items = items + 1
@@ -183,7 +183,8 @@ local TESTS = {
                 else
                     for slot, n in pairs(lo.counts) do
                         if not ns.ParseRelative(slot) then problem = "unknown slot " .. tostring(slot)
-                        elseif type(n) ~= "number" or n < 0 or n ~= math.floor(n) then problem = slot .. " = " .. tostring(n) end
+                        elseif type(n) ~= "number" or n < 0 or n ~= math.floor(n) then problem = slot .. " = " .. tostring(n)
+                        elseif slot:sub(1, 3) == "gem" and n > 1 then problem = slot .. " = " .. n .. " (one gem at most)" end
                     end
                     if lo.order ~= nil and ns.LoadoutOrder(lo, group) ~= lo.order then
                         problem = "order " .. tostring(lo.order) .. " isn't offered here"

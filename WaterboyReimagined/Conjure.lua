@@ -22,12 +22,32 @@
 local ADDON_NAME, ns = ...
 
 local GROUPS = { "solo", "party", "raid" }
-local SLOTS = { "water1", "water2", "food1", "food2" }
+local SLOTS = { "water1", "water2", "food1", "food2", "gem1", "gem2" }
+-- Mana gems ("gem1" = the highest gem you can conjure, "gem2" = one rank down) are 0 or 1: a mage can only carry
+-- one of each. Every loadout keeps your top gem by default.
 local DEFAULT_LOADOUTS = {
-    solo  = { makeup = false, order = "ratio", counts = { water1 = 2, food1 = 1 } },
-    party = { makeup = true,  order = "ratio", counts = { water1 = 2, food1 = 1 } },
-    raid  = { makeup = false, order = "ratio", counts = { water1 = 8, water2 = 4, food1 = 2 } },
+    solo  = { makeup = false, order = "ratio", counts = { water1 = 2, food1 = 1, gem1 = 1 } },
+    party = { makeup = true,  order = "ratio", counts = { water1 = 2, food1 = 1, gem1 = 1 } },
+    raid  = { makeup = false, order = "ratio", counts = { water1 = 8, water2 = 4, food1 = 2, gem1 = 1 } },
 }
+-- Where mana gems go in the macro's order (per profile, default "first"). They stay out of the ratio: you can
+-- only hold one of each, so there's no mix to keep, and each is a single cast.
+--   first - before any water or food: one or two quick casts, and a gem in your bags can refill your mana
+--           during a long conjuring session
+--   last  - once the water and food are done
+local GEM_ORDERS = { "first", "last" }
+local GEM_ORDER_NAMES = { first = "Before water and food", last = "After water and food" }
+ns.GEM_ORDERS, ns.GEM_ORDER_NAMES = GEM_ORDERS, GEM_ORDER_NAMES
+
+-- The gem order for profile `key` ("default", a character key, or nil = this character), and whether it's
+-- inherited from the default profile.
+function ns.GemOrder(key)
+    if key ~= "default" then
+        local p = ns.Profile(key or "me")
+        if p and p.gemOrder then return p.gemOrder, false end
+    end
+    return ns.Profile("default").gemOrder or "first", key ~= "default"
+end
 -- Orders each loadout row offers, the first being the default.
 local ORDERS = {
     solo = { "ratio", "category" },
@@ -103,6 +123,12 @@ function ns.InitLoadouts(db)
     for _, g in ipairs(GROUPS) do
         if not def[g] then def[g] = ns.DefaultLoadout(g) end
     end
+    -- Loadouts saved before mana gems existed keep your top gem from now on (a 0 you set stays 0).
+    for _, p in pairs(db.profiles) do
+        for _, lo in pairs(p.loadouts) do
+            if type(lo) == "table" and type(lo.counts) == "table" and lo.counts.gem1 == nil then lo.counts.gem1 = 1 end
+        end
+    end
 end
 
 -- Loadout for `group` on profile `key` ("default", a character key, or nil = this character).
@@ -124,6 +150,7 @@ end
 
 local stackSizes = {}
 local function StackSize(id)
+    if ns.ITEMS[id] and ns.ITEMS[id].kind == "gem" then return 1 end -- one of each gem, never stacked
     if not stackSizes[id] then
         local size = select(8, GetItemInfoFn(id))
         if not size then return 20 end
@@ -168,6 +195,7 @@ local function Targets()
     local lo = ns.Loadout(group)
     local need, own = {}, {}
     for slot, n in pairs(lo.counts) do
+        if slot:sub(1, 3) == "gem" then n = math.min(n, 1) end -- one of each gem at most
         if n > 0 then AddItems(need, slot, n); AddItems(own, slot, n) end
     end
     local shares, members = { { role = "SELF", need = own } }, {}
@@ -194,7 +222,15 @@ local function Targets()
         end)
         for _, s in ipairs(members) do shares[#shares + 1] = s end
     end
-    return need, group, #members, shares, ns.LoadoutOrder(lo, group)
+    return need, group, #members, shares, ns.LoadoutOrder(lo, group), ns.GemOrder()
+end
+
+local function IsGem(id) return ns.ITEMS[id] and ns.ITEMS[id].kind == "gem" end
+-- The water and food in `t`, or (with `gems`) only the gems.
+local function Only(t, gems)
+    local r = {}
+    for id, n in pairs(t) do if (IsGem(id) and true or false) == (gems and true or false) then r[id] = n end end
+    return r
 end
 
 -- First item we're short of: water before food, highest rank first. Returns itemID, have, need.
@@ -222,30 +258,39 @@ end
 
 local function ByCategory(a, b) return CategoryScore(a) > CategoryScore(b) end
 
--- The next conjure for `ctx` = { need, shares, order } (from CurrentNeed). Returns itemID, have, need.
-local function NextConjure(ctx)
-    local need, id = ctx.need, nil
-    if ctx.order == "category" then
-        id = Pick(need, ByCategory)
-    elseif ctx.order == "character" and ctx.shares then
+-- The next water or food conjure for `ctx` by its order (gems aren't in it). Returns itemID or nil.
+local function NextFood(ctx)
+    local need = Only(ctx.need, false)
+    if ctx.order == "category" then return Pick(need, ByCategory) end
+    if ctx.order == "character" and ctx.shares then
         -- everyone's share in turn: the first share the bags don't cover yet gets the next conjure
         local cum = {}
         for _, share in ipairs(ctx.shares) do
-            for i, n in pairs(share.need) do cum[i] = (cum[i] or 0) + n end
-            id = Pick(cum, ByCategory)
-            if id then break end
+            for i, n in pairs(Only(share.need, false)) do cum[i] = (cum[i] or 0) + n end
+            local id = Pick(cum, ByCategory)
+            if id then return id end
         end
-        if not id then id = Pick(need, ByCategory) end
-    else
-        -- ratio: the item furthest behind its target, counted in items
-        local function share(i) return ItemCount(i) / need[i] end
-        id = Pick(need, function(a, b)
-            local x, y = share(a), share(b)
-            if x ~= y then return x < y end
-            return ByCategory(a, b)
-        end)
+        return Pick(need, ByCategory)
     end
-    if id then return id, ItemCount(id), need[id] end
+    -- ratio: the item furthest behind its target, counted in items
+    local function share(i) return ItemCount(i) / need[i] end
+    return Pick(need, function(a, b)
+        local x, y = share(a), share(b)
+        if x ~= y then return x < y end
+        return ByCategory(a, b)
+    end)
+end
+
+-- The next conjure for `ctx` = { need, shares, order, gemOrder } (from CurrentNeed). Mana gems go before or
+-- after the water and food (gemOrder), highest first; the order only sorts the water and food.
+-- Returns itemID, have, need.
+local function NextConjure(ctx)
+    local id
+    local function gem() return Pick(Only(ctx.need, true), ByCategory) end
+    if ctx.gemOrder ~= "last" then id = gem() end
+    if not id then id = NextFood(ctx) end
+    if not id and ctx.gemOrder == "last" then id = gem() end
+    if id then return id, ItemCount(id), ctx.need[id] end
 end
 
 local function SpellFor(id)
@@ -323,17 +368,19 @@ end
 -- What to keep right now, scaled for extra rounds. With `advance`, a finished extra round starts the next.
 -- Returns need, group, members, rounds (0 = no extra), ctx (for NextConjure: need, shares, order).
 local function CurrentNeed(advance)
-    local need, group, members, shares, order = Targets()
-    if not extra then return need, group, members, 0, { need = need, shares = shares, order = order } end
-    local function scale(t)
+    local need, group, members, shares, order, gemOrder = Targets()
+    if not extra then
+        return need, group, members, 0, { need = need, shares = shares, order = order, gemOrder = gemOrder }
+    end
+    local function scale(t) -- extra rounds make more water and food; you still only carry one of each gem
         local s = {}
-        for id, n in pairs(t) do s[id] = n * (1 + extra.rounds) end
+        for id, n in pairs(t) do s[id] = IsGem(id) and n or n * (1 + extra.rounds) end
         return s
     end
     local function scaled()
         local sh = {}
         for i, share in ipairs(shares) do sh[i] = { role = share.role, need = scale(share.need) } end
-        return { need = scale(need), shares = sh, order = order }
+        return { need = scale(need), shares = sh, order = order, gemOrder = gemOrder }
     end
     local ctx = scaled()
     if advance and next(ctx.need) and not NextConjure(ctx) then
@@ -472,6 +519,7 @@ end
 -- "water (rank 7)"
 local function Describe(id)
     local item = ns.ITEMS[id]
+    if item.kind == "gem" then return "a " .. ns.NAMES[id] end -- "a Mana Ruby"
     return string.format("%s (rank %d)", item.kind, item.rank)
 end
 
@@ -497,6 +545,10 @@ local function ReportConjured(final)
     local size = StackSize(p.id)
     local msg = string.format("Conjured %s (rank %d): %d / %d stacks", item.kind, item.rank,
         math.floor(ItemCount(p.id) / size), math.ceil((need[p.id] or 0) / size))
+    if item.kind == "gem" then
+        msg = "Conjured " .. Describe(p.id) .. "."
+        ns.Journal("conjure-gem", true, "rank " .. item.rank .. ", " .. (ctx.gemOrder or "first"))
+    end
     if rounds > 0 then msg = msg .. " (extra round " .. rounds .. ")" end
     ns.Journal("conjure-cast", true, string.format("%s rank %d, %s", item.kind, item.rank, ctx.order))
     if not NextConjure(ctx) then
@@ -581,7 +633,7 @@ btn:SetScript("PreClick", function()
         completePresses = 0
         local item = ns.ITEMS[id]
         pending = { id = id, spellID = ns.SPELLS[item.kind][item.rank], at = now, before = ItemCount(id) }
-        ns.Print(string.format("Casting %s (rank %d)...%s", item.kind, item.rank, rounds > 0 and " (extra)" or ""))
+        ns.Print(string.format("Casting %s...%s", Describe(id), rounds > 0 and " (extra)" or ""))
     elseif merged > 0 then
         ns.Print("Restacking...")
     else
@@ -632,7 +684,8 @@ end
 -- Lines describing what the macro aims for right now (for /wbr loadout and the config window).
 function ns.LoadoutStatus()
     local need, group, members, rounds, ctx = CurrentNeed(false)
-    local lines = { "Now: " .. group .. ", " .. ORDER_NAMES[ctx.order]:lower()
+    local lines = { "Now: " .. group .. ", " .. ORDER_NAMES[ctx.order]:lower() .. ", gems "
+        .. (ctx.gemOrder == "last" and "last" or "first")
         .. (members > 0 and (" (" .. members .. " players' trade settings added)") or "") }
     if rounds > 0 then
         lines[#lines + 1] = string.format("|cff69ccf0Making extra: round %d, ends in %ds without a conjure|r",
@@ -642,15 +695,20 @@ function ns.LoadoutStatus()
     for id in pairs(need) do ids[#ids + 1] = id end
     table.sort(ids, function(a, b)
         local x, y = ns.ITEMS[a], ns.ITEMS[b]
-        if x.kind ~= y.kind then return x.kind == "water" end
+        local rank = { water = 1, food = 2, gem = 3 }
+        if x.kind ~= y.kind then return rank[x.kind] < rank[y.kind] end
         return x.rank > y.rank
     end)
     for _, id in ipairs(ids) do
         local size = StackSize(id)
         local have = ItemCount(id)
         local color = have >= need[id] and "|cff40ff40" or "|cffffd040"
-        lines[#lines + 1] = string.format("%s%s: %d / %d stacks|r", color, ns.NAMES[id],
-            math.floor(have / size), math.ceil(need[id] / size))
+        if IsGem(id) then
+            lines[#lines + 1] = string.format("%s%s: %d / %d|r", color, ns.NAMES[id], math.min(have, 1), need[id])
+        else
+            lines[#lines + 1] = string.format("%s%s: %d / %d stacks|r", color, ns.NAMES[id],
+                math.floor(have / size), math.ceil(need[id] / size))
+        end
     end
     if #ids == 0 then lines[#lines + 1] = "nothing to conjure" end
     return lines
@@ -795,7 +853,8 @@ RefreshExtraTimer = function()
 end
 
 ---------------------------------------------------------------------------------------------------
--- Manual conjure buttons: highest and 2nd highest water and food, beside the config window on a mage.
+-- Manual conjure buttons: highest and 2nd highest water and food, then every mana gem rank (highest first),
+-- beside the config window on a mage.
 -- Each is a secure spell button: one click = one cast. The panel is its own frame (not a child of the
 -- config window) so opening and closing the config never gets blocked in combat; in combat it keeps its
 -- spells and position, and shows or hides once combat ends.
@@ -805,6 +864,9 @@ local MANUAL = {
     { slot = "water1", label = "Water" }, { slot = "water2", label = "Water -1" },
     { slot = "food1", label = "Food" }, { slot = "food2", label = "Food -1" },
 }
+for rank = #ns.GEMS, 1, -1 do -- every gem rank, highest first: { gem = rank }
+    MANUAL[#MANUAL + 1] = { gem = rank, label = ns.NAMES[ns.GEMS[rank]] }
+end
 local manual = CreateFrame("Frame", "WaterboyReimaginedManualConjure", UIParent)
 manual:SetSize(132, 34 + #MANUAL * 42)
 manual:SetFrameStrata("DIALOG")
@@ -830,11 +892,16 @@ for i, m in ipairs(MANUAL) do
     b.label = manual:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     b.label:SetPoint("LEFT", b, "RIGHT", 8, 0)
     b.label:SetJustifyH("LEFT")
-    b.slot, b.name = m.slot, m.label
+    b.slot, b.gem, b.name = m.slot or false, m.gem or false, m.label
     b:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
         local item = self.id and ns.ITEMS[self.id]
-        if item then
+        if item and item.kind == "gem" then
+            GameTooltip:SetText("Conjure " .. ns.NAMES[self.id])
+            GameTooltip:AddLine(ItemCount(self.id) > 0 and "In your bags: yes (you can only carry one)"
+                or "In your bags: no", 1, 1, 1)
+            GameTooltip:AddLine("Click to cast once.", 0.6, 0.8, 1, true)
+        elseif item then
             GameTooltip:SetText(string.format("Conjure %s (rank %d)", ns.NAMES[self.id], item.rank))
             local have = ItemCount(self.id)
             GameTooltip:AddLine(string.format("In your bags: %d (%d stacks)", have,
@@ -852,18 +919,28 @@ end
 
 local function RefreshManual()
     for _, b in ipairs(manual.buttons) do
-        local id = ns.Resolve(b.slot)
+        local id, learned
+        if b.gem then -- an exact gem rank
+            id = ns.GEMS[b.gem]
+            local top = ns.TopRank("gem")
+            learned = top ~= nil and b.gem <= top
+        else
+            id = ns.Resolve(b.slot)
+            -- "Water -1" needs a rank below the top one; with only rank 1 (or none) there isn't one
+            local kind, n = ns.ParseRelative(b.slot)
+            local top = ns.TopRank(kind)
+            learned = top ~= nil and top - n + 1 >= 1
+        end
         local item = ns.ITEMS[id]
-        -- "Water -1" needs a rank below the top one; with only rank 1 (or none) there isn't one
-        local kind, n = ns.ParseRelative(b.slot)
-        local top = ns.TopRank(kind)
-        local learned = top ~= nil and top - n + 1 >= 1
         b.id = learned and id or nil
-        b.icon:SetTexture(ns.SlotIcon and ns.SlotIcon(b.slot) or nil)
+        b.icon:SetTexture(ns.SlotIcon and ns.SlotIcon(b.slot or id) or nil)
         b.icon:SetDesaturated(not learned)
         b.icon:SetAlpha(learned and 1 or 0.4)
         b.count:SetText(learned and tostring(ItemCount(id)) or "")
-        b.label:SetText(b.name .. "\n|cff888888" .. (learned and ("rank " .. item.rank) or "not learned") .. "|r")
+        local sub = not learned and "not learned"
+            or b.gem and (ItemCount(id) > 0 and "in your bags" or "not in your bags")
+            or ("rank " .. item.rank)
+        b.label:SetText(b.name .. "\n|cff888888" .. sub .. "|r")
         if not InCombatLockdown() then
             local spell = learned and SpellFor(id) or nil
             b:SetAttribute("type", spell and "spell" or nil)

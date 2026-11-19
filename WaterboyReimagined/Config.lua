@@ -212,7 +212,7 @@ end
 -- a real conjured item on the cursor (picked up from the bags)
 local function CursorConjured()
     local kind, id = GetCursorInfo()
-    if kind == "item" and ns.ITEMS[id] then return id end
+    if kind == "item" and ns.ITEMS[id] and ns.ITEMS[id].kind ~= "gem" then return id end -- gems aren't traded
 end
 
 ---------------------------------------------------------------------------------------------------
@@ -356,8 +356,8 @@ end
 ---------------------------------------------------------------------------------------------------
 
 local GROUP_NAMES = { solo = "Solo", party = "Party", raid = "Raid" }
-local SLOT_HEADERS = { water1 = "Water", water2 = "Water -1", food1 = "Food", food2 = "Food -1" }
-local COL_X = { water1 = 216, water2 = 262, food1 = 308, food2 = 354 }
+local SLOT_HEADERS = { water1 = "Water", water2 = "Water -1", food1 = "Food", food2 = "Food -1", gem1 = "Gem", gem2 = "Gem -1" }
+local COL_X = { water1 = 216, water2 = 262, food1 = 308, food2 = 354, gem1 = 400, gem2 = 446 }
 -- What each conjure order does, for the order button's tooltip.
 local ORDER_TIPS = {
     ratio = "Conjures whatever keeps your bags closest to this row's mix (2 water to 1 food stays 2:1 as you go). "
@@ -388,6 +388,31 @@ local function BuildLoadoutsPage()
     sub:SetPoint("TOPLEFT", 200, -30)
     sub:SetWidth(320)
     sub:SetJustifyH("LEFT")
+
+    -- where mana gems go in the macro's order (per profile)
+    local gemLabel = Label(page, "Mana gems", "GameFontHighlightSmall")
+    gemLabel:SetPoint("TOPLEFT", 14, -62)
+    local gemOrder = CreateFrame("Button", nil, page, "UIPanelButtonTemplate")
+    gemOrder:SetSize(170, 20)
+    gemOrder:SetPoint("TOPLEFT", 14, -76)
+    gemOrder:SetScript("OnClick", function()
+        local cur = ns.GemOrder(state.profile)
+        ns.Profile(state.profile, true).gemOrder = cur == "first" and "last" or "first"
+        Refresh()
+    end)
+    gemOrder:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:SetText("Mana gems in the macro's order")
+        GameTooltip:AddLine("Before water and food (the default): one or two quick casts, and a gem in your bags "
+            .. "can refill your mana during a long conjuring session.", 1, 1, 1, true)
+        GameTooltip:AddLine("After water and food: the water and food come first, the gems once they're done.",
+            1, 1, 1, true)
+        GameTooltip:AddLine("Gems are never part of the ratio: you carry at most one of each. Set how many in the "
+            .. "Gem and Gem -1 columns (0 or 1). Click to switch.", 0.6, 0.8, 1, true)
+        GameTooltip:Show()
+    end)
+    gemOrder:SetScript("OnLeave", GameTooltip_Hide)
+    page.gemOrder = gemOrder
 
     page.headers = {}
     for _, slot in ipairs(ns.LOADOUT_SLOTS) do
@@ -431,10 +456,14 @@ local function BuildLoadoutsPage()
             box:SetPoint("TOPLEFT", COL_X[slot] + 6, y)
             box:SetAutoFocus(false)
             box:SetNumeric(true)
-            box:SetMaxLetters(3)
+            local gem = slot:sub(1, 3) == "gem" -- 0 or 1: a mage carries one of each gem
+            box:SetMaxLetters(gem and 1 or 3)
             box:SetJustifyH("CENTER")
             box:SetScript("OnTextChanged", function(self, userInput)
-                if userInput then EditableLoadout(group).counts[slot] = tonumber(self:GetText()) or 0 end
+                if not userInput then return end
+                local n = tonumber(self:GetText()) or 0
+                if gem and n > 1 then n = 1; self:SetText("1") end
+                EditableLoadout(group).counts[slot] = n
             end)
             box:SetScript("OnEnterPressed", box.ClearFocus)
             box:SetScript("OnEscapePressed", box.ClearFocus)
@@ -551,6 +580,9 @@ end
 local function RefreshLoadoutsPage()
     local page = frame.loadouts
     for slot, icon in pairs(page.headers) do icon:SetTexture(SlotIcon(slot)) end
+    local gemOrder, gemInherited = ns.GemOrder(state.profile)
+    page.gemOrder:SetText(ns.GEM_ORDER_NAMES[gemOrder])
+    page.gemOrder:SetAlpha(gemInherited and 0.6 or 1)
     for group, row in pairs(page.rows) do
         local lo, inherited = ns.Loadout(group, state.profile)
         local alpha = inherited and 0.5 or 1

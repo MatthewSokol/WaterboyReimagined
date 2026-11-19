@@ -12,6 +12,8 @@ Newest first. Each release is `## [version] - date` (the format Mechanic's `chan
   your bags at the loadout's mix, counting what's in them, so 2 water to 1 food stays 2:1 at any level. **By
   category** is the old order: all the water, then the food. **By character** (party and raid, with + group's
   trades) makes your own stacks first, then the healers', then the tanks', then everyone else's.
+- **Mana gems:** loadouts keep your top mana gem (Gem and Gem -1 columns, 0 or 1 each), conjured before the water
+  and food by default or after them (the Mana gems button). Conjure now has a button for every gem rank.
 
 ### Changed
 

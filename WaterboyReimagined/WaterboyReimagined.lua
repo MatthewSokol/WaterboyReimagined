@@ -19,6 +19,9 @@ local ADDON_NAME, ns = ...
 -- Conjured items by rank, lowest first.
 local WATER = { 5350, 2288, 2136, 3772, 8077, 8078, 8079 }
 local FOOD  = { 5349, 1113, 1114, 1487, 8075, 8076, 22895 }
+-- Mana gems by rank (Agate, Jade, Citrine, Ruby). A mage can carry one of each, so they're conjured for the
+-- mage's own loadout only, never traded.
+local GEMS  = { 5514, 5513, 8007, 8008 }
 local NAMES = {
     [5350] = "Conjured Water",       [5349] = "Conjured Muffin",
     [2288] = "Conjured Fresh Water", [1113] = "Conjured Bread",
@@ -27,17 +30,21 @@ local NAMES = {
     [8077] = "Conjured Mineral Water", [8075] = "Conjured Sourdough",
     [8078] = "Conjured Sparkling Water", [8076] = "Conjured Sweet Roll",
     [8079] = "Conjured Crystal Water", [22895] = "Conjured Cinnamon Roll",
+    [5514] = "Mana Agate", [5513] = "Mana Jade", [8007] = "Mana Citrine", [8008] = "Mana Ruby",
 }
-local ITEMS = {} -- [itemID] = { kind = "water"|"food", rank = 1..7, name = }
+local ITEMS = {} -- [itemID] = { kind = "water"|"food"|"gem", rank = 1..7 (gems 1..4), name = }
 for rank, id in ipairs(WATER) do ITEMS[id] = { kind = "water", rank = rank, name = NAMES[id] } end
 for rank, id in ipairs(FOOD) do ITEMS[id] = { kind = "food", rank = rank, name = NAMES[id] } end
+for rank, id in ipairs(GEMS) do ITEMS[id] = { kind = "gem", rank = rank, name = NAMES[id] } end
 local TOP_WATER, TOP_FOOD = WATER[#WATER], FOOD[#FOOD]
-local LISTS = { water = WATER, food = FOOD }
+local LISTS = { water = WATER, food = FOOD, gem = GEMS }
 
--- Conjure Water / Conjure Food spell IDs by rank, lowest first (to find the highest rank a mage knows).
+-- Conjure Water / Conjure Food / Conjure Mana <gem> spell IDs by rank, lowest first (to find the highest rank
+-- a mage knows).
 local SPELLS = {
     water = { 5504, 5505, 5506, 6127, 10138, 10139, 10140 },
     food  = { 587, 597, 990, 6129, 10144, 10145, 28612 },
+    gem   = { 759, 3552, 10053, 10054 },
 }
 
 -- A slot is either an itemID (that exact rank) or a relative rank: "water1" = the highest rank of water
@@ -255,7 +262,7 @@ local function RecordMage()
     db.mages[charKey] = m
     m.level = UnitLevel("player")
     m.name, m.where = FullName(), WhereLabel()
-    m.water, m.food = HighestKnown("water"), HighestKnown("food")
+    m.water, m.food, m.gem = HighestKnown("water"), HighestKnown("food"), HighestKnown("gem")
 end
 
 -- Highest rank of `kind` the mage `key` knows (nil if unknown: not a recorded mage).
@@ -476,7 +483,7 @@ end
 -- Shared with Config.lua
 ---------------------------------------------------------------------------------------------------
 
-ns.WATER, ns.FOOD, ns.ITEMS, ns.CLASSES, ns.TRADE_SLOTS = WATER, FOOD, ITEMS, CLASSES, TRADE_SLOTS
+ns.WATER, ns.FOOD, ns.GEMS, ns.ITEMS, ns.CLASSES, ns.TRADE_SLOTS = WATER, FOOD, GEMS, ITEMS, CLASSES, TRADE_SLOTS
 ns.PlayerName, ns.UnitFullName, ns.FindPlayerKey = PlayerName, UnitFullName, FindPlayerKey
 ns.Profile, ns.PlayerKey, ns.CopyEntry, ns.DefaultClassEntry = Profile, PlayerKey, CopyEntry, DefaultClassEntry
 ns.Describe, ns.Print, ns.Dbg, ns.Want, ns.SPELLS = Describe, Print, Dbg, Want, SPELLS
