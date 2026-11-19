@@ -8,12 +8,12 @@ Newest first. Each release is `## [version] - date` (the format Mechanic's `chan
 
 - **Optional Mechanic support:** with the Mechanic developer addon installed, Waterboy Reimagined logs to its
   console and adds 7 self-tests to its Tests tab. Nothing changes without it.
-- **Conjure order:** each loadout row picks what the macro conjures next. **By ratio** (the new default) keeps
+- **Conjure order:** each loadout row's Order dropdown picks what the macro conjures next. **By ratio** (the new default) keeps
   your bags at the loadout's mix, counting what's in them, so 2 water to 1 food stays 2:1 at any level. **By
   category** is the old order: all the water, then the food. **By character** (party and raid, with + group's
   trades) makes your own stacks first, then the healers', then the tanks', then everyone else's.
 - **Mana gems:** loadouts keep your top mana gem (Gem and Gem -1 columns, 0 or 1 each), conjured before the water
-  and food by default or after them (the Mana gems button). Conjure now has a button for every gem rank.
+  and food by default or after them (the Mana gems dropdown). Conjure now has a button for every gem rank.
 
 ### Changed
 

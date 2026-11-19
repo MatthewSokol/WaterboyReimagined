@@ -60,7 +60,7 @@ Columns are the highest and 2nd highest rank of water and food the mage knows, a
 mana gem (**Gem** and **Gem -1**: 0 or 1, since you can only carry one of each). **+ group's trades** adds what
 everyone in the group would get in a trade (their class or player setting) on top of the row's stacks.
 
-**Order:** each row's **Order** button picks what the macro makes next:
+**Order:** each row's **Order** dropdown picks what the macro makes next:
 
 - **By ratio** (the default): whatever keeps your bags closest to the row's mix, so 2 water to 1 food stays 2:1
   as you go. It counts what's in your bags, so it works however much one conjure makes at your level.
@@ -69,7 +69,7 @@ everyone in the group would get in a trade (their class or player setting) on to
   each tank's, then everyone else's. Roles are guessed: the game's role if one is set, a raid's main tanks, then
   by class (bear-form druids, and warriors in a party, tank; priests, other druids, paladins and shamans heal).
 
-**Mana gems** (the **Mana gems** button, per profile) go **before water and food** by default: one or two quick
+**Mana gems** (the **Mana gems** dropdown, per profile) go **before water and food** by default: one or two quick
 casts, and a gem in your bags can refill your mana during a long conjuring session. Switch it to **after water and
 food** to make them last. Gems are never part of the ratio, and extra rounds don't make more of them.
 
