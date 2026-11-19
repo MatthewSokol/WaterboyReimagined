@@ -357,7 +357,16 @@ end
 
 local GROUP_NAMES = { solo = "Solo", party = "Party", raid = "Raid" }
 local SLOT_HEADERS = { water1 = "Water", water2 = "Water -1", food1 = "Food", food2 = "Food -1" }
-local COL_X = { water1 = 216, water2 = 272, food1 = 328, food2 = 384 }
+local COL_X = { water1 = 216, water2 = 262, food1 = 308, food2 = 354 }
+-- What each conjure order does, for the order button's tooltip.
+local ORDER_TIPS = {
+    ratio = "Conjures whatever keeps your bags closest to this row's mix (2 water to 1 food stays 2:1 as you go). "
+        .. "Counts what's in your bags, so it works however much one conjure makes at your level.",
+    category = "All the water first, then the food, highest rank first.",
+    character = "Your own stacks first, then each healer's, then each tank's, then everyone else's (with + group's "
+        .. "trades). Roles are guessed: the game's role if set, else bear druids and party warriors tank, and "
+        .. "priests, druids, paladins and shamans heal.",
+}
 
 local function EditableLoadout(group)
     local p = ns.Profile(state.profile, true)
@@ -392,7 +401,7 @@ local function BuildLoadoutsPage()
 
     page.rows = {}
     for i, group in ipairs(ns.LOADOUT_GROUPS) do
-        local y = -104 - (i - 1) * 34
+        local y = -104 - (i - 1) * 50
         local row = { boxes = {} }
         row.name = Label(page, GROUP_NAMES[group])
         row.name:SetPoint("TOPLEFT", 14, y - 4)
@@ -432,9 +441,38 @@ local function BuildLoadoutsPage()
             box:SetScript("OnEditFocusLost", function() Refresh() end)
             row.boxes[slot] = box
         end
+        -- the conjure order: a button that steps through the orders this group offers
+        local orderLabel = Label(page, "Order", "GameFontHighlightSmall")
+        orderLabel:SetPoint("TOPLEFT", 30, y - 30)
+        local ob = CreateFrame("Button", nil, page, "UIPanelButtonTemplate")
+        ob:SetSize(124, 20)
+        ob:SetPoint("TOPLEFT", 68, y - 26)
+        ob:SetScript("OnClick", function()
+            local lo = EditableLoadout(group)
+            local list, cur, at = ns.LOADOUT_ORDERS[group], ns.LoadoutOrder(lo, group), 1
+            for k, o in ipairs(list) do if o == cur then at = k end end
+            lo.order = list[at % #list + 1]
+            Refresh()
+        end)
+        ob:SetScript("OnEnter", function(self)
+            local lo = ns.Loadout(group, state.profile)
+            local cur = ns.LoadoutOrder(lo, group)
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+            GameTooltip:SetText(ns.ORDER_NAMES[cur])
+            GameTooltip:AddLine(ORDER_TIPS[cur], 1, 1, 1, true)
+            if cur == "character" and not lo.makeup then
+                GameTooltip:AddLine("Turn on + group's trades for this to count anyone but you.", 1, 0.5, 0.25, true)
+            end
+            local names = {}
+            for _, o in ipairs(ns.LOADOUT_ORDERS[group]) do names[#names + 1] = ns.ORDER_NAMES[o] end
+            GameTooltip:AddLine("Click for the next: " .. table.concat(names, ", ") .. ".", 0.6, 0.8, 1, true)
+            GameTooltip:Show()
+        end)
+        ob:SetScript("OnLeave", GameTooltip_Hide)
+        row.order = ob
         local reset = CreateFrame("Button", nil, page, "UIPanelButtonTemplate")
         reset:SetSize(84, 22)
-        reset:SetPoint("TOPLEFT", 440, y + 1)
+        reset:SetPoint("TOPLEFT", 496, y + 1)
         reset:SetScript("OnClick", function()
             local p = ns.Profile(state.profile)
             if state.profile == "default" then p.loadouts[group] = ns.DefaultLoadout(group)
@@ -446,29 +484,29 @@ local function BuildLoadoutsPage()
     end
 
     local now = Label(page, "Right now (this character)")
-    now:SetPoint("TOPLEFT", 14, -214)
+    now:SetPoint("TOPLEFT", 14, -268)
     page.status = Label(page, "", "GameFontHighlightSmall")
-    page.status:SetPoint("TOPLEFT", 18, -232)
+    page.status:SetPoint("TOPLEFT", 18, -286)
     page.status:SetWidth(500)
     page.status:SetJustifyH("LEFT")
     page.status:SetSpacing(2)
 
     local macroLabel = Label(page, "Macro")
-    macroLabel:SetPoint("TOPLEFT", 14, -312)
+    macroLabel:SetPoint("TOPLEFT", 14, -382)
     local make = CreateFrame("Button", nil, page, "UIPanelButtonTemplate")
     make:SetSize(150, 24)
-    make:SetPoint("TOPLEFT", 14, -330)
+    make:SetPoint("TOPLEFT", 14, -400)
     make:SetText("Put macro on cursor")
     make:SetScript("OnClick", function() ns.MakeMacro() end)
 
     -- the macro's icon: the addon's images, or the next conjure's own icon; the chosen one has a gold border
     local iconLabel = Label(page, "Macro icon", "GameFontHighlightSmall")
-    iconLabel:SetPoint("TOPLEFT", 262, -306)
+    iconLabel:SetPoint("TOPLEFT", 262, -376)
     page.iconButtons = {}
     for i, opt in ipairs(ns.MACRO_ICONS) do
         local b = CreateFrame("Button", nil, page)
         b:SetSize(24, 24)
-        b:SetPoint("TOPLEFT", 330 + (i - 1) * 28, -300)
+        b:SetPoint("TOPLEFT", 330 + (i - 1) * 28, -370)
         b.border = b:CreateTexture(nil, "BACKGROUND")
         b.border:SetAllPoints()
         b.icon = b:CreateTexture(nil, "ARTWORK")
@@ -492,7 +530,7 @@ local function BuildLoadoutsPage()
     text:SetMultiLine(true)
     text:SetFontObject(ChatFontNormal)
     text:SetSize(330, 36)
-    text:SetPoint("TOPLEFT", 180, -326)
+    text:SetPoint("TOPLEFT", 180, -396)
     text:SetAutoFocus(false)
     local tbg = text:CreateTexture(nil, "BACKGROUND")
     tbg:SetPoint("TOPLEFT", -4, 4)
@@ -505,7 +543,7 @@ local function BuildLoadoutsPage()
     local hint = Label(page, "Creates the account macro \"Waterboy\" (or click the text and Ctrl+C to copy it). "
         .. "Each press restacks, then conjures one thing that's missing. The made macro fades when you can't "
         .. "cast the next conjure (no mana, say) and shows the loadout in its tooltip.", "GameFontDisableSmall")
-    hint:SetPoint("TOPLEFT", 14, -362)
+    hint:SetPoint("TOPLEFT", 14, -432)
     hint:SetWidth(500)
     hint:SetJustifyH("LEFT")
 end
@@ -521,6 +559,8 @@ local function RefreshLoadoutsPage()
             row.makeup:SetChecked(lo.makeup)
             row.makeup:SetAlpha(alpha)
         end
+        row.order:SetText(ns.ORDER_NAMES[ns.LoadoutOrder(lo, group)])
+        row.order:SetAlpha(alpha)
         for slot, box in pairs(row.boxes) do
             if not box:HasFocus() then box:SetText(tostring(lo.counts[slot] or 0)) end
             box:SetAlpha(alpha)
@@ -542,7 +582,7 @@ local function RefreshLoadoutsPage()
 end
 
 local function Build()
-    frame = ns.CreateWindow("WaterboyReimaginedConfig", 540, 450, "Waterboy Reimagined")
+    frame = ns.CreateWindow("WaterboyReimaginedConfig", 600, 520, "Waterboy Reimagined")
     frame:SetPoint("CENTER")
     frame:SetMovable(true)
     frame:EnableMouse(true)

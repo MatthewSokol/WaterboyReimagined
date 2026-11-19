@@ -79,3 +79,9 @@ GetPartyAssignment = nil
 print("rogue: " .. NS.GuessRole("party1"))
 local ok, lines = pcall(NS.LoadoutStatus)
 print("status: " .. (ok and lines[1] or ("ERROR: " .. tostring(lines))))
+-- the Loadouts tab draws every row with its order button, on the default and on a character profile
+CALL("/wbr", SlashCmdList.WATERBOYREIMAGINED, "")
+NS.Profile("default").loadouts.raid.order = "character"
+CALL("Loadouts tab, default profile", NS.OpenLoadouts, "default")
+CALL("Loadouts tab, this character", NS.OpenLoadouts, NS.CharKey())
+print("raid order after drawing: " .. NS.LoadoutOrder(NS.Profile("default").loadouts.raid, "raid"))
