@@ -1,6 +1,8 @@
 -- The test journal (Journal.lua): which checklist steps get proven, and that no names are stored.
 FIRE("ADDON_LOADED", "WaterboyReimagined")
 FIRE("PLAYER_LOGIN")
+-- these flows predate mana gems: no gems in the loadouts (smoke-gems.lua covers them)
+for _, g in ipairs(NS.LOADOUT_GROUPS) do NS.Profile("default").loadouts[g].counts.gem1 = 0 end
 FIRE("SPELLS_CHANGED")
 FIRE("PLAYER_ENTERING_WORLD")
 FIRE("TRADE_SHOW")                                   -- auto-fill on: trade-auto

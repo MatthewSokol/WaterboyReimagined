@@ -47,6 +47,7 @@ if (!fs.existsSync(path.join(__dirname, "node_modules", "fengari"))) {
     ["Mechanic hooks", path.join("tools", "stub-mechanic.lua"), "smoke-mechanic.lua"],
     ["test journal", "", "smoke-journal.lua"],
     ["conjure order", "", "smoke-order.lua"],
+    ["mana gems", "", "smoke-gems.lua"],
   ];
   for (const [name, pre, script] of runs) {
     const r = node([path.join("tools", "harness.js"), "WaterboyReimagined", pre, path.join("tools", script)]);

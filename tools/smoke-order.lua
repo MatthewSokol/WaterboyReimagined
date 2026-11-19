@@ -9,6 +9,8 @@ local function expect(label, want)
   print((got == want and "ok " or "ERROR: ") .. label .. ": next " .. tostring(got) .. ", expected " .. tostring(want))
 end
 local solo = NS.Profile("default").loadouts.solo -- 2 water, 1 food: 40 and 20 items
+-- mana gems have their own test (smoke-gems.lua): none here
+for _, g in ipairs(NS.LOADOUT_GROUPS) do NS.Profile("default").loadouts[g].counts.gem1 = 0 end
 
 -- default is by ratio
 print("solo order: " .. NS.LoadoutOrder(solo, "solo"))
