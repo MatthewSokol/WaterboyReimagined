@@ -5,7 +5,7 @@ happens: each change gets its own group under 2.2 when the work starts, so you c
 release when it gets too long. Claude keeps it on the Waterboy Release Checklist page, where you tick rows and
 note problems. Every in-game action here is a click or key press of yours: nothing is automated.
 
-**Waiting since 1.0.0:** 5 changes, 14 rows (the page counts them for you).
+**Waiting since 1.0.0:** 6 changes, 17 rows (the page counts them for you).
 
 **Build under test:** `<commit>` (`<git describe>`), stamped `<date>`. A fix restamps it: untick stage 1, the
 smoke rows and every row the fix touches, and start again from stage 1.
@@ -136,6 +136,17 @@ friend or an alt on another account). Keep BugSack and Mechanic (`/mech`) enable
 - [ ] 2.2.5.4 Extra rounds (Temporary) make more water and food, never a second gem
 - [ ] 2.2.5.5 **Conjure now** shows Mana Ruby, Citrine, Jade and Agate (unlearned ranks greyed out); a click
       casts that gem once, and the label says whether it's in your bags
+
+</details>
+
+<details open>
+<summary><b>2.2.6 Fast presses (#18)</b> · open PR</summary>
+
+- [ ] 2.2.6.1 Press the macro again right as each cast bar ends: every press keeps the loadout's mix, never
+      repeating the last item because its items weren't in the bags yet
+- [ ] 2.2.6.2 Press during the last moment of a cast: chat says `Next: …` and the queued cast is the right one;
+      an earlier press mid-cast does nothing
+- [ ] 2.2.6.3 Interrupt a cast (move): the next press makes that item again
 
 </details>
 

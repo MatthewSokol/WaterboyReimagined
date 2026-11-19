@@ -20,6 +20,11 @@ Newest first. Each release is `## [version] - date` (the format Mechanic's `chan
 - **AddOn list:** the addon shows as "Waterboy Reimagined (Mage Water & Food)", its tooltip says what it does in
   one sentence, and it links to its CurseForge page.
 
+### Fixed
+
+- **Fast presses:** pressing the conjure macro right as a cast ends (or in the game's spell queue window) no
+  longer conjures the same thing again; the items still on their way to your bags now count.
+
 ## [1.0.0] - 2026-11-12
 
 First release.
