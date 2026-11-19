@@ -1,4 +1,4 @@
-KNOWN_EVENTS = { ADDON_LOADED = true, PLAYER_LOGIN = true, PLAYER_ENTERING_WORLD = true, TRADE_SHOW = true, TRADE_CLOSED = true, SPELLS_CHANGED = true, PLAYER_REGEN_ENABLED = true, GROUP_ROSTER_UPDATE = true, BAG_UPDATE_DELAYED = true, TRADE_PLAYER_ITEM_CHANGED = true, TRADE_MONEY_CHANGED = true, TRADE_ACCEPT_UPDATE = true, UNIT_SPELLCAST_SUCCEEDED = true, UNIT_SPELLCAST_INTERRUPTED = true, ADDON_ACTION_BLOCKED = true, ADDON_ACTION_FORBIDDEN = true }
+KNOWN_EVENTS = { ADDON_LOADED = true, PLAYER_LOGIN = true, PLAYER_ENTERING_WORLD = true, TRADE_SHOW = true, TRADE_CLOSED = true, SPELLS_CHANGED = true, PLAYER_REGEN_ENABLED = true, GROUP_ROSTER_UPDATE = true, BAG_UPDATE_DELAYED = true, TRADE_PLAYER_ITEM_CHANGED = true, TRADE_MONEY_CHANGED = true, TRADE_ACCEPT_UPDATE = true, UNIT_SPELLCAST_SUCCEEDED = true, UNIT_SPELLCAST_INTERRUPTED = true, UNIT_SPELLCAST_START = true, UNIT_SPELLCAST_FAILED = true, ADDON_ACTION_BLOCKED = true, ADDON_ACTION_FORBIDDEN = true }
 -- Minimal WoW API stubs to load the addon and click through it.
 local frames = {}
 local function stub(name)
@@ -148,3 +148,6 @@ rawset(Minimap, "GetHeight", function() return 140 end)
 rawset(Minimap, "GetCenter", function() return 1000, 600 end)
 rawset(Minimap, "GetEffectiveScale", function() return 1 end)
 GetCursorPosition = function() local c = STUB_CURSOR or { 0, 0 }; return c[1], c[2] end
+-- the player's cast: STUB_CAST = { name, endMS } while casting, nil otherwise
+UnitCastingInfo = function() if STUB_CAST then return STUB_CAST[1], "", 0, 0, STUB_CAST[2] end end
+GetCVar = function(name) return STUB_CVARS and STUB_CVARS[name] end

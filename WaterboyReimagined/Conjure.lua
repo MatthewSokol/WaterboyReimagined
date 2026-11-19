@@ -226,6 +226,19 @@ local function Targets()
 end
 
 local function IsGem(id) return ns.ITEMS[id] and ns.ITEMS[id].kind == "gem" end
+
+-- Conjures cast or casting whose items aren't in the bags yet, oldest first:
+-- { guid, id, n = items expected, before = bag count to beat, at, succeeded, macro = from a macro press }.
+-- The server adds conjured items a moment after the cast ends, and a press in the spell queue window comes
+-- before the cast even ends; counting these keeps the next pick from repeating the last one.
+local casts = {}
+
+-- Items of `id` in the bags plus those on the way. Picks use this; messages show the bags.
+local function Have(id)
+    local n = ItemCount(id)
+    for _, c in ipairs(casts) do if c.id == id then n = n + c.n end end
+    return n
+end
 -- The water and food in `t`, or (with `gems`) only the gems.
 local function Only(t, gems)
     local r = {}
@@ -251,7 +264,7 @@ end
 local function Pick(want, better)
     local best
     for id, n in pairs(want) do
-        if ItemCount(id) < n and Learned(id) and (not best or better(id, best)) then best = id end
+        if Have(id) < n and Learned(id) and (not best or better(id, best)) then best = id end
     end
     return best
 end
@@ -273,7 +286,7 @@ local function NextFood(ctx)
         return Pick(need, ByCategory)
     end
     -- ratio: the item furthest behind its target, counted in items
-    local function share(i) return ItemCount(i) / need[i] end
+    local function share(i) return Have(i) / need[i] end
     return Pick(need, function(a, b)
         local x, y = share(a), share(b)
         if x ~= y then return x < y end
@@ -290,7 +303,7 @@ local function NextConjure(ctx)
     if ctx.gemOrder ~= "last" then id = gem() end
     if not id then id = NextFood(ctx) end
     if not id and ctx.gemOrder == "last" then id = gem() end
-    if id then return id, ItemCount(id), ctx.need[id] end
+    if id then return id, Have(id), ctx.need[id] end
 end
 
 local function SpellFor(id)
@@ -508,12 +521,30 @@ local function ShowMorePrompt(group)
     prompt:Show()
 end
 
--- The conjure we just asked for: { id, spellID, at, succeeded }. The progress line waits for the cast to
--- finish and the items to land in the bags.
-local pending
+-- The last macro press that aimed at a conjure: { id, at }. The cast it starts (now, or queued) reports
+-- its progress line when its items land.
+local lastPress
 
 local function Casting()
     return UnitCastingInfo and UnitCastingInfo("player") ~= nil
+end
+
+-- Is the current cast close enough to its end that the game queues the next press (SpellQueueWindow, in
+-- ms, 400 unless changed)? Earlier presses the game refuses.
+local function InQueueWindow()
+    local _, _, _, _, endMS = UnitCastingInfo("player")
+    if not endMS then return false end
+    local window = tonumber(GetCVar and GetCVar("SpellQueueWindow")) or 400
+    return endMS / 1000 - GetTime() <= window / 1000
+end
+
+-- Take `c` off the in-flight list. `landed`: its items are in, so later casts of the same item count from
+-- the bags as they are now.
+local function Drop(c, landed)
+    for i, o in ipairs(casts) do if o == c then table.remove(casts, i); break end end
+    if landed then
+        for _, o in ipairs(casts) do if o.id == c.id then o.before = ItemCount(o.id) end end
+    end
 end
 
 -- "water (rank 7)"
@@ -523,23 +554,23 @@ local function Describe(id)
     return string.format("%s (rank %d)", item.kind, item.rank)
 end
 
--- `final`: the fallback timer, so a cast that added nothing gets reported; a bag update that comes before
--- the conjured items (some other bag change) waits for a later one.
-local function ReportConjured(final)
-    local p = pending
-    if not p or p.reported then return end
-    p.reported = true
-    pending = nil
-    local gained = p.before and (ItemCount(p.id) - p.before)
-    if gained and gained > 0 and ns.DB() then
+-- A finished cast `p` (from `casts`): once its items are in, drop it and, for a macro press, print the
+-- progress line. `final`: the fallback timer, so a cast that added nothing gets dropped and reported; a bag
+-- update that comes before the conjured items (some other bag change) waits for a later one.
+local function ReportConjured(p, final)
+    local gained = ItemCount(p.id) - p.before
+    if gained > 0 and ns.DB() then
         ns.DB().yields = ns.DB().yields or {}
         ns.DB().yields[p.id] = math.max(ns.DB().yields[p.id] or 0, gained) -- a full bag can cut one short
     end
-    if p.before and ItemCount(p.id) <= p.before then
-        if not final then p.reported = nil; pending = p; return end
-        ns.Print("The " .. Describe(p.id) .. " conjure didn't add anything: are your bags full?")
+    if gained <= 0 then
+        if not final then return end
+        Drop(p)
+        if p.macro then ns.Print("The " .. Describe(p.id) .. " conjure didn't add anything: are your bags full?") end
         return
     end
+    Drop(p, true)
+    if not p.macro then return end
     local need, group, _, rounds, ctx = CurrentNeed(false)
     local item = ns.ITEMS[p.id]
     local size = StackSize(p.id)
@@ -587,7 +618,7 @@ local function HasRoom(id)
         if n and n > 0 and (family == nil or family == 0) then return true end
     end
     local size = StackSize(id)
-    local partial = ItemCount(id) % size
+    local partial = Have(id) % size
     if partial == 0 then return false, 0 end
     local room = size - partial
     local y = Yield(id)
@@ -611,12 +642,15 @@ btn:SetScript("PreClick", function()
         return
     end
     if not ns.IsMage() then ns.Print("Conjuring only works on a mage."); return end
-    if Casting() then return end -- pressed again mid-cast: the game refuses it, say nothing
+    -- Pressed mid-cast: near the end the game queues the press, so aim it past the current cast (whose items
+    -- count as on the way); earlier the game refuses it, so say nothing.
+    local queued = Casting()
+    if queued and not InQueueWindow() then return end
     if not ns.TopRank("water") and not ns.TopRank("food") then
         ns.Print("You haven't learned Conjure Water or Conjure Food yet.")
         return
     end
-    local merged = Restack()
+    local merged = queued and 0 or Restack()
     local id, _, _, group, _, _, rounds = Update(true)
     local roomOK, room = true, 0
     if id then roomOK, room = HasRoom(id) end
@@ -631,9 +665,9 @@ btn:SetScript("PreClick", function()
         end
     elseif id then
         completePresses = 0
-        local item = ns.ITEMS[id]
-        pending = { id = id, spellID = ns.SPELLS[item.kind][item.rank], at = now, before = ItemCount(id) }
-        ns.Print(string.format("Casting %s...%s", Describe(id), rounds > 0 and " (extra)" or ""))
+        lastPress = { id = id, at = now }
+        ns.Print(string.format("%s %s...%s", queued and "Next:" or "Casting", Describe(id),
+            rounds > 0 and " (extra)" or ""))
     elseif merged > 0 then
         ns.Print("Restacking...")
     else
@@ -740,29 +774,66 @@ function ns.PrintLoadout()
     end
 end
 
--- After a macro press: the cast finishing (or being interrupted), then the conjured items arriving.
--- UNIT_SPELLCAST_* args on Forever: unit, castGUID, spellID. A cast that never starts (moving, no mana, the
--- macro's 2nd /click line) only gets the game's own error; its pending entry expires.
+-- itemID a conjure spell makes, or nil.
+local spellItems
+local function ItemForSpell(spellID)
+    if not spellItems then
+        spellItems = {}
+        for id, item in pairs(ns.ITEMS) do
+            local s = ns.SPELLS[item.kind] and ns.SPELLS[item.kind][item.rank]
+            if s then spellItems[s] = id end
+        end
+    end
+    return spellID and spellItems[spellID]
+end
+
+local function FindCast(guid)
+    for _, c in ipairs(casts) do if c.guid == guid then return c end end
+end
+
+local function InList(c)
+    for _, o in ipairs(casts) do if o == c then return true end end
+end
+
+-- Every conjure (macro, Conjure now or spellbook): its items count as on the way from cast start until they
+-- land, and the button re-aims past it, so a press in the spell queue window queues the right spell.
+-- UNIT_SPELLCAST_* args on Forever: unit, castGUID, spellID.
 local castFrame = CreateFrame("Frame")
-ns.RegisterEvents(castFrame, { "UNIT_SPELLCAST_SUCCEEDED", "UNIT_SPELLCAST_INTERRUPTED", "BAG_UPDATE_DELAYED" })
-castFrame:SetScript("OnEvent", function(_, event, unit, _, spellID)
-    local p = pending
-    if not p then return end
-    if GetTime() - p.at > 30 then pending = nil; return end -- the cast never started
+ns.RegisterEvents(castFrame, { "UNIT_SPELLCAST_START", "UNIT_SPELLCAST_SUCCEEDED", "UNIT_SPELLCAST_INTERRUPTED",
+    "UNIT_SPELLCAST_FAILED", "BAG_UPDATE_DELAYED" })
+castFrame:SetScript("OnEvent", function(_, event, unit, guid, spellID)
+    local now = GetTime()
+    for i = #casts, 1, -1 do -- a cast that never finished
+        if not casts[i].succeeded and now - casts[i].at > 30 then table.remove(casts, i) end
+    end
     if event == "BAG_UPDATE_DELAYED" then
-        if p.succeeded then ReportConjured() end
+        local seen, list = {}, {}
+        for i, c in ipairs(casts) do list[i] = c end -- ReportConjured takes casts off the list
+        for _, c in ipairs(list) do -- oldest finished cast of each item first
+            if c.succeeded and not seen[c.id] then seen[c.id] = true; ReportConjured(c) end
+        end
+        Update()
         return
     end
-    if unit ~= "player" or (spellID and spellID ~= p.spellID) then return end
-    if event == "UNIT_SPELLCAST_SUCCEEDED" then
-        p.succeeded = true
-        if extra then extra.last = GetTime(); WatchExtraIdle(); RefreshExtraTimer() end
-        -- in case the bags updated before this event; only for this cast, not a newer press
-        C_Timer.After(2, function() if pending == p then ReportConjured(true) end end)
-    elseif event == "UNIT_SPELLCAST_INTERRUPTED" then
-        pending = nil
-        ns.Print("Conjure interrupted.")
+    local id = unit == "player" and ItemForSpell(spellID)
+    if not id then return end
+    local c = FindCast(guid)
+    if not c and (event == "UNIT_SPELLCAST_START" or event == "UNIT_SPELLCAST_SUCCEEDED") then
+        c = { guid = guid, id = id, n = Yield(id) or 1, before = ItemCount(id), at = now,
+            macro = lastPress ~= nil and lastPress.id == id and now - lastPress.at < 1.5 }
+        if c.macro then lastPress = nil end
+        casts[#casts + 1] = c
     end
+    if event == "UNIT_SPELLCAST_SUCCEEDED" then
+        c.succeeded, c.at = true, now
+        if c.macro and extra then extra.last = now; WatchExtraIdle(); RefreshExtraTimer() end
+        -- in case the bags updated before this event, or never do (bags full)
+        C_Timer.After(2, function() if InList(c) then ReportConjured(c, true); Update() end end)
+    elseif c and (event == "UNIT_SPELLCAST_INTERRUPTED" or event == "UNIT_SPELLCAST_FAILED") then
+        Drop(c)
+        if c.macro and event == "UNIT_SPELLCAST_INTERRUPTED" then ns.Print("Conjure interrupted.") end
+    end
+    Update() -- aim past the casts on the way (no-op in combat)
 end)
 
 ---------------------------------------------------------------------------------------------------
