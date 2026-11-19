@@ -8,18 +8,40 @@
 -- Loadouts live in the profiles like trade settings: a mage's own loadout overrides the default's.
 --
 -- The macro is "/click WaterboyReimaginedConjure": a secure button. Each press restacks partial stacks, then
--- casts ONE conjure for the first item you're short of (water before food, highest rank first). When
--- nothing is missing it does nothing and says the loadout is complete. One press = one cast (hardware event).
+-- casts ONE conjure for the next item you're short of, picked by the loadout's order (below). When nothing is
+-- missing it does nothing and says the loadout is complete. One press = one cast (hardware event).
+--
+-- Order (per loadout row, default "ratio"):
+--   ratio     - whatever keeps the bags closest to the loadout's mix: the item with the lowest share of its
+--               target (items in the bags / items wanted). Counted in items, not casts, since a conjure makes
+--               more as the mage levels.
+--   category  - all the water, then all the food (highest rank first). The original behaviour.
+--   character - party and raid with "+ group's trades": your own stacks first, then each healer's, then each
+--               tank's, then everyone else's. Roles are guessed (see GuessRole).
 
 local ADDON_NAME, ns = ...
 
 local GROUPS = { "solo", "party", "raid" }
 local SLOTS = { "water1", "water2", "food1", "food2" }
 local DEFAULT_LOADOUTS = {
-    solo  = { makeup = false, counts = { water1 = 2, food1 = 1 } },
-    party = { makeup = true,  counts = { water1 = 2, food1 = 1 } },
-    raid  = { makeup = false, counts = { water1 = 8, water2 = 4, food1 = 2 } },
+    solo  = { makeup = false, order = "ratio", counts = { water1 = 2, food1 = 1 } },
+    party = { makeup = true,  order = "ratio", counts = { water1 = 2, food1 = 1 } },
+    raid  = { makeup = false, order = "ratio", counts = { water1 = 8, water2 = 4, food1 = 2 } },
 }
+-- Orders each loadout row offers, the first being the default.
+local ORDERS = {
+    solo = { "ratio", "category" },
+    party = { "ratio", "category", "character" },
+    raid = { "ratio", "category", "character" },
+}
+local ORDER_NAMES = { ratio = "By ratio", category = "By category", character = "By character" }
+ns.LOADOUT_ORDERS, ns.ORDER_NAMES = ORDERS, ORDER_NAMES
+
+-- The order a loadout row uses: its own if this group offers it, else the default (ratio).
+function ns.LoadoutOrder(lo, group)
+    for _, o in ipairs(ORDERS[group] or ORDERS.solo) do if lo and lo.order == o then return o end end
+    return "ratio"
+end
 local MACRO_NAME = "Waterboy"
 local BUTTON_NAME = "WaterboyReimaginedConjure"
 -- Two lines so it works with "cast on key down" on or off: the button only acts on the one that matches.
@@ -68,7 +90,7 @@ end
 local function CopyLoadout(lo)
     local counts = {}
     for k, v in pairs(lo.counts) do counts[k] = v end
-    return { makeup = lo.makeup, counts = counts }
+    return { makeup = lo.makeup, order = lo.order, counts = counts }
 end
 ns.CopyLoadout = CopyLoadout
 
@@ -110,16 +132,45 @@ local function StackSize(id)
     return stackSizes[id]
 end
 
--- What to keep in the bags right now: { [itemID] = items }, group, number of group members counted
+-- A group member's role, for the "by character" order: "HEALER", "TANK" or "DAMAGER". Forever's group tools
+-- rarely set one, so after any role the game knows (the role picker, a raid's main tank) it guesses by class:
+-- bear-form druids tank, warriors tank in a party (in a raid only the assigned main tanks count, since most
+-- raid warriors deal damage), and priests, other druids, paladins and shamans heal.
+local function GuessRole(unit, inRaid)
+    local role = UnitGroupRolesAssigned and UnitGroupRolesAssigned(unit)
+    if role == "HEALER" or role == "TANK" then return role end
+    if GetPartyAssignment and (GetPartyAssignment("MAINTANK", unit) or GetPartyAssignment("MAINTANK", unit, true)) then
+        return "TANK"
+    end
+    local _, class = UnitClass(unit)
+    if class == "WARRIOR" then return inRaid and "DAMAGER" or "TANK" end
+    if class == "DRUID" then
+        if UnitPowerType and UnitPowerType(unit) == 1 then return "TANK" end -- rage: bear form
+        return "HEALER"
+    end
+    if class == "PRIEST" or class == "PALADIN" or class == "SHAMAN" then return "HEALER" end
+    return "DAMAGER"
+end
+ns.GuessRole = GuessRole
+local ROLE_ORDER = { HEALER = 1, TANK = 2, DAMAGER = 3 }
+
+-- Stacks per slot -> items per itemID, added into `need`.
+local function AddItems(need, slot, stacks)
+    local id = ns.Resolve(slot)
+    need[id] = (need[id] or 0) + stacks * StackSize(id)
+end
+
+-- What to keep in the bags right now: { [itemID] = items }, group, number of group members counted, and the
+-- shares behind it (your own first, then each member's, healers before tanks before the rest) for the
+-- "by character" order.
 local function Targets()
     local group = GroupType()
     local lo = ns.Loadout(group)
-    local stacks = {}
-    local function add(slot, n) stacks[slot] = (stacks[slot] or 0) + n end
+    local need, own = {}, {}
     for slot, n in pairs(lo.counts) do
-        if n > 0 then add(slot, n) end
+        if n > 0 then AddItems(need, slot, n); AddItems(own, slot, n) end
     end
-    local members = 0
+    local shares, members = { { role = "SELF", need = own } }, {}
     if lo.makeup and group ~= "solo" then
         local prefix = group == "raid" and "raid" or "party"
         local count = group == "raid" and GetNumGroupMembers() or GetNumSubgroupMembers()
@@ -129,18 +180,21 @@ local function Targets()
                 local name = ns.UnitFullName(u)
                 local _, class = UnitClass(u)
                 if name and class then
-                    for _, slot in ipairs(ns.Want(name, class).slots) do add(slot, 1) end
-                    members = members + 1
+                    local share = { role = GuessRole(u, group == "raid"), index = i, need = {} }
+                    for _, slot in ipairs(ns.Want(name, class).slots) do
+                        AddItems(need, slot, 1); AddItems(share.need, slot, 1)
+                    end
+                    members[#members + 1] = share
                 end
             end
         end
+        table.sort(members, function(a, b)
+            if a.role ~= b.role then return ROLE_ORDER[a.role] < ROLE_ORDER[b.role] end
+            return a.index < b.index
+        end)
+        for _, s in ipairs(members) do shares[#shares + 1] = s end
     end
-    local need = {}
-    for slot, n in pairs(stacks) do
-        local id = ns.Resolve(slot)
-        need[id] = (need[id] or 0) + n * StackSize(id)
-    end
-    return need, group, members
+    return need, group, #members, shares, ns.LoadoutOrder(lo, group)
 end
 
 -- First item we're short of: water before food, highest rank first. Returns itemID, have, need.
@@ -151,17 +205,47 @@ local function Learned(id)
     return top ~= nil and item.rank <= top
 end
 
-local function NextConjure(need)
+-- Water before food, higher rank first (the "category" order, and the tie-break for the others).
+local function CategoryScore(id)
+    local item = ns.ITEMS[id]
+    return (item.kind == "water" and 100 or 0) + item.rank
+end
+
+-- Among items short of `want` (itemID -> items), the one `better(a, b)` puts first. Returns itemID or nil.
+local function Pick(want, better)
     local best
-    for id, n in pairs(need) do
-        local have = ItemCount(id)
-        if have < n and Learned(id) then
-            local item = ns.ITEMS[id]
-            local score = (item.kind == "water" and 100 or 0) + item.rank
-            if not best or score > best.score then best = { id = id, have = have, need = n, score = score } end
-        end
+    for id, n in pairs(want) do
+        if ItemCount(id) < n and Learned(id) and (not best or better(id, best)) then best = id end
     end
-    if best then return best.id, best.have, best.need end
+    return best
+end
+
+local function ByCategory(a, b) return CategoryScore(a) > CategoryScore(b) end
+
+-- The next conjure for `ctx` = { need, shares, order } (from CurrentNeed). Returns itemID, have, need.
+local function NextConjure(ctx)
+    local need, id = ctx.need, nil
+    if ctx.order == "category" then
+        id = Pick(need, ByCategory)
+    elseif ctx.order == "character" and ctx.shares then
+        -- everyone's share in turn: the first share the bags don't cover yet gets the next conjure
+        local cum = {}
+        for _, share in ipairs(ctx.shares) do
+            for i, n in pairs(share.need) do cum[i] = (cum[i] or 0) + n end
+            id = Pick(cum, ByCategory)
+            if id then break end
+        end
+        if not id then id = Pick(need, ByCategory) end
+    else
+        -- ratio: the item furthest behind its target, counted in items
+        local function share(i) return ItemCount(i) / need[i] end
+        id = Pick(need, function(a, b)
+            local x, y = share(a), share(b)
+            if x ~= y then return x < y end
+            return ByCategory(a, b)
+        end)
+    end
+    if id then return id, ItemCount(id), need[id] end
 end
 
 local function SpellFor(id)
@@ -237,21 +321,26 @@ local function WatchExtraIdle()
 end
 
 -- What to keep right now, scaled for extra rounds. With `advance`, a finished extra round starts the next.
--- Returns need, group, members, rounds (0 = no extra).
+-- Returns need, group, members, rounds (0 = no extra), ctx (for NextConjure: need, shares, order).
 local function CurrentNeed(advance)
-    local need, group, members = Targets()
-    if not extra then return need, group, members, 0 end
+    local need, group, members, shares, order = Targets()
+    if not extra then return need, group, members, 0, { need = need, shares = shares, order = order } end
+    local function scale(t)
+        local s = {}
+        for id, n in pairs(t) do s[id] = n * (1 + extra.rounds) end
+        return s
+    end
     local function scaled()
-        local t = {}
-        for id, n in pairs(need) do t[id] = n * (1 + extra.rounds) end
-        return t
+        local sh = {}
+        for i, share in ipairs(shares) do sh[i] = { role = share.role, need = scale(share.need) } end
+        return { need = scale(need), shares = sh, order = order }
     end
-    local s = scaled()
-    if advance and next(s) and not NextConjure(s) then
+    local ctx = scaled()
+    if advance and next(ctx.need) and not NextConjure(ctx) then
         extra.rounds = extra.rounds + 1
-        s = scaled()
+        ctx = scaled()
     end
-    return s, group, members, extra.rounds
+    return ctx.need, group, members, extra.rounds, ctx
 end
 
 -- Point the button at the next conjure (out of combat only). `advance`: this is a macro press.
@@ -300,8 +389,8 @@ local function Update(advance)
     if InCombatLockdown() then return end
     if not ns.IsMage() then btn:SetAttribute("type", nil); armedID = nil; return end
     EndExtraIfIdle(not advance)
-    local need, group, members, rounds = CurrentNeed(advance)
-    local id, have, total = NextConjure(need)
+    local _, group, members, rounds, ctx = CurrentNeed(advance)
+    local id, have, total = NextConjure(ctx)
     local spell = id and SpellFor(id)
     if spell then
         btn:SetAttribute("type", "spell")
@@ -403,14 +492,14 @@ local function ReportConjured(final)
         ns.Print("The " .. Describe(p.id) .. " conjure didn't add anything: are your bags full?")
         return
     end
-    local need, group, _, rounds = CurrentNeed(false)
+    local need, group, _, rounds, ctx = CurrentNeed(false)
     local item = ns.ITEMS[p.id]
     local size = StackSize(p.id)
     local msg = string.format("Conjured %s (rank %d): %d / %d stacks", item.kind, item.rank,
         math.floor(ItemCount(p.id) / size), math.ceil((need[p.id] or 0) / size))
     if rounds > 0 then msg = msg .. " (extra round " .. rounds .. ")" end
-    ns.Journal("conjure-cast", true, string.format("%s rank %d", item.kind, item.rank))
-    if not NextConjure(need) then
+    ns.Journal("conjure-cast", true, string.format("%s rank %d, %s", item.kind, item.rank, ctx.order))
+    if not NextConjure(ctx) then
         if rounds > 0 then msg = msg .. ". Extra round " .. rounds .. " done: press again for another."
         else msg = msg .. ". Loadout complete (" .. group .. ")."; ns.Journal("loadout-complete", true, group) end
     end
@@ -534,10 +623,17 @@ end
 
 function ns.MacroText() return MACRO_BODY end -- the copyable part; the made macro adds #showtooltip
 
+-- What the next macro press would conjure right now (itemID, have, need), without pressing it. For tests.
+function ns.NextConjureNow()
+    local _, _, _, _, ctx = CurrentNeed(false)
+    return NextConjure(ctx)
+end
+
 -- Lines describing what the macro aims for right now (for /wbr loadout and the config window).
 function ns.LoadoutStatus()
-    local need, group, members, rounds = CurrentNeed(false)
-    local lines = { "Now: " .. group .. (members > 0 and (" (" .. members .. " players' trade settings added)") or "") }
+    local need, group, members, rounds, ctx = CurrentNeed(false)
+    local lines = { "Now: " .. group .. ", " .. ORDER_NAMES[ctx.order]:lower()
+        .. (members > 0 and (" (" .. members .. " players' trade settings added)") or "") }
     if rounds > 0 then
         lines[#lines + 1] = string.format("|cff69ccf0Making extra: round %d, ends in %ds without a conjure|r",
             rounds, math.ceil(ExtraLeft()))

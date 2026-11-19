@@ -185,8 +185,12 @@ local TESTS = {
                         if not ns.ParseRelative(slot) then problem = "unknown slot " .. tostring(slot)
                         elseif type(n) ~= "number" or n < 0 or n ~= math.floor(n) then problem = slot .. " = " .. tostring(n) end
                     end
+                    if lo.order ~= nil and ns.LoadoutOrder(lo, group) ~= lo.order then
+                        problem = "order " .. tostring(lo.order) .. " isn't offered here"
+                    end
                 end
-                Detail(d, group, problem or "OK", problem and "fail" or "pass")
+                Detail(d, group, problem or ("OK, " .. ns.ORDER_NAMES[ns.LoadoutOrder(lo, group)]:lower()),
+                    problem and "fail" or "pass")
             end
             local ok, lines = pcall(ns.LoadoutStatus)
             Detail(d, "Current target", ok and lines[1] or ("error: " .. tostring(lines)), ok and "pass" or "fail")
