@@ -5,7 +5,7 @@ happens: each change gets its own group under 2.2 when the work starts, so you c
 release when it gets too long. Claude keeps it on the Waterboy Release Checklist page, where you tick rows and
 note problems. Every in-game action here is a click or key press of yours: nothing is automated.
 
-**Waiting since 1.0.0:** 3 changes, 5 rows (the page counts them for you).
+**Waiting since 1.0.0:** 5 changes, 14 rows (the page counts them for you).
 
 **Build under test:** `<commit>` (`<git describe>`), stamped `<date>`. A fix restamps it: untick stage 1, the
 smoke rows and every row the fix touches, and start again from stage 1.
@@ -108,6 +108,34 @@ friend or an alt on another account). Keep BugSack and Mechanic (`/mech`) enable
 
 - [ ] 2.2.3.1 At the character screen, **AddOns** lists "Waterboy Reimagined (Mage Water & Food)" with the drop
       icon, and hovering it shows the one-sentence summary
+
+</details>
+
+<details open>
+<summary><b>2.2.4 Conjure order (#16)</b> · open PR</summary>
+
+- [ ] 2.2.4.1 Loadouts tab: each row has an **Order** button. Solo steps through By ratio and By category; party
+      and raid add By character. Hovering it says what the order does
+- [ ] 2.2.4.2 **By ratio** (the default), solo with 2 water and 1 food: from empty bags (or after handing some
+      out), the presses keep about 2 water stacks to 1 food stack, and `/wbr loadout` says "by ratio"
+      `[auto validated · journal: conjure-cast]` (proves the casts; the mix needs your eyes)
+- [ ] 2.2.4.3 **By category:** all the water first, then the food
+- [ ] 2.2.4.4 **By character,** in a party with **+ group's trades**: your own stacks first, then the healer's
+      water, then the tank's food, then the others'
+
+</details>
+
+<details open>
+<summary><b>2.2.5 Mana gems (#17)</b> · open PR</summary>
+
+- [ ] 2.2.5.1 Loadouts tab: **Gem** and **Gem -1** columns (0 or 1; typing 2 becomes 1), and your saved loadouts
+      now show Gem 1. The **Mana gems** button switches Before water and food / After water and food
+- [ ] 2.2.5.2 With gems **before** (the default) and no gem in your bags, the first press conjures your top gem,
+      then water and food `[auto validated · journal: conjure-gem]`
+- [ ] 2.2.5.3 With gems **after**: water and food first, the gem once they're done
+- [ ] 2.2.5.4 Extra rounds (Temporary) make more water and food, never a second gem
+- [ ] 2.2.5.5 **Conjure now** shows Mana Ruby, Citrine, Jade and Agate (unlearned ranks greyed out); a click
+      casts that gem once, and the label says whether it's in your bags
 
 </details>
 
