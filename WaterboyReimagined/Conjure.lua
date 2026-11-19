@@ -735,17 +735,19 @@ function ns.LoadoutStatus()
         if x.kind ~= y.kind then return rank[x.kind] < rank[y.kind] end
         return x.rank > y.rank
     end)
+    local gems = {} -- all the gems share one line
     for _, id in ipairs(ids) do
         local size = StackSize(id)
         local have = ItemCount(id)
         local color = have >= need[id] and "|cff40ff40" or "|cffffd040"
         if IsGem(id) then
-            lines[#lines + 1] = string.format("%s%s: %d / %d|r", color, ns.NAMES[id], math.min(have, 1), need[id])
+            gems[#gems + 1] = string.format("%s%s: %d / %d|r", color, ns.NAMES[id], math.min(have, 1), need[id])
         else
             lines[#lines + 1] = string.format("%s%s: %d / %d stacks|r", color, ns.NAMES[id],
                 math.floor(have / size), math.ceil(need[id] / size))
         end
     end
+    if #gems > 0 then lines[#lines + 1] = table.concat(gems, ", ") end
     if #ids == 0 then lines[#lines + 1] = "nothing to conjure" end
     return lines
 end
