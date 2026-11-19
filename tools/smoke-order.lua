@@ -87,3 +87,26 @@ NS.Profile("default").loadouts.raid.order = "character"
 CALL("Loadouts tab, default profile", NS.OpenLoadouts, "default")
 CALL("Loadouts tab, this character", NS.OpenLoadouts, NS.CharKey())
 print("raid order after drawing: " .. NS.LoadoutOrder(NS.Profile("default").loadouts.raid, "raid"))
+
+-- the Loadouts tab's dropdowns: open one, see the orders its group offers, pick one
+CALL("Loadouts tab", NS.OpenLoadouts, "default")
+local function open(name)
+  STUB_MENU = {}
+  local dd = _G[name]
+  if not dd then print("ERROR: no dropdown " .. name); return {} end
+  rawget(dd, "__init")(dd, 1)
+  local texts = {}
+  for _, info in ipairs(STUB_MENU) do texts[#texts + 1] = info.text .. (info.checked and "*" or "") end
+  print(name .. ": " .. table.concat(texts, ", ") .. " (shows " .. tostring(rawget(dd, "__text")) .. ")")
+  return STUB_MENU
+end
+local soloMenu = open("WaterboyReimaginedOrderDropDown_solo")
+print((#soloMenu == 2 and "ok " or "ERROR: ") .. "solo offers 2 orders")
+local raidMenu = open("WaterboyReimaginedOrderDropDown_raid")
+print((#raidMenu == 3 and "ok " or "ERROR: ") .. "raid offers 3 orders")
+for _, info in ipairs(soloMenu) do if info.arg1 == "category" then info.func(nil, info.arg1) end end
+print((NS.Profile("default").loadouts.solo.order == "category" and "ok " or "ERROR: ") .. "picked By category for solo")
+open("WaterboyReimaginedOrderDropDown_solo")
+local gemMenu = open("WaterboyReimaginedGemOrderDropDown")
+for _, info in ipairs(gemMenu) do if info.arg1 == "last" then info.func(nil, info.arg1) end end
+print((NS.GemOrder("default") == "last" and "ok " or "ERROR: ") .. "picked gems after")
