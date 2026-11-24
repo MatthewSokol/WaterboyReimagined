@@ -350,6 +350,9 @@ end
 ---------------------------------------------------------------------------------------------------
 
 local btn = CreateFrame("Button", BUTTON_NAME, UIParent, "SecureActionButtonTemplate")
+-- Key Bindings > AddOns > Waterboy Reimagined (Bindings.xml): the same button the macro clicks.
+BINDING_HEADER_WATERBOYREIMAGINED = "Waterboy Reimagined"
+_G["BINDING_NAME_CLICK " .. BUTTON_NAME .. ":LeftButton"] = "Conjure next (same as the Waterboy macro)"
 btn:RegisterForClicks("AnyUp", "AnyDown")
 
 -- Extra rounds (Temporary in the "keep making more?" prompt): keep conjuring past the loadout in the same
@@ -631,9 +634,14 @@ local function HasRoom(id)
     return y == nil or room >= y, room
 end
 
-btn:SetScript("PreClick", function()
+-- One press of the macro or the keybinding clicks the button twice: the macro's two /click lines (down, then
+-- up) in the same frame, or the key going down and up. The button casts on only one of them (the game's
+-- "cast on key down" setting), so only that one picks the next conjure.
+btn:SetScript("PreClick", function(_, _, down)
+    local onDown = GetCVarBool and GetCVarBool("ActionButtonUseKeyDown") or false
+    if (down and true or false) ~= onDown then return end
     local now = GetTime()
-    if now == lastClick then return end -- the macro's 2nd /click line in the same press
+    if now == lastClick then return end -- same press, already handled
     lastClick = now
     if InCombatLockdown() then
         -- the button can't be re-aimed in combat: it repeats whatever it was set to when combat started
