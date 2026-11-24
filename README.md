@@ -132,7 +132,7 @@ down is used, then higher ranks.
 
 With **Fill trades automatically** off (General tab of `/wbr`, or `/wbr off`), opening a trade on a mage shows a
 panel next to the trade window instead: who you're trading with, which setting applies and its 6 slots.
-**Add to trade** puts the stacks in; right-click a slot to leave it out of this trade; **Edit setting** opens
+**Add to trade** puts the stacks in; right-click or Shift-click a slot, or click its **x**, to leave it out of this trade; **Edit setting** opens
 the config on that setting. **Vend** is a placeholder until the vending machine lands.
 
 First match wins:
