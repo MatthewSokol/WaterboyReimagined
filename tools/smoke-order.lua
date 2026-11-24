@@ -111,3 +111,9 @@ open("WaterboyReimaginedOrderDropDown_solo")
 local gemMenu = open("WaterboyReimaginedGemOrderDropDown")
 for _, info in ipairs(gemMenu) do if info.arg1 == "last" then info.func(nil, info.arg1) end end
 print((NS.GemOrder("default") == "last" and "ok " or "ERROR: ") .. "picked gems after")
+
+-- make extra: /wbr extra switches it on (only on), the status says so
+CALL("/wbr extra", SlashCmdList.WATERBOYREIMAGINED, "extra")
+local st = NS.LoadoutStatus()
+print(((st[2] or ""):find("Making extra", 1, true) and "ok " or "ERROR: ") .. "after /wbr extra: " .. tostring(st[2]))
+CALL("/wbr extra again", SlashCmdList.WATERBOYREIMAGINED, "extra")

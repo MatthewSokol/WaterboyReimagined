@@ -520,6 +520,22 @@ local function BuildLoadoutsPage()
 
     local now = Label(page, "Right now (this character)")
     now:SetPoint("TOPLEFT", 14, -226)
+    -- start "make extra" without the three extra presses (same as /wbr extra)
+    local more = CreateFrame("Button", nil, page, "UIPanelButtonTemplate")
+    more:SetSize(100, 22)
+    more:SetPoint("TOPLEFT", 424, -222)
+    more:SetText("Make extra")
+    more:SetScript("OnClick", function() ns.StartExtra() end)
+    more:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:SetText("Make extra")
+        GameTooltip:AddLine("Keep conjuring past your loadout in the same ratio, one round at a time, until you go a "
+            .. "minute without conjuring (same as /wbr extra, or Temporary after three more presses). Then press "
+            .. "the macro.", 1, 1, 1, true)
+        GameTooltip:Show()
+    end)
+    more:SetScript("OnLeave", GameTooltip_Hide)
+    page.more = more
     page.status = Label(page, "", "GameFontHighlightSmall")
     page.status:SetPoint("TOPLEFT", 18, -244)
     page.status:SetWidth(490)

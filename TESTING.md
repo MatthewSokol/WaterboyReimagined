@@ -5,7 +5,7 @@ happens: each change gets its own group under 2.2 when the work starts, so you c
 release when it gets too long. Claude keeps it on the Waterboy Release Checklist page, where you tick rows and
 note problems. Every in-game action here is a click or key press of yours: nothing is automated.
 
-**Waiting since 1.0.0:** 11 changes, 30 rows (the page counts them for you).
+**Waiting since 1.0.0:** 12 changes, 34 rows (the page counts them for you).
 
 **Build under test:** `<commit>` (`<git describe>`), stamped `<date>`. A fix restamps it: untick stage 1, the
 smoke rows and every row the fix touches, and start again from stage 1.
@@ -200,6 +200,14 @@ friend or an alt on another account). Keep BugSack and Mechanic (`/mech`) enable
 
 </details>
 
+<details open>
+<summary><b>2.2.12 Make extra button and command (#25)</b> · open PR</summary>
+
+- [ ] 2.2.12.1 Loadouts tab: **Make extra** starts the countdown bar and the next presses make extra rounds
+- [ ] 2.2.12.2 `/wbr extra` does the same; again while it's on says "Already making extra"
+
+</details>
+
 ## 2.3 Core features (standing)
 
 <details open>
@@ -241,6 +249,8 @@ friend or an alt on another account). Keep BugSack and Mechanic (`/mech`) enable
 - [ ] 2.3.3.3 When the loadout is full a press says so `[auto validated · journal: loadout-complete]`
 - [ ] 2.3.3.4 Three more presses ask about making extra: Cancel, Temporary (countdown bar, ends after a minute
       without conjuring, right-click stops it) and Update loadout
+- [ ] 2.3.3.4.a Make extra, way 2: the **Make extra** button on the Loadouts tab
+- [ ] 2.3.3.4.b Make extra, way 3: `/wbr extra`
 - [ ] 2.3.3.5 In a party with **+ group's trades**, the target grows by each member's trade setting
 - [ ] 2.3.3.6 With full bags, a press casts nothing and says why
 - [ ] 2.3.3.7 In combat, a press repeats the last cast and says so; the loadout is rechecked after combat

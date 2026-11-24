@@ -6,6 +6,8 @@ Newest first. Each release is `## [version] - date` (the format Mechanic's `chan
 
 ### Added
 
+- **Make extra, two more ways:** a **Make extra** button on the Loadouts tab and `/wbr extra` switch on making
+  extra rounds right away, without the three extra presses.
 - **Conjure now without the panel:** keybindings for each Conjure now button, and `/click
   WaterboyReimaginedManual1` to `8` in your own macros.
 - **Conjure next keybinding:** Key Bindings > AddOns > Waterboy Reimagined > Conjure next does what a macro
