@@ -79,3 +79,12 @@ NS.Profile("default").loadouts.solo.counts.gem1 = 2
 local r = (MECH_REG and MECH_REG.WaterboyReimagined) and MECH_REG.WaterboyReimagined.tests.run("loadouts")
 print("loadouts self-test with gem1 = 2: " .. (r and tostring(r.passed) or "no Mechanic in this run"))
 NS.Profile("default").loadouts.solo.counts.gem1 = 1
+
+-- Conjure now buttons are armed at login, panel shown or not: /click and keybindings work
+NS.HideManualConjure()
+WaterboyReimaginedManual1:SetAttribute("spell", nil) -- prove the login event sets it, not the earlier panel
+FIRE("PLAYER_ENTERING_WORLD")
+local b1 = WaterboyReimaginedManual1
+print((b1:GetAttribute("spell") and "ok " or "ERROR: ") .. "panel hidden, Water button armed: " .. tostring(b1:GetAttribute("spell")))
+print((_G["BINDING_NAME_CLICK WaterboyReimaginedManual8:LeftButton"] and "ok " or "ERROR: ") .. "binding name 8: "
+  .. tostring(_G["BINDING_NAME_CLICK WaterboyReimaginedManual8:LeftButton"]))

@@ -978,6 +978,7 @@ for i, m in ipairs(MANUAL) do
     b.label:SetPoint("LEFT", b, "RIGHT", 8, 0)
     b.label:SetJustifyH("LEFT")
     b.slot, b.gem, b.name = m.slot or false, m.gem or false, m.label
+    _G["BINDING_NAME_CLICK WaterboyReimaginedManual" .. i .. ":LeftButton"] = "Conjure now: " .. m.label
     b:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
         local item = self.id and ns.ITEMS[self.id]
@@ -1055,11 +1056,14 @@ function ns.ShowManualConjure(anchor) manualWanted, manualAnchor = true, anchor;
 function ns.HideManualConjure() manualWanted = false; ApplyManual() end
 function ns.PlaceManualConjure() ApplyManual() end -- the config window moved
 
+-- The buttons are armed from login on, shown or not, so /click WaterboyReimaginedManualN and their keybindings
+-- work without opening the panel.
 local mf = CreateFrame("Frame")
-ns.RegisterEvents(mf, { "PLAYER_REGEN_ENABLED", "BAG_UPDATE_DELAYED", "SPELLS_CHANGED" })
+ns.RegisterEvents(mf, { "PLAYER_REGEN_ENABLED", "BAG_UPDATE_DELAYED", "SPELLS_CHANGED", "PLAYER_ENTERING_WORLD" })
+local function ArmManual() if ns.DB() and ns.IsMage() then RefreshManual() end end
 mf:SetScript("OnEvent", function(_, event)
-    if event == "PLAYER_REGEN_ENABLED" then ApplyManual()
-    elseif manual:IsShown() then RefreshManual() end
+    if event == "PLAYER_REGEN_ENABLED" then ArmManual(); ApplyManual()
+    elseif event ~= "BAG_UPDATE_DELAYED" or manual:IsShown() then ArmManual() end
 end)
 
 local f = CreateFrame("Frame")
