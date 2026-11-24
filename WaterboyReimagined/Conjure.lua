@@ -584,11 +584,13 @@ local function ReportConjured(p, final)
     end
     if rounds > 0 then msg = msg .. " (extra round " .. rounds .. ")" end
     ns.Journal("conjure-cast", true, string.format("%s rank %d, %s", item.kind, item.rank, ctx.order))
-    if not NextConjure(ctx) then
+    if not NextConjure(ctx) then -- the last one: always say so
         if rounds > 0 then msg = msg .. ". Extra round " .. rounds .. " done: press again for another."
         else msg = msg .. ". Loadout complete (" .. group .. ")."; ns.Journal("loadout-complete", true, group) end
+        ns.Print(msg)
+    else
+        ns.Chat(msg)
     end
-    ns.Print(msg)
 end
 
 -- Presses that found nothing to conjure; the 3rd in a row asks whether to keep going.
@@ -668,10 +670,10 @@ btn:SetScript("PreClick", function()
     elseif id then
         completePresses = 0
         lastPress = { id = id, at = now }
-        ns.Print(string.format("%s %s...%s", queued and "Next:" or "Casting", Describe(id),
+        ns.Chat(string.format("%s %s...%s", queued and "Next:" or "Casting", Describe(id),
             rounds > 0 and " (extra)" or ""))
     elseif merged > 0 then
-        ns.Print("Restacking...")
+        ns.Chat("Restacking...")
     else
         if now - lastCompletePress > 30 then completePresses = 0 end
         lastCompletePress = now
@@ -835,7 +837,7 @@ castFrame:SetScript("OnEvent", function(_, event, unit, guid, spellID)
         C_Timer.After(2, function() if InList(c) then ReportConjured(c, true); Update() end end)
     elseif c and (event == "UNIT_SPELLCAST_INTERRUPTED" or event == "UNIT_SPELLCAST_FAILED") then
         Drop(c)
-        if c.macro and event == "UNIT_SPELLCAST_INTERRUPTED" then ns.Print("Conjure interrupted.") end
+        if c.macro and event == "UNIT_SPELLCAST_INTERRUPTED" then ns.Chat("Conjure interrupted.") end
     end
     Update() -- aim past the casts on the way (no-op in combat)
 end)

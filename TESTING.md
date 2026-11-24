@@ -5,7 +5,7 @@ happens: each change gets its own group under 2.2 when the work starts, so you c
 release when it gets too long. Claude keeps it on the Waterboy Release Checklist page, where you tick rows and
 note problems. Every in-game action here is a click or key press of yours: nothing is automated.
 
-**Waiting since 1.0.0:** 8 changes, 21 rows (the page counts them for you).
+**Waiting since 1.0.0:** 9 changes, 23 rows (the page counts them for you).
 
 **Build under test:** `<commit>` (`<git describe>`), stamped `<date>`. A fix restamps it: untick stage 1, the
 smoke rows and every row the fix touches, and start again from stage 1.
@@ -170,6 +170,15 @@ friend or an alt on another account). Keep BugSack and Mechanic (`/mech`) enable
 - [ ] 2.2.8.2 **Reset** on each Default row gives solo 2 water 1 food, party 3 water 1 food + trades, raid
       4 water 2 food + trades, all with Gem and Gem -1 at 1
 - [ ] 2.2.8.3 The Trades and General tabs still fit the smaller window
+
+</details>
+
+<details open>
+<summary><b>2.2.9 Chat messages toggle (#22)</b> · open PR</summary>
+
+- [ ] 2.2.9.1 General tab: **Chat messages** is off after the update; trades and macro presses put nothing in
+      chat, but a short trade, a warning (bags full, in combat) and "Loadout complete" still show
+- [ ] 2.2.9.2 Turn it on (checkbox or `/wbr chat`): the trade summary and Casting / Conjured lines come back
 
 </details>
 
