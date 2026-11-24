@@ -5,7 +5,7 @@ happens: each change gets its own group under 2.2 when the work starts, so you c
 release when it gets too long. Claude keeps it on the Waterboy Release Checklist page, where you tick rows and
 note problems. Every in-game action here is a click or key press of yours: nothing is automated.
 
-**Waiting since 1.0.0:** 13 changes, 38 rows (the page counts them for you).
+**Waiting since 1.0.0:** 14 changes, 42 rows (the page counts them for you).
 
 **Build under test:** `<commit>` (`<git describe>`), stamped `<date>`. A fix restamps it: untick stage 1, the
 smoke rows and every row the fix touches, and start again from stage 1.
@@ -217,6 +217,15 @@ friend or an alt on another account). Keep BugSack and Mechanic (`/mech`) enable
 
 </details>
 
+<details open>
+<summary><b>2.2.14 Test a trade from the Trades tab (#27)</b> · open PR</summary>
+
+- [ ] 2.2.14.1 Trades tab: select a class, click **Test**: chat says what it gets, from which setting, and
+      whether your bags have it; with a player selected, their own setting
+- [ ] 2.2.14.2 `/wbr test priest` says the same, bag check included
+
+</details>
+
 ## 2.3 Core features (standing)
 
 <details open>
@@ -233,6 +242,8 @@ friend or an alt on another account). Keep BugSack and Mechanic (`/mech`) enable
 - [ ] 2.3.1.5.a Leave out, way 2: Shift-click a slot
 - [ ] 2.3.1.5.b Leave out, way 3: the slot's **x**
 - [ ] 2.3.1.6 **Edit setting** on the panel opens the config on that player or class
+- [ ] 2.3.1.6.a Check a trade, way 1: **Test** on the Trades tab
+- [ ] 2.3.1.6.b Check a trade, way 2: `/wbr test <class or player>`
 - [ ] 2.3.1.7 On a non-mage character, a trade is left alone and `/wbr list` says settings still save
 
 </details>

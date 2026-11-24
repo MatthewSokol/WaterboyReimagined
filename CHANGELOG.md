@@ -6,6 +6,8 @@ Newest first. Each release is `## [version] - date` (the format Mechanic's `chan
 
 ### Added
 
+- **Test a trade:** a **Test** button on the Trades tab says what a trade with the selected class or player gets,
+  and whether your bags have it right now; `/wbr test` says the same.
 - **Trade panel:** Shift-click a slot or click its **x** to leave it out of the trade (right-click still works).
 - **Make extra, two more ways:** a **Make extra** button on the Loadouts tab and `/wbr extra` switch on making
   extra rounds right away, without the three extra presses.

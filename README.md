@@ -180,7 +180,7 @@ character and the mages on this account), **Trades** (below) and **Loadouts** (s
 | `/wbr list` | show the default profile and this character's overrides |
 | `/wbr set [me] <class\|player> <water> <food>` | stacks to hand out; `me` = this character only |
 | `/wbr clear [me] <class\|player>` | remove a setting |
-| `/wbr test <class\|player>` | show what a trade would get |
+| `/wbr test <class\|player>` | show what a trade would get, and whether your bags have it (also **Test** on the Trades tab) |
 | `/wbr on` / `off` | fill trades or not |
 | `/wbr macro` | put the Waterboy conjure macro on your cursor |
 | `/wbr loadout` | what the macro is aiming for right now |
