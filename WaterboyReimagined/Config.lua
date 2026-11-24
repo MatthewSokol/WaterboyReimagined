@@ -300,29 +300,33 @@ local function BuildGeneralPage()
         "On a mage, when someone opens a trade, put in their stacks right away. When off, a panel next to "
             .. "the trade window shows what they'd get, with Add to trade.",
         function() return ns.DB().enabled end, function(v) ns.DB().enabled = v end)
-    Check(-96, "Debug messages", "Print what the addon is doing in chat (same as /wbr debug).",
+    Check(-90, "Chat messages",
+        "Say in chat what each trade got and what the macro casts and makes (same as /wbr chat). Warnings, "
+            .. "a short trade and a finished loadout always show.",
+        function() return ns.DB().chat end, function(v) ns.DB().chat = v end)
+    Check(-140, "Debug messages", "Print what the addon is doing in chat (same as /wbr debug).",
         function() return ns.DB().debug end, function(v) ns.DB().debug = v end)
-    Check(-152, "Minimap button",
+    Check(-190, "Minimap button",
         "Show the Waterboy button around the minimap (same as /wbr minimap). Drag it to move it.",
         function() return ns.MinimapButtonShown() end, function(v) ns.SetMinimapButtonShown(v) end)
 
-    Label(page, "This character"):SetPoint("TOPLEFT", 14, -202)
+    Label(page, "This character"):SetPoint("TOPLEFT", 14, -244)
     page.me = Label(page, "", "GameFontHighlightSmall")
-    page.me:SetPoint("TOPLEFT", 18, -220)
+    page.me:SetPoint("TOPLEFT", 18, -262)
     page.me:SetWidth(490)
     page.me:SetJustifyH("LEFT")
 
-    Label(page, "Mages on this account"):SetPoint("TOPLEFT", 14, -248)
+    Label(page, "Mages on this account"):SetPoint("TOPLEFT", 14, -290)
     page.mages = Label(page, "", "GameFontHighlightSmall")
-    page.mages:SetPoint("TOPLEFT", 18, -266)
+    page.mages:SetPoint("TOPLEFT", 18, -308)
     page.mages:SetWidth(490)
     page.mages:SetJustifyH("LEFT")
     page.mages:SetSpacing(2)
 
-    Label(page, "Commands"):SetPoint("TOPLEFT", 14, -352)
+    Label(page, "Commands"):SetPoint("TOPLEFT", 14, -392)
     local cmds = Label(page, "/wbr or /wb opens this window. /wbr help lists the rest, "
         .. "e.g. /wbr set Grimbold 1 1.", "GameFontHighlightSmall")
-    cmds:SetPoint("TOPLEFT", 18, -370)
+    cmds:SetPoint("TOPLEFT", 18, -410)
     cmds:SetWidth(490)
     cmds:SetJustifyH("LEFT")
 

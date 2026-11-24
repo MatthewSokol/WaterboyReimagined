@@ -61,3 +61,19 @@ expect("water on the way: food", F)
 for _, f in ipairs(STUB_TIMERS or {}) do f() end
 STUB_TIMERS = {}
 expect("never landed, fallback ran: water again", W)
+
+-- Chat messages: off by default (routine lines stay quiet), /wbr chat turns them on
+local said, realPrint = {}, print
+print = function(...) said[#said + 1] = table.concat({ ... }, " "); realPrint(...) end
+local function saidCasting()
+  for _, s in ipairs(said) do if s:find("Casting ", 1, true) then return true end end
+end
+STUB_ITEMS, STUB_CAST = {}, nil
+print("chat setting by default: " .. tostring(WaterboyReimaginedDB.chat))
+said = {}; press()
+print((not saidCasting() and "ok " or "ERROR: ") .. "chat off: the press says nothing")
+CALL("/wbr chat", SlashCmdList.WATERBOYREIMAGINED, "chat")
+said = {}; press()
+print((saidCasting() and "ok " or "ERROR: ") .. "chat on: the press says Casting")
+CALL("/wbr chat", SlashCmdList.WATERBOYREIMAGINED, "chat")
+print = realPrint

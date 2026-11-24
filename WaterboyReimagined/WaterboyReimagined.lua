@@ -89,6 +89,11 @@ local function Print(msg)
     print("|cff69ccf0Waterboy Reimagined|r: " .. msg)
     if ns.LogSink then ns.LogSink("chat", msg) end
 end
+-- Routine progress lines (what a trade got, what the macro casts and made): only with Chat messages on
+-- (/wbr chat, off by default). Warnings and answers to commands always print.
+local function Chat(msg)
+    if db and db.chat then Print(msg) elseif ns.LogSink then ns.LogSink("chat", msg) end
+end
 local function Dbg(fmt, ...)
     local show = db and db.debug
     if not show and not ns.LogSink then return end
@@ -453,7 +458,7 @@ local function AddToTrade(entry, label)
 
     local msg = label .. ": " .. Describe(entry)
     if missing > 0 then msg = msg .. string.format(" - %d stack(s) short", missing) end
-    Print(msg)
+    if missing > 0 then Print(msg) else Chat(msg) end -- a short trade always says so
 
     if #queue == 0 then return 0, missing end
     local token = tradeToken
@@ -486,7 +491,7 @@ end
 ns.WATER, ns.FOOD, ns.GEMS, ns.ITEMS, ns.CLASSES, ns.TRADE_SLOTS = WATER, FOOD, GEMS, ITEMS, CLASSES, TRADE_SLOTS
 ns.PlayerName, ns.UnitFullName, ns.FindPlayerKey = PlayerName, UnitFullName, FindPlayerKey
 ns.Profile, ns.PlayerKey, ns.CopyEntry, ns.DefaultClassEntry = Profile, PlayerKey, CopyEntry, DefaultClassEntry
-ns.Describe, ns.Print, ns.Dbg, ns.Want, ns.SPELLS = Describe, Print, Dbg, Want, SPELLS
+ns.Describe, ns.Print, ns.Chat, ns.Dbg, ns.Want, ns.SPELLS = Describe, Print, Chat, Dbg, Want, SPELLS
 ns.Resolve, ns.SlotName, ns.ParseRelative, ns.TopRank = Resolve, SlotName, ParseRelative, TopRank
 ns.RELATIVE_COUNT, ns.NAMES, ns.AddToTrade = RELATIVE_COUNT, NAMES, AddToTrade
 function ns.DB() return db end
@@ -527,6 +532,7 @@ local HELP = {
     "/wbr macro - put the Waterboy conjure macro on your cursor",
     "/wbr loadout - what the conjure macro is aiming for right now",
     "/wbr minimap - show or hide the minimap button",
+    "/wbr chat - toggle chat messages (what trades get, what the macro casts and makes)",
     "/wbr debug - toggle debug messages",
 }
 
@@ -586,6 +592,9 @@ local function Slash(input)
     elseif cmd == "minimap" then
         ns.SetMinimapButtonShown(not ns.MinimapButtonShown())
         Print("Minimap button " .. (ns.MinimapButtonShown() and "shown" or "hidden") .. ".")
+    elseif cmd == "chat" then
+        db.chat = not db.chat
+        Print("Chat messages " .. (db.chat and "on" or "off"))
     elseif cmd == "debug" then
         db.debug = not db.debug
         Print("Debug " .. (db.debug and "on" or "off"))
