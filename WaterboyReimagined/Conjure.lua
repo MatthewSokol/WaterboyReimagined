@@ -600,7 +600,7 @@ local function ReportConjured(p, final)
         else msg = msg .. ". Loadout complete (" .. group .. ")."; ns.Journal("loadout-complete", true, group) end
         ns.Print(msg)
     else
-        ns.Chat(msg)
+        ns.Log("basic", msg)
     end
 end
 
@@ -686,10 +686,10 @@ btn:SetScript("PreClick", function(_, _, down)
     elseif id then
         completePresses = 0
         lastPress = { id = id, at = now }
-        ns.Chat(string.format("%s %s...%s", queued and "Next:" or "Casting", Describe(id),
+        ns.Log("basic", string.format("%s %s...%s", queued and "Next:" or "Casting", Describe(id),
             rounds > 0 and " (extra)" or ""))
     elseif merged > 0 then
-        ns.Chat("Restacking...")
+        ns.Log("basic", "Restacking...")
     else
         if now - lastCompletePress > 30 then completePresses = 0 end
         lastCompletePress = now
@@ -853,7 +853,7 @@ castFrame:SetScript("OnEvent", function(_, event, unit, guid, spellID)
         C_Timer.After(2, function() if InList(c) then ReportConjured(c, true); Update() end end)
     elseif c and (event == "UNIT_SPELLCAST_INTERRUPTED" or event == "UNIT_SPELLCAST_FAILED") then
         Drop(c)
-        if c.macro and event == "UNIT_SPELLCAST_INTERRUPTED" then ns.Chat("Conjure interrupted.") end
+        if c.macro and event == "UNIT_SPELLCAST_INTERRUPTED" then ns.Log("basic", "Conjure interrupted.") end
     end
     Update() -- aim past the casts on the way (no-op in combat)
 end)
