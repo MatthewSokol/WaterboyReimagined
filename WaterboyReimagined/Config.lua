@@ -839,6 +839,25 @@ local function Build()
     clear:SetText("Give nothing")
     clear:SetScript("OnClick", function() EditableEntry().slots = {}; Refresh() end)
 
+    -- check what a trade with the selected class or player would get, and whether your bags have it
+    local test = CreateFrame("Button", nil, tp, "UIPanelButtonTemplate")
+    test:SetSize(96, 22)
+    test:SetPoint("TOPLEFT", 432, -402)
+    test:SetText("Test")
+    test:SetScript("OnClick", function()
+        ns.TestTrade(state.field == "classes" and state.key or ns.PlayerName(state.key))
+    end)
+    test:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:SetText("Test this trade")
+        GameTooltip:AddLine("Says in chat what a trade with the selected class or player gets, which setting it "
+            .. "comes from, and whether your bags have it right now (same as /wbr test). Touches no trade.",
+            1, 1, 1, true)
+        GameTooltip:Show()
+    end)
+    test:SetScript("OnLeave", GameTooltip_Hide)
+    frame.testTrade = test
+
     -- palette
     local pal = Label(tp, "Drag to a slot")
     pal:SetPoint("TOPLEFT", 432, -34)
@@ -874,7 +893,7 @@ local function Build()
     -- under the fake trade window: whether trades get filled (the option itself is on the General tab)
     frame.tradeNote = Label(tp, "", "GameFontDisableSmall")
     frame.tradeNote:SetPoint("TOPLEFT", 194, -406)
-    frame.tradeNote:SetWidth(330)
+    frame.tradeNote:SetWidth(230)
     frame.tradeNote:SetJustifyH("LEFT")
 
     -- drag icon follows the cursor

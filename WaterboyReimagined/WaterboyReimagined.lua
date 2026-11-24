@@ -447,6 +447,35 @@ local function PlaceNext(queue, idx, token)
     C_Timer.After(PLACE_DELAY, function() PlaceNext(queue, idx + 1, token) end)
 end
 
+local function ClassToken(word)
+    local up = word:upper()
+    for _, c in ipairs(CLASSES) do if c == up then return c end end
+end
+
+-- What a trade with `who` (a class token or a player's name) would get, and whether the bags have it right
+-- now, without touching a trade (/wbr test, and Test on the Trades tab).
+local function TestTrade(who)
+    local class = ClassToken(who)
+    local want, src
+    if class then
+        want, src = Lookup("classes", class)
+        src = (src or "nothing set") .. " profile"
+    else
+        want, src = Want(who, "?")
+    end
+    local label = class and LOCALIZED_CLASS_NAMES_MALE and LOCALIZED_CLASS_NAMES_MALE[class] or who
+    local msg = label .. " gets " .. Describe(want) .. " [" .. src .. "]"
+    if want and #want.slots > 0 and ns.IsMage() then
+        local stacks, used, short = FindStacks(), {}, 0
+        for i = 1, math.min(#want.slots, TRADE_SLOTS) do
+            if not PickStack(stacks, Resolve(want.slots[i]), used) then short = short + 1 end
+        end
+        msg = msg .. (short > 0 and string.format(". Your bags are %d stack(s) short.", short) or ". Your bags have it all.")
+    end
+    Print(msg)
+end
+ns.TestTrade = TestTrade
+
 -- Put the stacks for `entry` into the open trade window (one every PLACE_DELAY seconds).
 local function AddToTrade(entry, label)
     tradeToken = tradeToken + 1
@@ -502,11 +531,6 @@ ns.KnownMages, ns.CharInfo = KnownMages, CharInfo
 ---------------------------------------------------------------------------------------------------
 -- Slash commands
 ---------------------------------------------------------------------------------------------------
-
-local function ClassToken(word)
-    local up = word:upper()
-    for _, c in ipairs(CLASSES) do if c == up then return c end end
-end
 
 local function ListProfile(which)
     local p = Profile(which)
@@ -577,15 +601,7 @@ local function Slash(input)
         Print("Cleared " .. args[2] .. (which == "me" and " (this character)" or " (default)"))
         if ns.RefreshConfig then ns.RefreshConfig() end
     elseif cmd == "test" and args[2] then
-        local class = ClassToken(args[2])
-        local want, src
-        if class then
-            want, src = Lookup("classes", class)
-            src = (src or "nothing set") .. " profile"
-        else
-            want, src = Want(args[2], "?")
-        end
-        Print(args[2] .. " gets " .. Describe(want) .. " [" .. src .. "]")
+        TestTrade(args[2])
     elseif cmd == "on" or cmd == "off" then
         db.enabled = cmd == "on"
         Print("Trade filling " .. (db.enabled and "on" or "off"))

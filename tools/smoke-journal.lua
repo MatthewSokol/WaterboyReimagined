@@ -50,3 +50,17 @@ STUB_SHIFT = nil
 CALL("x on slot 1", rawget(pop.slots[1].x, "__s_OnClick"), pop.slots[1].x)
 print((left() == 1 and "ok " or "ERROR: ") .. "4 slots, 3 left out (a plain click does nothing): " .. left() .. " left")
 print((#NS.Profile("default").classes.PRIEST.slots == 4 and "ok " or "ERROR: ") .. "the saved priest setting keeps 4")
+
+-- check a trade: /wbr test and the Trades tab's Test button say what it gets and whether the bags have it
+local said2, realPrint2 = {}, print
+print = function(...) said2[#said2 + 1] = table.concat({ ... }, " "); realPrint2(...) end
+CALL("/wbr test priest", SlashCmdList.WATERBOYREIMAGINED, "test priest")
+NS.OpenConfig("classes", "WARRIOR")
+CALL("Test button (warrior selected)", rawget(WaterboyReimaginedConfig.testTrade, "__s_OnClick"), WaterboyReimaginedConfig.testTrade)
+print = realPrint2
+local a, b = "", ""
+for _, s in ipairs(said2) do
+  if s:find("[Pp]riest gets") then a = s elseif s:find("[Ww]arrior gets") or s:find("WARRIOR gets", 1, true) then b = s end
+end
+print((a ~= "" and "ok " or "ERROR: ") .. "/wbr test: " .. a)
+print((b ~= "" and "ok " or "ERROR: ") .. "Test button: " .. b)
