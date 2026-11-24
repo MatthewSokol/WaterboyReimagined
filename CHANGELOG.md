@@ -16,7 +16,7 @@ Newest first. Each release is `## [version] - date` (the format Mechanic's `chan
 - **Conjure next keybinding:** Key Bindings > AddOns > Waterboy Reimagined > Conjure next does what a macro
   press does, so you can conjure without the macro.
 - **Optional Mechanic support:** with the Mechanic developer addon installed, Waterboy Reimagined logs to its
-  console and adds 7 self-tests to its Tests tab. Nothing changes without it.
+  console and adds 8 self-tests to its Tests tab. Nothing changes without it.
 - **Conjure order:** each loadout row's Order dropdown picks what the macro conjures next. **By ratio** (the new default) keeps
   your bags at the loadout's mix, counting what's in them, so 2 water to 1 food stays 2:1 at any level. **By
   category** is the old order: all the water, then the food. **By character** (party and raid, with + group's
@@ -26,9 +26,9 @@ Newest first. Each release is `## [version] - date` (the format Mechanic's `chan
 
 ### Changed
 
-- **Quieter chat:** what each trade got and the macro's Casting / Conjured lines only show with the new **Chat
-  messages** setting (General tab, `/wbr chat`), off by default. Warnings, a short trade and a finished loadout
-  always show.
+- **Chat logging levels:** **Off** (the default), **Basic** (what each trade got, and the macro's Casting, Next
+  and Conjured lines) or **Verbose** (debugging detail), on the General tab or with `/wbr log`. Warnings, a short
+  trade, a finished loadout and replies to your commands always show. `/wbr debug` now switches Verbose on and off.
 - **Loadout defaults:** party makes 3 water to 1 food, and raid 4 water to 2 food with + group's trades on (it
   was 8 + 4 water and 2 food without them). Loadouts you saved stay as they are; Reset brings the new ones.
 - **Loadouts tab:** each group fits on one line again, so the window is back to about its 1.0.0 size.

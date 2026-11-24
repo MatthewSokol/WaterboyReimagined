@@ -186,8 +186,8 @@ character and the mages on this account), **Trades** (below) and **Loadouts** (s
 | `/wbr loadout` | what the macro is aiming for right now |
 | `/wbr extra` | make extra past the loadout in the same ratio, until a minute without conjuring |
 | `/wbr minimap` | show or hide the minimap button |
-| `/wbr chat` | toggle chat messages: what each trade got, what the macro casts and makes (off by default) |
-| `/wbr debug` | toggle debug messages |
+| `/wbr log off|basic|verbose` | chat logging: **off** shows only warnings and replies to your commands; **basic** adds what each trade got and what the macro casts and makes; **verbose** adds debugging detail. `/wbr log` says the current level |
+| `/wbr debug` | verbose chat logging on or off |
 
 `/wb` works too. Example: `/wbr set Grimbold 1 1`.
 
