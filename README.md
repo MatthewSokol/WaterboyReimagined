@@ -176,6 +176,7 @@ character and the mages on this account), **Trades** (below) and **Loadouts** (s
 | `/wbr macro` | put the Waterboy conjure macro on your cursor |
 | `/wbr loadout` | what the macro is aiming for right now |
 | `/wbr minimap` | show or hide the minimap button |
+| `/wbr chat` | toggle chat messages: what each trade got, what the macro casts and makes (off by default) |
 | `/wbr debug` | toggle debug messages |
 
 `/wb` works too. Example: `/wbr set Grimbold 1 1`.

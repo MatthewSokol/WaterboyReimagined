@@ -17,6 +17,9 @@ Newest first. Each release is `## [version] - date` (the format Mechanic's `chan
 
 ### Changed
 
+- **Quieter chat:** what each trade got and the macro's Casting / Conjured lines only show with the new **Chat
+  messages** setting (General tab, `/wbr chat`), off by default. Warnings, a short trade and a finished loadout
+  always show.
 - **Loadout defaults:** party makes 3 water to 1 food, and raid 4 water to 2 food with + group's trades on (it
   was 8 + 4 water and 2 food without them). Loadouts you saved stay as they are; Reset brings the new ones.
 - **Loadouts tab:** each group fits on one line again, so the window is back to about its 1.0.0 size.
