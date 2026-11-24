@@ -37,3 +37,16 @@ if others > 0 then print("ERROR: another addon's blocked action was journaled") 
 for i = 1, 250 do NS.Journal("cap", true, i) end
 print("journal capped: " .. #WaterboyReimaginedDB.journal)
 if #WaterboyReimaginedDB.journal ~= 200 then print("ERROR: journal not capped at 200") end
+
+-- the trade panel: leave a slot out by right-click, Shift-click or its x (the saved setting stays)
+NS.ShowTradePopup("Tester", "PRIEST", { slots = { "water1", "water1", "water1", "water1" } }, "class default")
+local pop = WaterboyReimaginedTradePopup
+local function left() local n = 0; for _, b in ipairs(pop.slots) do if rawget(b, "slot") then n = n + 1 end end; return n end
+CALL("right-click slot 1", rawget(pop.slots[1], "__s_OnClick"), pop.slots[1], "RightButton")
+CALL("plain left-click slot 1", rawget(pop.slots[1], "__s_OnClick"), pop.slots[1], "LeftButton")
+STUB_SHIFT = true
+CALL("shift-click slot 1", rawget(pop.slots[1], "__s_OnClick"), pop.slots[1], "LeftButton")
+STUB_SHIFT = nil
+CALL("x on slot 1", rawget(pop.slots[1].x, "__s_OnClick"), pop.slots[1].x)
+print((left() == 1 and "ok " or "ERROR: ") .. "4 slots, 3 left out (a plain click does nothing): " .. left() .. " left")
+print((#NS.Profile("default").classes.PRIEST.slots == 4 and "ok " or "ERROR: ") .. "the saved priest setting keeps 4")
