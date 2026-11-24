@@ -225,6 +225,28 @@ local TESTS = {
         end,
     },
     {
+        id = "chatlog", name = "Chat logging", category = "Settings",
+        description = "The chat-logging level is off, basic or verbose; only a choice you made is saved, and the "
+            .. "default follows the build (off on a release, basic on a test build).",
+        run = function(d)
+            local level, saved = ns.ChatLevel(), ns.DB() and ns.DB().chatLog
+            Detail(d, "Level", level, ns.LOG_LEVELS[level] and "pass" or "fail")
+            Detail(d, "Saved choice", saved == nil and "none (build default)" or tostring(saved),
+                (saved == nil or ns.LOG_LEVELS[saved]) and "pass" or "fail")
+            local dev = ns.IsDevBuild()
+            Detail(d, "This build", dev and "test build" or "release",
+                (saved ~= nil or level == (dev and "basic" or "off")) and "pass" or "fail")
+            local cases = { ["1.1.0"] = false, ["v1.1.0"] = false, ["v1.0.0-3-gabc1234"] = true,
+                ["v1.1.0-dirty"] = true, ["@project-version@"] = true, ["dev"] = true, ["1152a65"] = true,
+                ["candidate/v1.1.0"] = true }
+            local wrong = {}
+            for v, want in pairs(cases) do if ns.IsDevBuild(v) ~= want then wrong[#wrong + 1] = v end end
+            Detail(d, "Release or test build, by version", #wrong == 0 and "8 of 8 right"
+                or ("wrong for " .. table.concat(wrong, ", ")), #wrong == 0 and "pass" or "fail")
+            return Summary(d, "Chat logging " .. level)
+        end,
+    },
+    {
         id = "ui", name = "Minimap button", category = "UI",
         description = "The minimap button exists and is shown or hidden as set.",
         run = function(d)

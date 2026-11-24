@@ -5,7 +5,7 @@ happens: each change gets its own group under 2.2 when the work starts, so you c
 release when it gets too long. Claude keeps it on the Waterboy Release Checklist page, where you tick rows and
 note problems. Every in-game action here is a click or key press of yours: nothing is automated.
 
-**Waiting since 1.0.0:** 14 changes, 42 rows (the page counts them for you).
+**Waiting since 1.0.0:** 14 changes, 44 rows (the page counts them for you).
 
 **Build under test:** `<commit>` (`<git describe>`), stamped `<date>`. A fix restamps it: untick stage 1, the
 smoke rows and every row the fix touches, and start again from stage 1.
@@ -83,7 +83,10 @@ friend or an alt on another account). Keep BugSack and Mechanic (`/mech`) enable
 - [ ] 2.1.6 **Upgrade:** Claude runs `wow-env restore`, then `wow-env profile upgrade --addon WaterboyReimagined
       --from v<previous>`; log in: settings, loadouts and the macro icon are kept `[auto validated · journal: install-upgrade]`
 - [ ] 2.1.7 `/reload` a few times: no errors
-- [ ] 2.1.8 `wow-env restore` `[auto executed · when you say the smoke pass is done]`
+- [ ] 2.1.8 **Chat logging** (on the release zip): the General tab's dropdown says Off and lists Off and Basic only;
+      a macro press and a trade put only warnings in chat; `/wbr log basic` brings the Casting / Conjured lines
+      back; `/wbr log off` again `[auto validated · selftest: chatlog]`
+- [ ] 2.1.9 `wow-env restore` `[auto executed · when you say the smoke pass is done]`
 
 </details>
 
@@ -92,7 +95,7 @@ friend or an alt on another account). Keep BugSack and Mechanic (`/mech`) enable
 <details open>
 <summary><b>2.2.1 Optional Mechanic support (#9)</b> · merged</summary>
 
-- [ ] 2.2.1.1 `/mech`, **Tests**, **Run all** shows 7 passing (a warning such as "no macro yet" is fine)
+- [ ] 2.2.1.1 `/mech`, **Tests**, **Run all** shows 8 passing (a warning such as "no macro yet" is fine)
 - [ ] 2.2.1.2 **Console** tab shows the addon's chat messages and debug lines from this session
 
 </details>
@@ -174,11 +177,13 @@ friend or an alt on another account). Keep BugSack and Mechanic (`/mech`) enable
 </details>
 
 <details open>
-<summary><b>2.2.9 Chat messages toggle (#22)</b> · open PR</summary>
+<summary><b>2.2.9 Chat logging levels (#22, #28)</b> · open PR</summary>
 
-- [ ] 2.2.9.1 General tab: **Chat messages** is off after the update; trades and macro presses put nothing in
-      chat, but a short trade, a warning (bags full, in combat) and "Loadout complete" still show
-- [ ] 2.2.9.2 Turn it on (checkbox or `/wbr chat`): the trade summary and Casting / Conjured lines come back
+- [ ] 2.2.9.1 On this test build the General tab's **Chat logging** says Basic: a macro press says Casting /
+      Conjured, a trade says what it got; warnings and "Loadout complete" show at every level
+- [ ] 2.2.9.2 Set **Off** (dropdown or `/wbr log off`): only warnings and command replies; **Verbose** (or
+      `/wbr debug`) adds the debug lines; `/wbr debug` again goes back to Basic
+- [ ] 2.2.9.3 `/wbr log` says the level; the self-test "Chat logging" passes `[auto validated · selftest: chatlog]`
 
 </details>
 

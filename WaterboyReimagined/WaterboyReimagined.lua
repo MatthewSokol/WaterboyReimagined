@@ -89,19 +89,49 @@ local function Print(msg)
     print("|cff69ccf0Waterboy Reimagined|r: " .. msg)
     if ns.LogSink then ns.LogSink("chat", msg) end
 end
--- Routine progress lines (what a trade got, what the macro casts and made): only with Chat messages on
--- (/wbr chat, off by default). Warnings and answers to commands always print.
-local function Chat(msg)
-    if db and db.chat then Print(msg) elseif ns.LogSink then ns.LogSink("chat", msg) end
+-- Chat logging: off, basic or verbose (wow-mod-dev ui.md 5). Features, warnings and replies to typed commands
+-- use Print and always show. ns.Log("basic", ...) is for routine progress lines (what a trade got, Casting /
+-- Next, Conjured); Dbg is the verbose level. Mechanic's console gets every line whatever the level.
+local LOG_LEVELS = { off = 0, basic = 1, verbose = 2 }
+local GetMetaFn = (C_AddOns and C_AddOns.GetAddOnMetadata) or rawget(_G, "GetAddOnMetadata")
+-- A dev build: the version came from git describe (v1.0.0-3-gabc1234, -dirty, a bare hash before the first tag,
+-- candidate/v1.1.0 at a candidate tag), is "dev" or still unfilled, or the TOC has an X-Dev-Build line.
+local function IsDevBuild(v)
+    if v == nil then
+        if GetMetaFn and GetMetaFn(ADDON_NAME, "X-Dev-Build") then return true end
+        v = GetMetaFn and GetMetaFn(ADDON_NAME, "Version") or ""
+    end
+    return v == "" or v == "dev"
+        or v:find("@project-version@", 1, true) ~= nil -- plain find: no % escapes
+        or v:find("%-g%x+") ~= nil
+        or v:find("^%x+$") ~= nil
+        or v:find("candidate/", 1, true) ~= nil
+        or v:find("dirty", 1, true) ~= nil
+end
+-- The level in effect: the player's own choice (the only one saved), else off on a release, basic on a dev build.
+local function ChatLevel()
+    local saved = db and db.chatLog
+    if LOG_LEVELS[saved] then return saved end
+    return IsDevBuild() and "basic" or "off"
+end
+local function Log(level, msg)
+    if LOG_LEVELS[ChatLevel()] >= LOG_LEVELS[level] then Print(msg)
+    elseif ns.LogSink then ns.LogSink("chat", msg) end
 end
 local function Dbg(fmt, ...)
-    local show = db and db.debug
+    local show = ChatLevel() == "verbose"
     if not show and not ns.LogSink then return end
     local ok, msg = pcall(string.format, fmt, ...)
     if not ok then msg = tostring(fmt) end
     if show then print("|cff69ccf0Waterboy debug|r: " .. msg) end
     if ns.LogSink then ns.LogSink("debug", msg) end
 end
+-- Set the level (nil = back to the build's default), and say what it is now.
+local function SetChatLevel(level)
+    db.chatLog = level
+    Print("Chat logging: " .. ChatLevel() .. (level == nil and " (this build's default)" or ""))
+end
+ns.LOG_LEVELS, ns.IsDevBuild, ns.ChatLevel, ns.Log, ns.SetChatLevel = LOG_LEVELS, IsDevBuild, ChatLevel, Log, SetChatLevel
 
 -- The addon's logo (the glowing drop, also its AddOns-list icon).
 ns.ICON = "Interface\\AddOns\\WaterboyReimagined\\Icon"
@@ -182,6 +212,9 @@ local function InitDB()
     WaterboyReimaginedDB = WaterboyReimaginedDB or {}
     db = WaterboyReimaginedDB
     if db.enabled == nil then db.enabled = true end
+    -- the old debug switch is verbose logging now; the brief Chat messages switch never shipped
+    if db.debug and db.chatLog == nil then db.chatLog = "verbose" end
+    db.debug, db.chat = nil, nil
     db.profiles = db.profiles or {}
     local def = db.profiles.default or {}
     db.profiles.default = def
@@ -487,7 +520,7 @@ local function AddToTrade(entry, label)
 
     local msg = label .. ": " .. Describe(entry)
     if missing > 0 then msg = msg .. string.format(" - %d stack(s) short", missing) end
-    if missing > 0 then Print(msg) else Chat(msg) end -- a short trade always says so
+    if missing > 0 then Print(msg) else Log("basic", msg) end -- a short trade always says so
 
     if #queue == 0 then return 0, missing end
     local token = tradeToken
@@ -520,7 +553,7 @@ end
 ns.WATER, ns.FOOD, ns.GEMS, ns.ITEMS, ns.CLASSES, ns.TRADE_SLOTS = WATER, FOOD, GEMS, ITEMS, CLASSES, TRADE_SLOTS
 ns.PlayerName, ns.UnitFullName, ns.FindPlayerKey = PlayerName, UnitFullName, FindPlayerKey
 ns.Profile, ns.PlayerKey, ns.CopyEntry, ns.DefaultClassEntry = Profile, PlayerKey, CopyEntry, DefaultClassEntry
-ns.Describe, ns.Print, ns.Chat, ns.Dbg, ns.Want, ns.SPELLS = Describe, Print, Chat, Dbg, Want, SPELLS
+ns.Describe, ns.Print, ns.Dbg, ns.Want, ns.SPELLS = Describe, Print, Dbg, Want, SPELLS
 ns.Resolve, ns.SlotName, ns.ParseRelative, ns.TopRank = Resolve, SlotName, ParseRelative, TopRank
 ns.RELATIVE_COUNT, ns.NAMES, ns.AddToTrade = RELATIVE_COUNT, NAMES, AddToTrade
 function ns.DB() return db end
@@ -557,8 +590,8 @@ local HELP = {
     "/wbr loadout - what the conjure macro is aiming for right now",
     "/wbr extra - make extra past the loadout, same ratio, until a minute without conjuring",
     "/wbr minimap - show or hide the minimap button",
-    "/wbr chat - toggle chat messages (what trades get, what the macro casts and makes)",
-    "/wbr debug - toggle debug messages",
+    "/wbr log off | basic | verbose - chat logging: what trades get, what the macro casts and makes (now: %s)",
+    "/wbr debug - verbose chat logging on or off",
 }
 
 local OPEN = { [""] = true, config = true, settings = true, options = true, show = true }
@@ -611,14 +644,17 @@ local function Slash(input)
         Print("Minimap button " .. (ns.MinimapButtonShown() and "shown" or "hidden") .. ".")
     elseif cmd == "extra" then
         if ns.StartExtra then ns.StartExtra() end
-    elseif cmd == "chat" then
-        db.chat = not db.chat
-        Print("Chat messages " .. (db.chat and "on" or "off"))
-    elseif cmd == "debug" then
-        db.debug = not db.debug
-        Print("Debug " .. (db.debug and "on" or "off"))
+    elseif cmd == "log" then
+        local want = args[2] and args[2]:lower()
+        if not want then Print("Chat logging: " .. ChatLevel() .. ". /wbr log off | basic | verbose")
+        elseif LOG_LEVELS[want] then SetChatLevel(want)
+        else Print("Chat logging levels: off, basic, verbose.") end
+    elseif cmd == "debug" then -- verbose on, or back to the build's default
+        SetChatLevel(ChatLevel() ~= "verbose" and "verbose" or nil)
     else
-        for _, line in ipairs(HELP) do Print(line:format(db.enabled and "on" or "off")) end
+        for _, line in ipairs(HELP) do
+            Print(line:format(line:find("/wbr log", 1, true) and ChatLevel() or (db.enabled and "on" or "off")))
+        end
     end
 end
 

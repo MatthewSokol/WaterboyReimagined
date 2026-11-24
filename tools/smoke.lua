@@ -305,6 +305,6 @@ CALL("/wbr minimap (show)", SlashCmdList.WATERBOYREIMAGINED, "minimap")
 print("shown again: " .. tostring(mb:IsShown()))
 local gp = cfg.general
 print("General tab checkboxes: " .. tostring(gp and #gp.checks))
-CALL("untick Minimap button", function() local cb = gp.checks[3]; cb:SetChecked(false); rawget(cb, "__s_OnClick")(cb) end)
+CALL("untick Minimap button", function() local cb = gp.checks[2]; cb:SetChecked(false); rawget(cb, "__s_OnClick")(cb) end)
 print("hidden by the checkbox: " .. tostring(not mb:IsShown()))
 NS.SetMinimapButtonShown(true)

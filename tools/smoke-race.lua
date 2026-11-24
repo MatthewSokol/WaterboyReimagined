@@ -62,26 +62,37 @@ for _, f in ipairs(STUB_TIMERS or {}) do f() end
 STUB_TIMERS = {}
 expect("never landed, fallback ran: water again", W)
 
--- Chat messages: off by default (routine lines stay quiet), /wbr chat turns them on
+-- Chat logging: basic on a dev build (the harness has no version), off and verbose by /wbr log, /wbr debug
+-- toggles verbose; only an explicit choice is saved
 local said, realPrint = {}, print
 print = function(...) said[#said + 1] = table.concat({ ... }, " "); realPrint(...) end
 local function saidCasting()
   for _, s in ipairs(said) do if s:find("Casting ", 1, true) then return true end end
 end
 STUB_ITEMS, STUB_CAST = {}, nil
-print("chat setting by default: " .. tostring(WaterboyReimaginedDB.chat))
+local function check(ok, label) said[#said + 1] = "x"; realPrint((ok and "ok " or "ERROR: ") .. label) end
+check(NS.ChatLevel() == "basic" and WaterboyReimaginedDB.chatLog == nil, "dev build default: basic, nothing saved (" .. NS.ChatLevel() .. ")")
 said = {}; press()
-print((not saidCasting() and "ok " or "ERROR: ") .. "chat off: the press says nothing")
-CALL("/wbr chat", SlashCmdList.WATERBOYREIMAGINED, "chat")
+check(saidCasting(), "basic: the press says Casting")
+CALL("/wbr log off", SlashCmdList.WATERBOYREIMAGINED, "log off")
 said = {}; press()
-print((saidCasting() and "ok " or "ERROR: ") .. "chat on: the press says Casting")
-CALL("/wbr chat", SlashCmdList.WATERBOYREIMAGINED, "chat")
+check(not saidCasting(), "off: the press says nothing")
+CALL("/wbr debug", SlashCmdList.WATERBOYREIMAGINED, "debug")
+check(NS.ChatLevel() == "verbose", "/wbr debug: verbose")
+CALL("/wbr debug again", SlashCmdList.WATERBOYREIMAGINED, "debug")
+check(NS.ChatLevel() == "basic" and WaterboyReimaginedDB.chatLog == nil, "/wbr debug again: back to the default, nothing saved")
+CALL("/wbr log bogus", SlashCmdList.WATERBOYREIMAGINED, "log bogus")
+CALL("/wbr log", SlashCmdList.WATERBOYREIMAGINED, "log")
+for v, want in pairs({ ["1.1.0"] = false, ["v1.0.0-44-gd0d12e4"] = true, ["v1.0.0-44-gd0d12e4-dirty"] = true,
+    ["@project-version@"] = true, ["dev"] = true, [""] = true, ["1152a65"] = true, ["candidate/v1.1.0"] = true,
+    ["v1.1.0"] = false }) do
+  check(NS.IsDevBuild(v) == want, "dev build? " .. v .. ": " .. tostring(NS.IsDevBuild(v)))
+end
 print = realPrint
 
 -- the keybinding (and the macro) click twice per press, down and up: only the click that casts picks
 STUB_TIME = STUB_TIME + 5
 STUB_ITEMS, STUB_CAST = {}, nil
-CALL("/wbr chat", SlashCmdList.WATERBOYREIMAGINED, "chat")
 said = {}
 print = function(...) said[#said + 1] = table.concat({ ... }, " "); realPrint(...) end
 CALL("key down", rawget(WaterboyReimaginedConjure, "__s_PreClick"), WaterboyReimaginedConjure, "LeftButton", true)
@@ -92,4 +103,3 @@ print = realPrint
 print(((not downSaid and saidCasting()) and "ok " or "ERROR: ") .. "key down skipped, key up picks (cast on key up)")
 print((_G["BINDING_NAME_CLICK WaterboyReimaginedConjure:LeftButton"] and "ok " or "ERROR: ") .. "binding name: "
   .. tostring(_G["BINDING_NAME_CLICK WaterboyReimaginedConjure:LeftButton"]))
-CALL("/wbr chat", SlashCmdList.WATERBOYREIMAGINED, "chat")
