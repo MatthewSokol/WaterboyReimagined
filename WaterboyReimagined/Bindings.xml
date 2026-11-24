@@ -1,0 +1,4 @@
+<Bindings>
+	<!-- Conjure next: clicks the secure button the Waterboy macro clicks. One key press, one cast. -->
+	<Binding name="CLICK WaterboyReimaginedConjure:LeftButton" header="WATERBOYREIMAGINED" category="ADDONS"/>
+</Bindings>

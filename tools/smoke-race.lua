@@ -77,3 +77,19 @@ said = {}; press()
 print((saidCasting() and "ok " or "ERROR: ") .. "chat on: the press says Casting")
 CALL("/wbr chat", SlashCmdList.WATERBOYREIMAGINED, "chat")
 print = realPrint
+
+-- the keybinding (and the macro) click twice per press, down and up: only the click that casts picks
+STUB_TIME = STUB_TIME + 5
+STUB_ITEMS, STUB_CAST = {}, nil
+CALL("/wbr chat", SlashCmdList.WATERBOYREIMAGINED, "chat")
+said = {}
+print = function(...) said[#said + 1] = table.concat({ ... }, " "); realPrint(...) end
+CALL("key down", rawget(WaterboyReimaginedConjure, "__s_PreClick"), WaterboyReimaginedConjure, "LeftButton", true)
+local downSaid = saidCasting()
+STUB_TIME = STUB_TIME + 0.1
+CALL("key up", rawget(WaterboyReimaginedConjure, "__s_PreClick"), WaterboyReimaginedConjure, "LeftButton", false)
+print = realPrint
+print(((not downSaid and saidCasting()) and "ok " or "ERROR: ") .. "key down skipped, key up picks (cast on key up)")
+print((_G["BINDING_NAME_CLICK WaterboyReimaginedConjure:LeftButton"] and "ok " or "ERROR: ") .. "binding name: "
+  .. tostring(_G["BINDING_NAME_CLICK WaterboyReimaginedConjure:LeftButton"]))
+CALL("/wbr chat", SlashCmdList.WATERBOYREIMAGINED, "chat")
