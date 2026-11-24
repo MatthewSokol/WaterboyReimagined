@@ -5,7 +5,7 @@ happens: each change gets its own group under 2.2 when the work starts, so you c
 release when it gets too long. Claude keeps it on the Waterboy Release Checklist page, where you tick rows and
 note problems. Every in-game action here is a click or key press of yours: nothing is automated.
 
-**Waiting since 1.0.0:** 10 changes, 26 rows (the page counts them for you).
+**Waiting since 1.0.0:** 11 changes, 30 rows (the page counts them for you).
 
 **Build under test:** `<commit>` (`<git describe>`), stamped `<date>`. A fix restamps it: untick stage 1, the
 smoke rows and every row the fix touches, and start again from stage 1.
@@ -191,6 +191,15 @@ friend or an alt on another account). Keep BugSack and Mechanic (`/mech`) enable
 
 </details>
 
+<details open>
+<summary><b>2.2.11 Conjure now without the panel (#24)</b> · open PR</summary>
+
+- [ ] 2.2.11.1 Right after login, without opening `/wbr`: a macro with `/click WaterboyReimaginedManual5` casts
+      your top gem (or the rank it names)
+- [ ] 2.2.11.2 Key Bindings lists **Conjure now: Water** … **Mana Agate**; a bound key casts that one once
+
+</details>
+
 ## 2.3 Core features (standing)
 
 <details open>
@@ -238,6 +247,8 @@ friend or an alt on another account). Keep BugSack and Mechanic (`/mech`) enable
 - [ ] 2.3.3.8 Macro icon: each choice on the Loadouts tab shows on the bar (drop, cooler, buckets, next conjure);
       the macro fades when you can't cast (out of mana)
 - [ ] 2.3.3.9 **Conjure now** buttons cast one of each rank; unlearned ranks are greyed out
+- [ ] 2.3.3.9.a Conjure now, way 2: `/click WaterboyReimaginedManualN` in a macro, panel closed
+- [ ] 2.3.3.9.b Conjure now, way 3: its keybindings (Key Bindings > AddOns)
 - [ ] 2.3.3.10 After conjuring and trading, open the bank, the auction house and talents: no "AddOn has been
       blocked" `[auto validated · journal: no-taint]`
 

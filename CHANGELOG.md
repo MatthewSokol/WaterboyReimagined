@@ -6,6 +6,8 @@ Newest first. Each release is `## [version] - date` (the format Mechanic's `chan
 
 ### Added
 
+- **Conjure now without the panel:** keybindings for each Conjure now button, and `/click
+  WaterboyReimaginedManual1` to `8` in your own macros.
 - **Conjure next keybinding:** Key Bindings > AddOns > Waterboy Reimagined > Conjure next does what a macro
   press does, so you can conjure without the macro.
 - **Optional Mechanic support:** with the Mechanic developer addon installed, Waterboy Reimagined logs to its

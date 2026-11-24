@@ -108,6 +108,9 @@ ends.
 **Conjure now:** on a mage, a small panel beside the `/wbr` window has a button each for your highest and
 2nd highest water and food, with how many you're carrying, and one for every mana gem rank (Ruby, Citrine, Jade,
 Agate; ranks you haven't learned are greyed out). One click casts it once; it doesn't change your loadout.
+The same casts work without the panel: bind them under Key Bindings > AddOns > Waterboy Reimagined
+(**Conjure now: Water**, ... **Conjure now: Mana Agate**), or put `/click WaterboyReimaginedManual1` in a macro
+(1 Water, 2 Water -1, 3 Food, 4 Food -1, 5 Mana Ruby, 6 Mana Citrine, 7 Mana Jade, 8 Mana Agate).
 
 **Making more than the loadout:** press the macro 3 more times once the loadout is complete (it counts `Keep pressing to
 override 1/3`, `2/3`) and it asks whether to keep making stuff in the same ratio:
