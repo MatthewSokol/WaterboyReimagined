@@ -272,6 +272,24 @@ end
 
 local GetMeta = (C_AddOns and C_AddOns.GetAddOnMetadata) or GetAddOnMetadata
 
+-- A dropdown menu of `choices()` = { { value, text, tip }, ... }, checked at `cur()`; picking one calls
+-- `set(value)` and refreshes the window. Each choice's tip shows when you hover it in the open menu.
+local function ChoiceDropDown(name, parent, width, choices, cur, set)
+    local dd = CreateFrame("Frame", name, parent, "UIDropDownMenuTemplate")
+    UIDropDownMenu_SetWidth(dd, width)
+    UIDropDownMenu_Initialize(dd, function(_, level)
+        for _, c in ipairs(choices()) do
+            local info = UIDropDownMenu_CreateInfo()
+            info.text, info.arg1, info.checked = c.text, c.value, cur() == c.value
+            info.tooltipTitle, info.tooltipText, info.tooltipOnButton = c.text, c.tip, true
+            info.func = function(_, v) set(v); CloseDropDownMenus(); Refresh() end
+            UIDropDownMenu_AddButton(info, level)
+        end
+    end)
+    return dd
+end
+
+
 local function BuildGeneralPage()
     local page = CreateFrame("Frame", nil, frame)
     page:SetPoint("TOPLEFT", 6, -26)
@@ -300,33 +318,50 @@ local function BuildGeneralPage()
         "On a mage, when someone opens a trade, put in their stacks right away. When off, a panel next to "
             .. "the trade window shows what they'd get, with Add to trade.",
         function() return ns.DB().enabled end, function(v) ns.DB().enabled = v end)
-    Check(-90, "Chat messages",
-        "Say in chat what each trade got and what the macro casts and makes (same as /wbr chat). Warnings, "
-            .. "a short trade and a finished loadout always show.",
-        function() return ns.DB().chat end, function(v) ns.DB().chat = v end)
-    Check(-140, "Debug messages", "Print what the addon is doing in chat (same as /wbr debug).",
-        function() return ns.DB().debug end, function(v) ns.DB().debug = v end)
-    Check(-190, "Minimap button",
+    -- chat logging: Off, Basic, plus Verbose on dev builds (same as /wbr log)
+    local LOG_TIPS = {
+        off = "Only what you need: warnings, a short trade, a finished loadout and replies to your commands.",
+        basic = "Also what each trade got and what the macro casts and makes (Casting, Next, Conjured).",
+        verbose = "Also the addon's debugging detail (same as /wbr debug). For developers.",
+    }
+    local logLabel = Label(page, "Chat logging", "GameFontHighlight")
+    logLabel:SetPoint("TOPLEFT", 18, -98)
+    page.chatLog = ChoiceDropDown("WaterboyReimaginedChatLogDropDown", page, 90, function()
+        local list = {}
+        for _, l in ipairs({ "off", "basic", "verbose" }) do
+            if l ~= "verbose" or ns.IsDevBuild() or ns.ChatLevel() == "verbose" then
+                list[#list + 1] = { value = l, text = l:sub(1, 1):upper() .. l:sub(2), tip = LOG_TIPS[l] }
+            end
+        end
+        return list
+    end, function() return ns.ChatLevel() end, function(v) ns.DB().chatLog = v end)
+    page.chatLog:SetPoint("LEFT", logLabel, "RIGHT", -8, -2)
+    local logHelp = Label(page, "Warnings and replies to your commands always show. Default: Off on a release, "
+        .. "Basic on a test build (/wbr log).", "GameFontDisableSmall")
+    logHelp:SetPoint("TOPLEFT", 42, -122)
+    logHelp:SetWidth(470)
+    logHelp:SetJustifyH("LEFT")
+    Check(-140, "Minimap button",
         "Show the Waterboy button around the minimap (same as /wbr minimap). Drag it to move it.",
         function() return ns.MinimapButtonShown() end, function(v) ns.SetMinimapButtonShown(v) end)
 
-    Label(page, "This character"):SetPoint("TOPLEFT", 14, -244)
+    Label(page, "This character"):SetPoint("TOPLEFT", 14, -202)
     page.me = Label(page, "", "GameFontHighlightSmall")
-    page.me:SetPoint("TOPLEFT", 18, -262)
+    page.me:SetPoint("TOPLEFT", 18, -220)
     page.me:SetWidth(490)
     page.me:SetJustifyH("LEFT")
 
-    Label(page, "Mages on this account"):SetPoint("TOPLEFT", 14, -290)
+    Label(page, "Mages on this account"):SetPoint("TOPLEFT", 14, -248)
     page.mages = Label(page, "", "GameFontHighlightSmall")
-    page.mages:SetPoint("TOPLEFT", 18, -308)
+    page.mages:SetPoint("TOPLEFT", 18, -266)
     page.mages:SetWidth(490)
     page.mages:SetJustifyH("LEFT")
     page.mages:SetSpacing(2)
 
-    Label(page, "Commands"):SetPoint("TOPLEFT", 14, -392)
+    Label(page, "Commands"):SetPoint("TOPLEFT", 14, -352)
     local cmds = Label(page, "/wbr or /wb opens this window. /wbr help lists the rest, "
         .. "e.g. /wbr set Grimbold 1 1.", "GameFontHighlightSmall")
-    cmds:SetPoint("TOPLEFT", 18, -410)
+    cmds:SetPoint("TOPLEFT", 18, -370)
     cmds:SetWidth(490)
     cmds:SetJustifyH("LEFT")
 
@@ -343,6 +378,7 @@ end
 local function RefreshGeneralPage()
     local page = frame.general
     for _, cb in ipairs(page.checks) do cb:SetChecked(cb.get()) end
+    UIDropDownMenu_SetText(page.chatLog, ns.ChatLevel():sub(1, 1):upper() .. ns.ChatLevel():sub(2))
     if ns.IsMage() then
         page.me:SetText(MageLine(ns.CharKey()))
     else
@@ -373,23 +409,6 @@ local ORDER_TIPS = {
         .. "trades). Roles are guessed: the game's role if set, else bear druids and party warriors tank, and "
         .. "priests, druids, paladins and shamans heal.",
 }
-
--- A dropdown menu of `choices()` = { { value, text, tip }, ... }, checked at `cur()`; picking one calls
--- `set(value)` and refreshes the window. Each choice's tip shows when you hover it in the open menu.
-local function ChoiceDropDown(name, parent, width, choices, cur, set)
-    local dd = CreateFrame("Frame", name, parent, "UIDropDownMenuTemplate")
-    UIDropDownMenu_SetWidth(dd, width)
-    UIDropDownMenu_Initialize(dd, function(_, level)
-        for _, c in ipairs(choices()) do
-            local info = UIDropDownMenu_CreateInfo()
-            info.text, info.arg1, info.checked = c.text, c.value, cur() == c.value
-            info.tooltipTitle, info.tooltipText, info.tooltipOnButton = c.text, c.tip, true
-            info.func = function(_, v) set(v); CloseDropDownMenus(); Refresh() end
-            UIDropDownMenu_AddButton(info, level)
-        end
-    end)
-    return dd
-end
 
 local function EditableLoadout(group)
     local p = ns.Profile(state.profile, true)
