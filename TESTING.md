@@ -5,7 +5,7 @@ happens: each change gets its own group under 2.2 when the work starts, so you c
 release when it gets too long. Claude keeps it on the Waterboy Release Checklist page, where you tick rows and
 note problems. Every in-game action here is a click or key press of yours: nothing is automated.
 
-**Waiting since 1.0.0:** 9 changes, 23 rows (the page counts them for you).
+**Waiting since 1.0.0:** 10 changes, 26 rows (the page counts them for you).
 
 **Build under test:** `<commit>` (`<git describe>`), stamped `<date>`. A fix restamps it: untick stage 1, the
 smoke rows and every row the fix touches, and start again from stage 1.
@@ -182,6 +182,15 @@ friend or an alt on another account). Keep BugSack and Mechanic (`/mech`) enable
 
 </details>
 
+<details open>
+<summary><b>2.2.10 Conjure next keybinding (#23)</b> · open PR</summary>
+
+- [ ] 2.2.10.1 Key Bindings > AddOns > Waterboy Reimagined lists **Conjure next**; bind a key
+- [ ] 2.2.10.2 Each key press casts one conjure (never two), with "cast on key down" on and off
+      (Interface > Combat, or `/console ActionButtonUseKeyDown 1` / `0`)
+
+</details>
+
 ## 2.3 Core features (standing)
 
 <details open>
@@ -217,6 +226,7 @@ friend or an alt on another account). Keep BugSack and Mechanic (`/mech`) enable
 <summary><b>2.3.3 Conjuring (on the mage)</b></summary>
 
 - [ ] 2.3.3.1 **Put macro on cursor** (or `/wbr macro`) gives the Waterboy macro; drop it on a bar
+- [ ] 2.3.3.1.a Conjure next, way 2: the **Conjure next** keybinding does what a macro press does
 - [ ] 2.3.3.2 Each press restacks part stacks, then casts one conjure: water before food, highest rank first; chat
       says what it's casting, then your stack counts once the items land `[auto validated · journal: conjure-cast]`
 - [ ] 2.3.3.3 When the loadout is full a press says so `[auto validated · journal: loadout-complete]`

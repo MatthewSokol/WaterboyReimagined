@@ -6,6 +6,8 @@ Newest first. Each release is `## [version] - date` (the format Mechanic's `chan
 
 ### Added
 
+- **Conjure next keybinding:** Key Bindings > AddOns > Waterboy Reimagined > Conjure next does what a macro
+  press does, so you can conjure without the macro.
 - **Optional Mechanic support:** with the Mechanic developer addon installed, Waterboy Reimagined logs to its
   console and adds 7 self-tests to its Tests tab. Nothing changes without it.
 - **Conjure order:** each loadout row's Order dropdown picks what the macro conjures next. **By ratio** (the new default) keeps

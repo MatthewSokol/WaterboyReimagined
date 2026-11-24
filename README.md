@@ -81,7 +81,12 @@ on a bar. Its text, shown in the Loadouts tab, is:
 /click WaterboyReimaginedConjure
 ```
 
-(Two lines so it works whether "cast on key down" is on or off.) Each press merges partial stacks, then casts
+(Two lines so it works whether "cast on key down" is on or off.)
+
+**Keybinding:** instead of (or as well as) the macro, bind a key under Key Bindings > AddOns > Waterboy
+Reimagined > **Conjure next**. It clicks the same button, so a key press works just like a macro press.
+
+Each press merges partial stacks, then casts
 one conjure for the next thing you're short of, in the row's order. It says
 `Casting water (rank 7)...` on the press, and once the cast finishes and the items land, how many stacks you
 have of how many (plus "Loadout complete" when nothing is left). When everything's there a press just says the
@@ -191,7 +196,6 @@ Planned, in no particular order:
   off in dungeons and raids.
 - **Block levels:** choose how far a block goes: no automatic trade, no trade panel either, or decline their
   trades altogether.
-- **Mana gems:** conjure mana gems with the macro and keep them in your loadout.
 - **WoW Classic support:** the same addon on the Classic clients.
 - **Vending machine:** a Vend mode with a minimum tip per stack. While the tip is too low, a stack comes back
   out of the trade every 3 seconds.
