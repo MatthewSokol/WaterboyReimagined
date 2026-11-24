@@ -94,10 +94,18 @@ end
 -- Next, Conjured); Dbg is the verbose level. Mechanic's console gets every line whatever the level.
 local LOG_LEVELS = { off = 0, basic = 1, verbose = 2 }
 local GetMetaFn = (C_AddOns and C_AddOns.GetAddOnMetadata) or rawget(_G, "GetAddOnMetadata")
--- A dev build: the version came from git describe (v1.0.0-3-gabc1234, -dirty), or is "dev" or unfilled.
+-- A dev build: the version came from git describe (v1.0.0-3-gabc1234, -dirty, a bare hash before the first tag,
+-- candidate/v1.1.0 at a candidate tag), is "dev" or still unfilled, or the TOC has an X-Dev-Build line.
 local function IsDevBuild(v)
-    if v == nil then v = GetMetaFn and GetMetaFn(ADDON_NAME, "Version") or "" end
-    return v == "" or v == "dev" or v:find("@project-version@", 1, true) ~= nil or v:find("%-g%x+") ~= nil
+    if v == nil then
+        if GetMetaFn and GetMetaFn(ADDON_NAME, "X-Dev-Build") then return true end
+        v = GetMetaFn and GetMetaFn(ADDON_NAME, "Version") or ""
+    end
+    return v == "" or v == "dev"
+        or v:find("@project-version@", 1, true) ~= nil -- plain find: no % escapes
+        or v:find("%-g%x+") ~= nil
+        or v:find("^%x+$") ~= nil
+        or v:find("candidate/", 1, true) ~= nil
         or v:find("dirty", 1, true) ~= nil
 end
 -- The level in effect: the player's own choice (the only one saved), else off on a release, basic on a dev build.

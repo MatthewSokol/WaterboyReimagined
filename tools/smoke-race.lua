@@ -84,7 +84,8 @@ check(NS.ChatLevel() == "basic" and WaterboyReimaginedDB.chatLog == nil, "/wbr d
 CALL("/wbr log bogus", SlashCmdList.WATERBOYREIMAGINED, "log bogus")
 CALL("/wbr log", SlashCmdList.WATERBOYREIMAGINED, "log")
 for v, want in pairs({ ["1.1.0"] = false, ["v1.0.0-44-gd0d12e4"] = true, ["v1.0.0-44-gd0d12e4-dirty"] = true,
-    ["@project-version@"] = true, ["dev"] = true, [""] = true }) do
+    ["@project-version@"] = true, ["dev"] = true, [""] = true, ["1152a65"] = true, ["candidate/v1.1.0"] = true,
+    ["v1.1.0"] = false }) do
   check(NS.IsDevBuild(v) == want, "dev build? " .. v .. ": " .. tostring(NS.IsDevBuild(v)))
 end
 print = realPrint

@@ -236,11 +236,12 @@ local TESTS = {
             local dev = ns.IsDevBuild()
             Detail(d, "This build", dev and "test build" or "release",
                 (saved ~= nil or level == (dev and "basic" or "off")) and "pass" or "fail")
-            local cases = { ["1.1.0"] = false, ["v1.0.0-3-gabc1234"] = true, ["v1.1.0-dirty"] = true,
-                ["@project-version@"] = true, ["dev"] = true }
+            local cases = { ["1.1.0"] = false, ["v1.1.0"] = false, ["v1.0.0-3-gabc1234"] = true,
+                ["v1.1.0-dirty"] = true, ["@project-version@"] = true, ["dev"] = true, ["1152a65"] = true,
+                ["candidate/v1.1.0"] = true }
             local wrong = {}
             for v, want in pairs(cases) do if ns.IsDevBuild(v) ~= want then wrong[#wrong + 1] = v end end
-            Detail(d, "Release or test build, by version", #wrong == 0 and "5 of 5 right"
+            Detail(d, "Release or test build, by version", #wrong == 0 and "8 of 8 right"
                 or ("wrong for " .. table.concat(wrong, ", ")), #wrong == 0 and "pass" or "fail")
             return Summary(d, "Chat logging " .. level)
         end,
