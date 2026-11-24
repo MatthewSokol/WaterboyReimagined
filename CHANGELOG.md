@@ -6,6 +6,7 @@ Newest first. Each release is `## [version] - date` (the format Mechanic's `chan
 
 ### Added
 
+- **Trade panel:** Shift-click a slot or click its **x** to leave it out of the trade (right-click still works).
 - **Make extra, two more ways:** a **Make extra** button on the Loadouts tab and `/wbr extra` switch on making
   extra rounds right away, without the three extra presses.
 - **Conjure now without the panel:** keybindings for each Conjure now button, and `/click

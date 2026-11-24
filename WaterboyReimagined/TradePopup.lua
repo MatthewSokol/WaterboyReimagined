@@ -2,7 +2,7 @@
 -- With "Fill trades automatically" off, opening a trade on a mage shows this panel next to the trade window:
 -- who you're trading with, where their setting comes from, and the 6 slots they'd get.
 --   Add to trade: puts those stacks in the trade window.
---   Right-click a slot: leave it out of this trade (doesn't change the saved setting).
+--   Right-click, Shift-click or the x beside a slot: leave it out of this trade (doesn't change the saved setting).
 --   Edit setting: opens the config window on the setting this trade uses (player override or class).
 --   Vend: placeholder for the vending machine (not built yet).
 
@@ -28,6 +28,7 @@ local function Refresh()
         b.slot = slot
         b.icon:SetTexture(ns.SlotIcon(slot))
         b.name:SetText(slot and ns.SlotText(slot) or "")
+        b.x:SetShown(slot ~= nil)
     end
     popup.add:SetEnabled(#slots > 0)
 end
@@ -59,22 +60,34 @@ local function Build()
         b.icon = b:CreateTexture(nil, "ARTWORK")
         b.icon:SetAllPoints()
         b:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square", "ADD")
-        b:RegisterForClicks("RightButtonUp")
+        b:RegisterForClicks("LeftButtonUp", "RightButtonUp")
         b.num = b:CreateFontString(nil, "OVERLAY", "NumberFontNormalSmall")
         b.num:SetPoint("BOTTOMRIGHT", -2, 2)
         b.num:SetText(i)
         b.name = popup:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
         b.name:SetPoint("LEFT", b, "RIGHT", 8, 0)
-        b.name:SetWidth(160)
+        b.name:SetWidth(138)
         b.name:SetJustifyH("LEFT")
-        b:SetScript("OnClick", function(self)
-            if self.slot then table.remove(current.entry.slots, i); Refresh() end
+        local function leaveOut() if b.slot then table.remove(current.entry.slots, i); Refresh() end end
+        b:SetScript("OnClick", function(_, button)
+            if button == "RightButton" or IsShiftKeyDown() then leaveOut() end
         end)
+        b.x = CreateFrame("Button", nil, popup, "UIPanelCloseButton")
+        b.x:SetSize(22, 22)
+        b.x:SetPoint("LEFT", b, "RIGHT", 146, 0)
+        b.x:SetScript("OnClick", leaveOut)
+        b.x:SetScript("OnEnter", function(self)
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+            GameTooltip:SetText("Leave out of this trade")
+            GameTooltip:AddLine("Your saved setting stays as it is.", 1, 1, 1, true)
+            GameTooltip:Show()
+        end)
+        b.x:SetScript("OnLeave", GameTooltip_Hide)
         b:SetScript("OnEnter", function(self)
             if not self.slot then return end
             GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
             GameTooltip:SetHyperlink("item:" .. ns.Resolve(self.slot))
-            GameTooltip:AddLine("Right-click: leave out of this trade", 0.6, 0.8, 1)
+            GameTooltip:AddLine("Right-click, Shift-click or x: leave out of this trade", 0.6, 0.8, 1)
             GameTooltip:Show()
         end)
         b:SetScript("OnLeave", GameTooltip_Hide)

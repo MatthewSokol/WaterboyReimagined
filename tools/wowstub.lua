@@ -151,3 +151,4 @@ GetCursorPosition = function() local c = STUB_CURSOR or { 0, 0 }; return c[1], c
 -- the player's cast: STUB_CAST = { name, endMS } while casting, nil otherwise
 UnitCastingInfo = function() if STUB_CAST then return STUB_CAST[1], "", 0, 0, STUB_CAST[2] end end
 GetCVar = function(name) return STUB_CVARS and STUB_CVARS[name] end
+IsShiftKeyDown = function() return STUB_SHIFT and true or false end

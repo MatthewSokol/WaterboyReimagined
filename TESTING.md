@@ -5,7 +5,7 @@ happens: each change gets its own group under 2.2 when the work starts, so you c
 release when it gets too long. Claude keeps it on the Waterboy Release Checklist page, where you tick rows and
 note problems. Every in-game action here is a click or key press of yours: nothing is automated.
 
-**Waiting since 1.0.0:** 12 changes, 34 rows (the page counts them for you).
+**Waiting since 1.0.0:** 13 changes, 38 rows (the page counts them for you).
 
 **Build under test:** `<commit>` (`<git describe>`), stamped `<date>`. A fix restamps it: untick stage 1, the
 smoke rows and every row the fix touches, and start again from stage 1.
@@ -208,6 +208,15 @@ friend or an alt on another account). Keep BugSack and Mechanic (`/mech`) enable
 
 </details>
 
+<details open>
+<summary><b>2.2.13 Trade panel: more ways to leave a slot out (#26)</b> · open PR</summary>
+
+- [ ] 2.2.13.1 With auto-fill off, on the trade panel: Shift-click a slot, and click another slot's **x**; both
+      are left out of this trade, a plain click does nothing, and the saved setting is unchanged
+- [ ] 2.2.13.2 Empty slots have no x, and the names still fit beside the x
+
+</details>
+
 ## 2.3 Core features (standing)
 
 <details open>
@@ -221,6 +230,8 @@ friend or an alt on another account). Keep BugSack and Mechanic (`/mech`) enable
 - [ ] 2.3.1.4 **Fill trades automatically** off (General tab, or `/wbr off`): a trade shows the panel beside the
       trade window instead; **Add to trade** fills it `[auto validated · journal: trade-panel]`
 - [ ] 2.3.1.5 On the panel, right-click a slot: it's left out of this trade only
+- [ ] 2.3.1.5.a Leave out, way 2: Shift-click a slot
+- [ ] 2.3.1.5.b Leave out, way 3: the slot's **x**
 - [ ] 2.3.1.6 **Edit setting** on the panel opens the config on that player or class
 - [ ] 2.3.1.7 On a non-mage character, a trade is left alone and `/wbr list` says settings still save
 
