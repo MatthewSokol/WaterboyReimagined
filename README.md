@@ -112,8 +112,9 @@ The same casts work without the panel: bind them under Key Bindings > AddOns > W
 (**Conjure now: Water**, ... **Conjure now: Mana Agate**), or put `/click WaterboyReimaginedManual1` in a macro
 (1 Water, 2 Water -1, 3 Food, 4 Food -1, 5 Mana Ruby, 6 Mana Citrine, 7 Mana Jade, 8 Mana Agate).
 
-**Making more than the loadout:** press the macro 3 more times once the loadout is complete (it counts `Keep pressing to
-override 1/3`, `2/3`) and it asks whether to keep making stuff in the same ratio:
+**Making more than the loadout:** click **Make extra** on the Loadouts tab, type `/wbr extra`, or press the macro 3
+more times once the loadout is complete (it counts `Keep pressing to override 1/3`, `2/3`) and pick Temporary. The
+first two switch Temporary on straight away. The 3-press prompt asks whether to keep making stuff in the same ratio:
 
 - **Cancel:** nothing changes.
 - **Temporary:** each press keeps conjuring extra rounds in the same ratio (loadout x2, then x3...). It stops
@@ -183,6 +184,7 @@ character and the mages on this account), **Trades** (below) and **Loadouts** (s
 | `/wbr on` / `off` | fill trades or not |
 | `/wbr macro` | put the Waterboy conjure macro on your cursor |
 | `/wbr loadout` | what the macro is aiming for right now |
+| `/wbr extra` | make extra past the loadout in the same ratio, until a minute without conjuring |
 | `/wbr minimap` | show or hide the minimap button |
 | `/wbr chat` | toggle chat messages: what each trade got, what the macro casts and makes (off by default) |
 | `/wbr debug` | toggle debug messages |
