@@ -20,7 +20,7 @@ A build is green when all three pass, with no code change in between:
 |---|---|---|
 | Offline | `node tools/verify.js --release` | Every line `ok` (the .toc's files, brackets, the smoke, migration and Mechanic tests in a Lua VM, the changelog entry, a clean `main`, a free tag) |
 | In game, the checklist | [TESTING.md](TESTING.md) on the Waterboy Release Checklist page | Every row ticked (auto validated rows by Claude once their proof passes) or overridden by you with a note, and no open problems |
-| In game, the gate | Exit the game after the checklist; Claude has `wow-env.js watch -- node tools/release-check.js` running | `GREEN`: results newer than the code, installed copy matches, all 7 self-tests pass, no failed test-journal entry for this build, no Waterboy Reimagined Lua errors in BugGrabber |
+| In game, the gate | Exit the game after the checklist; Claude has `wow-env.js watch -- node tools/release-check.js` running | `GREEN`: results newer than the code, installed copy matches, all 8 self-tests pass, no failed test-journal entry for this build, no Waterboy Reimagined Lua errors in BugGrabber |
 
 **Mechanic is a dev tool, never a dependency.** Players don't have it: `Mechanic.lua` returns at once without it,
 the `.toc` only lists it under `## OptionalDeps`, and CurseForge must not list it as a related project. Your own

@@ -95,7 +95,7 @@ friend or an alt on another account). Keep BugSack and Mechanic (`/mech`) enable
 <details open>
 <summary><b>2.2.1 Optional Mechanic support (#9)</b> · merged</summary>
 
-- [ ] 2.2.1.1 `/mech`, **Tests**, **Run all** shows 7 passing (a warning such as "no macro yet" is fine)
+- [ ] 2.2.1.1 `/mech`, **Tests**, **Run all** shows 8 passing (a warning such as "no macro yet" is fine)
 - [ ] 2.2.1.2 **Console** tab shows the addon's chat messages and debug lines from this session
 
 </details>
