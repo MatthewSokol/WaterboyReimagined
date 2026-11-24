@@ -531,6 +531,7 @@ local HELP = {
     "/wbr on | off - fill trades or not (now: %s)",
     "/wbr macro - put the Waterboy conjure macro on your cursor",
     "/wbr loadout - what the conjure macro is aiming for right now",
+    "/wbr extra - make extra past the loadout, same ratio, until a minute without conjuring",
     "/wbr minimap - show or hide the minimap button",
     "/wbr chat - toggle chat messages (what trades get, what the macro casts and makes)",
     "/wbr debug - toggle debug messages",
@@ -592,6 +593,8 @@ local function Slash(input)
     elseif cmd == "minimap" then
         ns.SetMinimapButtonShown(not ns.MinimapButtonShown())
         Print("Minimap button " .. (ns.MinimapButtonShown() and "shown" or "hidden") .. ".")
+    elseif cmd == "extra" then
+        if ns.StartExtra then ns.StartExtra() end
     elseif cmd == "chat" then
         db.chat = not db.chat
         Print("Chat messages " .. (db.chat and "on" or "off"))

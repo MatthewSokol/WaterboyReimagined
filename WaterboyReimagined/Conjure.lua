@@ -476,6 +476,18 @@ local function EditLoadout(group)
 end
 
 local prompt
+-- Switch "make extra" on: keep conjuring past the loadout in the same ratio until a minute without a conjure.
+-- Ways: the prompt's Temporary, the Make extra button (Loadouts tab), /wbr extra. Never casts by itself.
+function ns.StartExtra()
+    if not ns.IsMage() then ns.Print("Making extra only works on a mage."); return end
+    if extra then ns.Print("Already making extra (round " .. extra.rounds .. "). Press the macro to go on."); return end
+    SetExtra({ rounds = 1, last = GetTime() })
+    WatchExtraIdle()
+    ns.Print("Making extra in the same ratio until you go a minute without conjuring. Press the macro to go on.")
+    Update()
+    if ns.RefreshConfig then ns.RefreshConfig() end
+end
+
 local function ShowMorePrompt(group)
     if not prompt then
         prompt = ns.CreateWindow("WaterboyReimaginedMorePrompt", 380, 132, "Waterboy Reimagined")
@@ -510,11 +522,7 @@ local function ShowMorePrompt(group)
             return b
         end
         prompt.cancel = Button("Cancel", -120, function() end)
-        prompt.temp = Button("Temporary", 0, function()
-            SetExtra({ rounds = 1, last = GetTime() })
-            WatchExtraIdle()
-            ns.Print("Making extra in the same ratio until you go a minute without conjuring. Press the macro to go on.")
-        end, "Temporary", "Keep pressing the macro to make more rounds in the same ratio. Stops once you go a "
+        prompt.temp = Button("Temporary", 0, function() ns.StartExtra() end, "Temporary", "Keep pressing the macro to make more rounds in the same ratio. Stops once you go a "
             .. "minute without conjuring.")
         prompt.raise = Button("Update loadout", 120, EditLoadout, "Update loadout",
             "Opens the Loadouts tab on this character's profile. What you change there is permanent "
